@@ -1761,6 +1761,43 @@
       }
     }
 
+    function extractCleanAiResponse(text) {
+      if (!text) return '';
+      let clean = text.trim();
+
+      // 1. Look for quoted final reply if model wrapped it in quotes
+      const quoteMatches = clean.match(/"([^"]{100,})"/gs);
+      if (quoteMatches && quoteMatches.length > 0) {
+        clean = quoteMatches[quoteMatches.length - 1].replace(/^"|"$/g, '').trim();
+      }
+
+      // 2. If model left greeting halfway through reasoning, strip preceding scratchpad
+      const greetingPos = clean.search(/(Вітаю|Доброго дня|Привіт)[!.,\s]/i);
+      if (greetingPos > 20) {
+        clean = clean.substring(greetingPos).trim();
+      }
+
+      // 3. Remove leftover reasoning/prompt keywords line by line
+      const lines = clean.split('\n');
+      const filtered = lines.filter(l => {
+        const t = l.trim();
+        if (t.startsWith('* Role:') || t.startsWith('* Specialization:') ||
+            t.startsWith('* Services:') || t.startsWith('* Pricing:') ||
+            t.startsWith('* Contact:') || t.startsWith('* Constraint') ||
+            t.startsWith('* User\'s') || t.startsWith('* Question:') ||
+            t.startsWith('* Draft') || t.startsWith('* Refining') ||
+            t.startsWith('* Check Constraints') || t.startsWith('* Language: OK') ||
+            t.startsWith('* Structure:') || t.startsWith('* Content: OK') ||
+            t.startsWith('* Role: OK') || t.startsWith('* Option A') || t.startsWith('* Option B')) {
+          return false;
+        }
+        return true;
+      });
+
+      clean = filtered.join('\n').trim();
+      return clean || text;
+    }
+
     async function fetchGeminiAiResponse(userMessage) {
       const apiKey = localStorage.getItem('psy_gemini_key') || (window.siteAppData && window.siteAppData.geminiKey);
       if (!apiKey) {
@@ -1782,14 +1819,19 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
 3. Давати короткі практичні техніки підтримки за потреби (дихання, заземлення, тілесні вправи).
 4. Відповіді повинні бути лаконічними та структурованими (до 2-3 невеликих абзаців або маркованих пунктів), щоб їх було зручно читати у віджеті чату.
 5. Не ставити медичних діагнозів, не призначати ліків.
-6. Наприкінці м'яко запропонувати записатися на індивідуальну консультацію до Юлії.`;
+6. Наприкінці м'яко запропонувати записатися на індивідуальну консультацію до Юлії.
+
+КАТЕГОРИЧНІ ВИМОГИ ДО ФОРМАТУ ВІДПОВІДІ:
+- Пиши ТІЛЬКИ готове повідомлення для клієнта.
+- КАТЕГОРИЧНО ЗАБОРОНЕНО виводити технічні плани, чернетки (Draft), аналіз обмежень (Constraint) чи службові міркування.
+- Починай відповідь одразу зі слів "Вітаю!" або "Доброго дня!".`;
 
       // Try preferred model from discovery or cutting-edge 2026 flash models
       const cleanedApiKey = apiKey.trim().replace(/^['"]|['"]$/g, '');
       const savedModel = localStorage.getItem('psy_gemini_model');
       const models = savedModel ? [savedModel, 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemma-4-26b-a4b-it'] : ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemma-4-26b-a4b-it'];
       
-      const promptPayload = `${SYSTEM_PROMPT}\n\n---\nПитання відвідувача сайту:\n"${userMessage}"\n\nТвоя відповідь як AI-асистента Юлії Олефіренко (українською мовою, структуровано, емпатично):`;
+      const promptPayload = `${SYSTEM_PROMPT}\n\n---\nПитання відвідувача сайту:\n"${userMessage}"\n\nГотова відповідь для відвідувача (без службових думок):`;
 
       let lastErrorMsg = '';
 
@@ -1812,17 +1854,7 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
             const data = await res.json();
             const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
             if (generatedText) {
-              let cleanText = generatedText;
-              // Clean up internal chain-of-thought from open weights models if needed
-              if (cleanText.includes('Response:') || cleanText.includes('response:')) {
-                const parts = cleanText.split(/response:\s*/i);
-                cleanText = parts[parts.length - 1];
-              } else if (cleanText.includes('* Direct response:')) {
-                const parts = cleanText.split(/\*\s*Direct response:\s*/i);
-                cleanText = parts[parts.length - 1];
-              }
-              cleanText = cleanText.replace(/^["']|["']$/g, '').trim();
-
+              const cleanText = extractCleanAiResponse(generatedText);
               console.log(`✅ Gemini AI (${model}) successfully generated response`);
               localStorage.setItem('psy_gemini_model', model);
               return { text: cleanText, cta: true };
