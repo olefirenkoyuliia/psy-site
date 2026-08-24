@@ -1164,6 +1164,93 @@
     </a>
   </div>
 
+  <!-- AI Assistant Chat Widget (Floating Interactive Agent) -->
+  <div id="ai-chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    
+    <!-- Chat Window Container (Hidden by default) -->
+    <div id="ai-chat-window" class="hidden w-[360px] sm:w-[410px] max-w-[94vw] h-[530px] max-h-[82vh] bg-white rounded-3xl shadow-2xl border border-warm-border flex flex-col overflow-hidden mb-3 transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
+      
+      <!-- Chat Header -->
+      <div class="bg-brand-900 text-white p-4 flex items-center justify-between shadow-sm shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <span class="w-10 h-10 rounded-full bg-brand-800 border border-brand-700 flex items-center justify-center text-lg shadow-sm">
+              🌿
+            </span>
+            <span class="w-3 h-3 rounded-full bg-emerald-400 border-2 border-brand-900 absolute -bottom-0.5 -right-0.5"></span>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm leading-tight text-white">Асистент Юлії Олефіренко</h3>
+            <p class="text-[11px] text-brand-200">Психологічний гід онлайн</p>
+          </div>
+        </div>
+        <button onclick="toggleAiChat()" class="text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors text-lg" title="Згорнути чат">
+          ✕
+        </button>
+      </div>
+
+      <!-- Chat Messages Stream -->
+      <div id="ai-chat-messages" class="flex-grow p-4 overflow-y-auto space-y-3.5 bg-warm-bg/50 text-xs sm:text-sm">
+        
+        <!-- Welcome Message -->
+        <div class="flex items-start gap-2.5 max-w-[92%]">
+          <span class="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center text-sm shrink-0 mt-0.5">🌿</span>
+          <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-warm-border shadow-card text-warm-text leading-relaxed space-y-2">
+            <p class="font-semibold text-gray-900">Вітаю! 👋 Я AI-асистент психологині Юлії Олефіренко.</p>
+            <p class="text-warm-muted text-xs leading-normal">
+              Можу розповісти про методи терапії (символдрама, КПТ), допомогти розібратися з тривогою або зорієнтувати щодо цін і формату консультацій. Про що хотіли б дізнатися?
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Starter Chips -->
+        <div id="ai-starter-chips" class="flex flex-wrap gap-1.5 pt-1">
+          <button onclick="sendQuickPrompt('Як працює метод символдрами?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
+            🌿 Метод символдрами
+          </button>
+          <button onclick="sendQuickPrompt('Як впоратися з тривогою та напругою?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
+            💭 Як впоратися з тривогою?
+          </button>
+          <button onclick="sendQuickPrompt('Скільки коштує консультація та як проходить?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
+            💳 Формати та ціни
+          </button>
+          <button onclick="sendQuickPrompt('Як записатися на першу консультацію?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
+            📅 Як записатися?
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Typing Indicator -->
+      <div id="ai-typing-indicator" class="hidden px-4 py-2 bg-warm-bg/50 flex items-center gap-2 text-xs text-warm-muted shrink-0 border-t border-warm-border/30">
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-600 animate-bounce"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-600 animate-bounce" style="animation-delay: 0.2s"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-brand-600 animate-bounce" style="animation-delay: 0.4s"></span>
+        <span class="text-[11px] font-medium text-brand-700">Асистент формує відповідь...</span>
+      </div>
+
+      <!-- Chat Input Form -->
+      <form id="ai-chat-form" onsubmit="handleUserMessage(event)" class="p-3 bg-white border-t border-warm-border flex items-center gap-2 shrink-0">
+        <input type="text" id="ai-chat-input" placeholder="Задайте питання про психологію чи консультації..." autocomplete="off" class="flex-grow px-4 py-2.5 rounded-xl border border-warm-border text-xs sm:text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-warm-bg/30">
+        <button type="submit" class="w-10 h-10 rounded-xl bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center shadow-sm shrink-0 transition-transform active:scale-95">
+          ➔
+        </button>
+      </form>
+
+    </div>
+
+    <!-- Floating Toggle Button -->
+    <button onclick="toggleAiChat()" id="ai-chat-toggle-btn" class="group flex items-center gap-2.5 px-5 py-3.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-2xl border-2 border-white/80 hover:shadow-glow transition-all duration-300 transform hover:scale-105">
+      <span class="relative flex h-3 w-3">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
+      </span>
+      <span id="ai-toggle-icon" class="text-base">💬</span>
+      <span class="hidden sm:inline font-semibold">Задати питання асистенту</span>
+    </button>
+
+  </div>
+
   <!-- Fullscreen Lightbox Modal for Diplomas -->
   <div id="lightbox" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4 transition-all duration-300" onclick="closeLightbox(event)">
     <div class="relative max-w-4xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
@@ -1489,6 +1576,190 @@
         console.log('Analytics initialized');
       }
     })();
+
+    // 10. AI Chatbot Dialogue Engine
+    let isAiChatOpen = false;
+
+    function toggleAiChat() {
+      const windowEl = document.getElementById('ai-chat-window');
+      const toggleIcon = document.getElementById('ai-toggle-icon');
+      isAiChatOpen = !isAiChatOpen;
+
+      if (isAiChatOpen) {
+        windowEl.classList.remove('hidden');
+        setTimeout(() => {
+          windowEl.classList.remove('scale-95', 'opacity-0');
+          windowEl.classList.add('scale-100', 'opacity-100');
+          document.getElementById('ai-chat-input').focus();
+        }, 10);
+        toggleIcon.textContent = '✕';
+      } else {
+        windowEl.classList.remove('scale-100', 'opacity-100');
+        windowEl.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          windowEl.classList.add('hidden');
+        }, 200);
+        toggleIcon.textContent = '💬';
+      }
+    }
+
+    function sendQuickPrompt(promptText) {
+      document.getElementById('ai-chat-input').value = promptText;
+      const form = document.getElementById('ai-chat-form');
+      form.dispatchEvent(new Event('submit', { cancelable: true }));
+    }
+
+    function handleUserMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('ai-chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      // 1. Render User Message
+      appendChatMessage('user', text);
+      input.value = '';
+
+      // Hide starter chips after first message
+      const chips = document.getElementById('ai-starter-chips');
+      if (chips) chips.classList.add('hidden');
+
+      // 2. Show Typing Indicator
+      const indicator = document.getElementById('ai-typing-indicator');
+      indicator.classList.remove('hidden');
+      scrollChatToBottom();
+
+      // 3. Process AI Response
+      setTimeout(() => {
+        indicator.classList.add('hidden');
+        const reply = generateAiPsychologistResponse(text);
+        appendChatMessage('bot', reply.text, reply.cta);
+        scrollChatToBottom();
+      }, 600);
+    }
+
+    function appendChatMessage(sender, text, cta) {
+      const container = document.getElementById('ai-chat-messages');
+      const msgDiv = document.createElement('div');
+
+      if (sender === 'user') {
+        msgDiv.className = 'flex items-end justify-end gap-2 ml-auto max-w-[85%]';
+        msgDiv.innerHTML = `
+          <div class="bg-brand-600 text-white p-3 rounded-2xl rounded-br-none shadow-sm text-xs sm:text-sm leading-relaxed">
+            ${escapeHtml(text)}
+          </div>
+        `;
+      } else {
+        msgDiv.className = 'flex items-start gap-2.5 max-w-[92%]';
+        let formattedText = formatMarkdown(text);
+        let ctaHtml = '';
+        if (cta) {
+          ctaHtml = `
+            <div class="pt-2 border-t border-gray-100">
+              <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition-all hover:scale-105">
+                <span>💬 Записатися до Юлії в Telegram</span>
+              </a>
+            </div>
+          `;
+        }
+        msgDiv.innerHTML = `
+          <span class="w-7 h-7 rounded-full bg-brand-100 flex items-center justify-center text-sm shrink-0 mt-0.5">🌿</span>
+          <div class="bg-white p-3.5 rounded-2xl rounded-tl-none border border-warm-border shadow-card text-warm-text leading-relaxed space-y-2 text-xs sm:text-sm">
+            <div>${formattedText}</div>
+            ${ctaHtml}
+          </div>
+        `;
+      }
+
+      container.appendChild(msgDiv);
+    }
+
+    function scrollChatToBottom() {
+      const container = document.getElementById('ai-chat-messages');
+      setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+      }, 50);
+    }
+
+    function escapeHtml(string) {
+      const el = document.createElement('div');
+      el.innerText = string;
+      return el.innerHTML;
+    }
+
+    function formatMarkdown(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>')
+        .replace(/• (.*?)(<br>|$)/g, '<div class="flex items-start gap-1.5 py-0.5"><span class="text-brand-600 font-bold">•</span><span>$1</span></div>');
+    }
+
+    // AI Knowledge Base & Semantic Response Generator
+    function generateAiPsychologistResponse(input) {
+      const q = input.toLowerCase();
+
+      // 1. Символдрама / Метод роботи
+      if (q.includes('символдрам') || q.includes('метод') || q.includes('образ') || q.includes('підхід') || q.includes('як працює')) {
+        return {
+          text: `**Символдрама (кататимно-імагінативна психотерапія)** — це глибокий та безпечний науковий метод роботи з підсвідомістю через образи та фантазію. ✨\n\n**Як проходить робота:**\n• У розслабленому стані Юлія пропонує уявити певний мотив (наприклад, галявину, струмок чи стежку в лісі).\n• Через цей образ м'яко вивільняються пригнічені емоції, внутрішні конфлікти та віднаходиться ресурс.\n• Жодного тиску чи болісного перепроживання травм — процес відбувається дбайливо та в комфортному для вас темпі.`,
+          cta: true
+        };
+      }
+
+      // 2. Тривога / Паніка / Страх / Стрес / Напруга
+      if (q.includes('тривог') || q.includes('панік') || q.includes('страх') || q.includes('стрес') || q.includes('напруг') || q.includes('боюсь')) {
+        return {
+          text: `Тривога — це природна реакція нервової системи на перевантаження або невизначеність. 🤍\n\n**🌿 Швидка практика самопідтримки просто зараз:**\n1. **Заземлення 5-4-3-2-1:** знайдіть очима 3 предмети навколо себе, відчуйте стопами міцну підлогу під ногами.\n2. **Дихання 4–6:** зробіть плавний вдих носом на 4 рахунки і довший видих ротом на 6 рахунків.\n\nНа консультаціях Юлія допомагає виявити першопричину тривоги, розірвати коло катастрофічних думок та повернути відчуття опори на себе.`,
+          cta: true
+        };
+      }
+
+      // 3. Самооцінка / Невпевненість / Провина / Критик / Синдром самозванця
+      if (q.includes('самооцінк') || q.includes('критик') || q.includes('провин') || q.includes('невпевнен') || q.includes('самозван') || q.includes('не вірю в себе')) {
+        return {
+          text: `Внутрішній голос самокритики часто формується з дитинства і з часом починає забирати радість від життя. 💫\n\n**У терапії з Юлією ви навчитеся:**\n• Розрізняти свої справжні бажання та нав'язані очікування.\n• Відпускати токсичне почуття провини та сорому.\n• Спиратися на свої сильні сторони та дозволити собі бути справжніми.\n\nЦе шлях від боротьби з собою до щирої турботи та самоповаги.`,
+          cta: true
+        };
+      }
+
+      // 4. Ціни / Вартість / Скільки коштує / Оплата / Формат
+      if (q.includes('цін') || q.includes('кошту') || q.includes('вартість') || q.includes('оплат') || q.includes('грош') || q.includes('тривал') || q.includes('формат')) {
+        return {
+          text: `**Умови та формати консультацій:**\n\n• **Перша зустріч:** 1 000 грн (знайомство, формування запиту, первинна діагностика).\n• **Подальші сесії:** 1 200 грн.\n• **Тривалість:** 50 хвилин.\n• **Формат:** Онлайн по відеозв'язку (Google Meet / Zoom).\n• **Оплата:** Офіційно за реквізитами ФОП (ПриватБанк).\n\nПовна конфіденційність та безпечна атмосфера гарантовані.`,
+          cta: true
+        };
+      }
+
+      // 5. Стосунки / Кордони / Сказати ні / Партнер / Розрив / Конфлікти
+      if (q.includes('стосунк') || q.includes('кордон') || q.includes('сказати ні') || q.includes('партнер') || q.includes('розрив') || q.includes('конфлікт') || q.includes('самотн')) {
+        return {
+          text: `Труднощі у стосунках та страх відстоювати кордони найчастіше пов'язані зі страхом бути відкинутими або покинутими. 💛\n\n**У терапії ми розбираємо:**\n• Як навчитися говорити «ні» спокійно, без провини та агресії.\n• Як будувати зрілі та безпечні партнерські стосунки.\n• Як зберегти власну індивідуальність поруч з іншою людиною.`,
+          cta: true
+        };
+      }
+
+      // 6. Вигорання / Втома / Апатія / Немає сил / Депресивний стан
+      if (q.includes('вигоран') || q.includes('втом') || q.includes('апаті') || q.includes('немає сил') || q.includes('виснаж') || q.includes('нічого не хочу')) {
+        return {
+          text: `Емоційне вигорання — це не слабкість і не лінь, а сигнал про те, що ваша внутрішня батарейка повністю розряджена. 🔋\n\nПерший крок — перестати вимагати від себе надрезультатів і дати собі право на повільність. На сесіях Юлія допомагає виявити витоки енергії, налагодити здоровий баланс і повернути смак до життя.`,
+          cta: true
+        };
+      }
+
+      // 7. Як записатися / Контакти / Telegram / Запис
+      if (q.includes('запис') || q.includes('контакт') || q.includes('телеграм') || q.includes('написати') || q.includes('як почати')) {
+        return {
+          text: `Записатися на консультацію можна напряму в Telegram Юлії! 📅\n\nВи зможете описати кілька слів про свій запит та підібрати найзручніший для вас день та час для відеодзвінка.`,
+          cta: true
+        };
+      }
+
+      // 8. Default supportive response
+      return {
+        text: `Дякую за ваше запитання! Кожна життєва ситуація унікальна, і найкращий спосіб дбайливо розібратися у ній — це індивідуальна розмова з психологинею. 🌿\n\nЮлія консультує онлайн за методом символдрами та КПТ. Ви можете коротко описати своє запитання або обрати зручний час на консультацію:`,
+        cta: true
+      };
+    }
   </script>
 
 </body>
