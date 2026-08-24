@@ -871,6 +871,14 @@
         paymentDetails: document.getElementById('field-payment').value
       };
 
+      // Sync Gemini AI Key & Model
+      const geminiInput = document.getElementById('gemini-token-input');
+      if (geminiInput && geminiInput.value.trim()) {
+        appData.geminiKey = geminiInput.value.trim().replace(/^['"]|['"]$/g, '');
+        const savedModel = localStorage.getItem('psy_gemini_model');
+        if (savedModel) appData.geminiModel = savedModel;
+      }
+
       // Save locally
       localStorage.setItem('psy_site_data', JSON.stringify(appData));
       if (pendingAudioBase64) {
