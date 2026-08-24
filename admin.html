@@ -935,7 +935,10 @@
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      if (!putRes.ok) throw new Error('Не вдалося оновити ' + path);
+      if (!putRes.ok) {
+        const errJson = await putRes.json().catch(() => ({}));
+        throw new Error(errJson.message || ('HTTP ' + putRes.status));
+      }
     }
 
     // GitHub API Push for Binary Audio/Image
