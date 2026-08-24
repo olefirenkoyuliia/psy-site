@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Вхід до адмін-панелі — Юлія Олефіренко</title>
+  <title>Адмін-панель — Юлія Олефіренко</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
 
   <!-- Google Fonts -->
@@ -125,7 +125,7 @@
           </span>
         </div>
         <p class="text-xs text-gray-600 leading-relaxed">
-          Введіть ваш <strong>GitHub Personal Access Token</strong>, щоб усі зміни та нові фотографії сертифікатів публікувалися на сайті в 1 клік:
+          Введіть ваш <strong>GitHub Personal Access Token</strong>, щоб усі зміни, нові сертифікати та аудіозаписи публікувалися на сайті в 1 клік:
         </p>
         <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
           <input type="password" id="github-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="flex-grow px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
@@ -188,7 +188,43 @@
         </div>
       </div>
 
-      <!-- Section 2: Pricing & Session formats -->
+      <!-- Section 2: Audio Voice Message Manager (Завантаження аудіо) -->
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+        <div class="border-b border-gray-100 pb-4 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">🎙️</span>
+            <h2 class="font-bold text-gray-900 text-base sm:text-lg">Голосове привітання (Аудіозапис)</h2>
+          </div>
+          <span id="audio-status-badge" class="text-xs px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 border border-brand-200 font-medium">
+            Аудіоплеєр активний
+          </span>
+        </div>
+
+        <p class="text-xs text-gray-600 leading-relaxed">
+          Завантажте голосовий запис знайомства для плеєра на першому екрані сайту. Підтримуються формати <strong>.mp3, .m4a, .wav, .ogg</strong>:
+        </p>
+
+        <!-- Audio Upload Form & Player Preview -->
+        <div class="p-5 rounded-2xl bg-gray-50 border border-gray-200 space-y-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="space-y-1.5 flex-grow">
+              <label class="text-xs font-bold text-gray-700">Виберіть аудіофайл на пристрої:</label>
+              <input type="file" id="audio-upload-input" accept="audio/*" onchange="handleAudioSelected(event)" class="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
+            </div>
+          </div>
+
+          <!-- In-Admin Audio Player Preview -->
+          <div class="pt-3 border-t border-gray-200/80 space-y-2">
+            <label class="text-xs font-bold text-gray-700">Попереднє прослуховування:</label>
+            <audio id="admin-audio-preview" controls class="w-full h-10 rounded-xl outline-none" src="audio/greeting.mp3"></audio>
+            <p id="audio-file-info" class="text-[11px] text-gray-500 font-medium">
+              Файл за замовчуванням: <code>audio/greeting.mp3</code>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Pricing & Session formats -->
       <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
         <div class="border-b border-gray-100 pb-4 flex items-center gap-2.5">
           <span class="text-xl">💳</span>
@@ -218,7 +254,7 @@
         </div>
       </div>
 
-      <!-- Section 3: Certificates Manager -->
+      <!-- Section 4: Certificates Manager -->
       <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
         <div class="border-b border-gray-100 pb-4 flex items-center justify-between">
           <div class="flex items-center gap-2.5">
@@ -236,7 +272,7 @@
         </div>
       </div>
 
-      <!-- Section 4: Security & Password Settings -->
+      <!-- Section 5: Security & Password Settings -->
       <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-5">
         <div class="border-b border-gray-100 pb-4 flex items-center gap-2.5">
           <span class="text-xl">🔐</span>
@@ -305,10 +341,13 @@
   <!-- Admin Logic Script -->
   <script>
     let appData = {};
+    let pendingAudioFile = null;
+    let pendingAudioBase64 = null;
+
     const REPO_OWNER = 'olefirenkoyuliia';
     const REPO_NAME = 'psy-site';
 
-    // Default credentials (can be changed anytime)
+    // Default credentials
     const DEFAULT_USER = 'admin';
     const DEFAULT_PASS = 'yuliia2026';
 
@@ -372,7 +411,31 @@
       showToast('Пароль успішно змінено!');
     }
 
-    // 2. Load Data on Startup
+    // 2. Audio File Handler
+    function handleAudioSelected(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      pendingAudioFile = file;
+      const preview = document.getElementById('admin-audio-preview');
+      const info = document.getElementById('audio-file-info');
+      const badge = document.getElementById('audio-status-badge');
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        pendingAudioBase64 = evt.target.result;
+        preview.src = pendingAudioBase64;
+        preview.load();
+        
+        info.innerHTML = `Обрано новий файл: <strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        badge.className = 'text-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium';
+        badge.textContent = '⏳ Готовий до збереження';
+        showToast('Аудіо завантажено в плеєр! Натисніть Зберегти');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 3. Load Data on Startup
     document.addEventListener('DOMContentLoaded', () => {
       checkAuthSession();
     });
@@ -391,6 +454,12 @@
       }
       populateForm();
       renderAdminCertificates();
+
+      // Check local audio override
+      const savedAudio = localStorage.getItem('psy_site_audio');
+      if (savedAudio) {
+        document.getElementById('admin-audio-preview').src = savedAudio;
+      }
     }
 
     function populateForm() {
@@ -513,66 +582,84 @@
 
       // Save locally
       localStorage.setItem('psy_site_data', JSON.stringify(appData));
+      if (pendingAudioBase64) {
+        localStorage.setItem('psy_site_audio', pendingAudioBase64);
+      }
 
       // Check if GitHub token is present to push live
       const token = localStorage.getItem('psy_github_token');
       if (token) {
         try {
-          await pushDataToGithub(token, appData);
-          showToast('Зміни збережено та опубліковано на сайт!');
+          // 1. Push data.json
+          await pushDataToGithub(token, 'data.json', JSON.stringify(appData, null, 2), 'Update website data via admin');
+
+          // 2. If new audio selected, push audio/greeting.mp3
+          if (pendingAudioBase64) {
+            const rawBase64 = pendingAudioBase64.split(',')[1];
+            await pushBinaryToGithub(token, 'audio/greeting.mp3', rawBase64, 'Update greeting.mp3 via admin');
+            document.getElementById('audio-status-badge').className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
+            document.getElementById('audio-status-badge').textContent = '✅ Аудіо збережено';
+            pendingAudioBase64 = null;
+          }
+
+          showToast('Зміни та аудіо збережено на GitHub!');
         } catch (err) {
           console.error('GitHub Push failed:', err);
           showToast('Збережено локально. Помилка GitHub: ' + err.message, '⚠️');
         }
       } else {
-        showToast('Збережено локально (для публікації введіть GitHub токен)');
+        showToast('Збережено в браузері (для сайту введіть GitHub токен)');
       }
 
       saveBtn.disabled = false;
       saveBtn.innerHTML = '<span>💾 Зберегти</span>';
     }
 
-    // GitHub API Push
-    async function pushDataToGithub(token, data) {
-      const path = 'data.json';
+    // GitHub API Push for Text/JSON
+    async function pushDataToGithub(token, path, contentStr, commitMsg) {
       const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`;
-
-      // Get current SHA
       let sha = null;
       try {
-        const getRes = await fetch(url, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         if (getRes.ok) {
           const fileData = await getRes.json();
           sha = fileData.sha;
         }
       } catch (e) {}
 
-      // UTF-8 base64 encoding
-      const jsonStr = JSON.stringify(data, null, 2);
-      const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
-
-      const body = {
-        message: 'Update website content via admin panel',
-        content: encoded,
-        branch: 'main'
-      };
+      const encoded = btoa(unescape(encodeURIComponent(contentStr)));
+      const body = { message: commitMsg, content: encoded, branch: 'main' };
       if (sha) body.sha = sha;
 
       const putRes = await fetch(url, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
+      if (!putRes.ok) throw new Error('Не вдалося оновити ' + path);
+    }
 
-      if (!putRes.ok) {
-        const errJson = await putRes.json();
-        throw new Error(errJson.message || 'Не вдалося оновити файл');
-      }
+    // GitHub API Push for Binary Audio/Image
+    async function pushBinaryToGithub(token, path, base64Content, commitMsg) {
+      const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`;
+      let sha = null;
+      try {
+        const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (getRes.ok) {
+          const fileData = await getRes.json();
+          sha = fileData.sha;
+        }
+      } catch (e) {}
+
+      const body = { message: commitMsg, content: base64Content, branch: 'main' };
+      if (sha) body.sha = sha;
+
+      const putRes = await fetch(url, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!putRes.ok) throw new Error('Не вдалося завантажити файл ' + path);
     }
 
     // GitHub Token Storage

@@ -1293,6 +1293,13 @@
             });
           }
         }
+        // Sync Audio Source if uploaded locally or from admin
+        const localAudio = localStorage.getItem('psy_site_audio');
+        const audioEl = document.getElementById('greeting-audio');
+        if (localAudio && audioEl) {
+          audioEl.src = localAudio;
+          audioEl.load();
+        }
       } catch (err) {
         console.log('Using default static content:', err);
       }
