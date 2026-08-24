@@ -1698,6 +1698,8 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
       
       const promptPayload = `${SYSTEM_PROMPT}\n\n---\nПитання відвідувача сайту:\n"${userMessage}"\n\nТвоя відповідь як AI-асистента Юлії Олефіренко (українською мовою, структуровано, емпатично):`;
 
+      let lastErrorMsg = '';
+
       for (const model of models) {
         try {
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${cleanedApiKey}`;
@@ -1722,14 +1724,23 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
             }
           } else {
             const errData = await res.json().catch(() => ({}));
+            lastErrorMsg = errData.error?.message || `HTTP ${res.status}`;
             console.warn(`⚠️ Gemini API error with ${model} (HTTP ${res.status}):`, errData);
           }
         } catch (err) {
+          lastErrorMsg = err.message;
           console.warn(`⚠️ Gemini network error with ${model}:`, err);
         }
       }
 
-      console.warn('Falling back to local psychological engine');
+      // If an explicit API key was provided by user, report the exact Google error:
+      if (apiKey && lastErrorMsg) {
+        return {
+          text: `⚠️ **Помилка відповіді від Google Gemini API:**\n_${lastErrorMsg}_\n\nБудь ласка, перевірте ваш ключ на [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey).`,
+          cta: false
+        };
+      }
+
       return generateAiPsychologistResponse(userMessage);
     }
 
