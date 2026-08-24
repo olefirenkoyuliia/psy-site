@@ -1784,10 +1784,10 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
 5. Не ставити медичних діагнозів, не призначати ліків.
 6. Наприкінці м'яко запропонувати записатися на індивідуальну консультацію до Юлії.`;
 
-      // Try preferred model from discovery or fallback list
+      // Try preferred model from discovery or cutting-edge 2026 flash models
       const cleanedApiKey = apiKey.trim().replace(/^['"]|['"]$/g, '');
       const savedModel = localStorage.getItem('psy_gemini_model');
-      const models = savedModel ? [savedModel, 'gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-pro'] : ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-pro', 'gemini-1.5-flash'];
+      const models = savedModel ? [savedModel, 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemma-4-26b-a4b-it'] : ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemma-4-26b-a4b-it'];
       
       const promptPayload = `${SYSTEM_PROMPT}\n\n---\nПитання відвідувача сайту:\n"${userMessage}"\n\nТвоя відповідь як AI-асистента Юлії Олефіренко (українською мовою, структуровано, емпатично):`;
 

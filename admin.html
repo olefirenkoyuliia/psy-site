@@ -1059,14 +1059,14 @@
           addDebugLog(`⚠️ У вашому проекті немає доступних моделей для generateContent.`, 'warn');
         }
 
-        // Step 2: Try actual generation
+        // Step 2: Try actual generation with cutting-edge 2026 models
         addDebugLog(`[Крок 3/3] Тестова генерація повідомлення через найшвидшу модель...`, 'step');
-        const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-pro', ...genModelNames];
+        const candidateModels = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite', 'gemma-4-26b-a4b-it', ...genModelNames];
         let verifiedModel = null;
         let sampleReply = '';
 
         for (const m of candidateModels) {
-          if (!genModelNames.includes(m) && genModelNames.length > 0 && !m.includes('flash')) continue;
+          if (!genModelNames.includes(m) && genModelNames.length > 0) continue;
           try {
             addDebugLog(`  Спроба відправки запиту на модель: ${m}...`, 'info');
             const genRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`, {
