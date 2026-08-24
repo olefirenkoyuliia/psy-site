@@ -1619,6 +1619,16 @@
       const text = input.value.trim();
       if (!text) return;
 
+      // Direct In-Chat Key Activation
+      if (text.startsWith('AIzaSy') || text.toLowerCase().startsWith('key aiza') || text.toLowerCase().startsWith('ключ aiza')) {
+        const cleanedKey = text.replace(/^(key|ключ)\s+/i, '').trim();
+        localStorage.setItem('psy_gemini_key', cleanedKey);
+        updateAiChatBadge();
+        input.value = '';
+        appendChatMessage('bot', '⚡ **Google Gemini AI успішно підключено та активовано!**\n\nТепер я працюю як жива мисляча нейромережа. Спробуйте задати будь-яке запитання або описати свій сон!');
+        return;
+      }
+
       // 1. Render User Message
       appendChatMessage('user', text);
       input.value = '';
