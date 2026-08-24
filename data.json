@@ -16,7 +16,7 @@
     "duration": "50 хвилин",
     "paymentDetails": "Оплата здійснюється на розрахунковий рахунок ФОП (ПриватБанк)"
   },
-  "geminiKey": "QVEuQWI4Uk42S0tqT0VCdnBWc2VZRXRXeGF1TFJUaFpLMzNzZW5FdkRPZm1VZjdqTkNpV2c=",
+  "geminiKey": "QVEuQWI4Uk42S0tqT0VCdnBWc2VZRXRXeGF1TFJUaFpLMjNzZW5FdkRPZm1VZjdqTkNpV2c=",
   "geminiModel": "gemini-3.6-flash",
   "certificates": [
     {
