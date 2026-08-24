@@ -1181,7 +1181,7 @@
           </div>
           <div>
             <h3 class="font-bold text-sm leading-tight text-white">Асистент Юлії Олефіренко</h3>
-            <p class="text-[11px] text-brand-200">Психологічний гід онлайн</p>
+            <p id="ai-chat-status-subtitle" class="text-[11px] text-brand-200">Психологічний гід онлайн</p>
           </div>
         </div>
         <button onclick="toggleAiChat()" class="text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors text-lg" title="Згорнути чат">
@@ -1657,7 +1657,7 @@
 
     function updateAiChatBadge() {
       const apiKey = localStorage.getItem('psy_gemini_key') || (window.siteAppData && window.siteAppData.geminiKey);
-      const subtitle = document.querySelector('#ai-chat-window p');
+      const subtitle = document.getElementById('ai-chat-status-subtitle') || document.querySelector('#ai-chat-window p');
       if (subtitle) {
         if (apiKey) {
           subtitle.textContent = '⚡ Нейромережа Gemini AI активна';
