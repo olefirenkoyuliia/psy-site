@@ -91,7 +91,7 @@
           </span>
           <div>
             <h1 class="font-bold text-gray-900 text-sm sm:text-base">Панель керування сайтом</h1>
-            <p class="text-[11px] text-gray-500">Юлія Олефіренко • Редагування контенту</p>
+            <p class="text-[11px] text-gray-500">Юлія Олефіренко • Статистика & Редагування</p>
           </div>
         </div>
 
@@ -112,6 +112,131 @@
 
     <!-- Main Container -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+      <!-- SECTION: Live Analytics & Visitors Statistics -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
+        <div class="border-b border-gray-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">📊</span>
+            <div>
+              <h2 class="font-bold text-gray-900 text-base sm:text-lg">Статистика відвідувань та Конверсії</h2>
+              <p class="text-xs text-gray-500">Аналітика переходів, реальні люди vs боти, ліди в Telegram</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="refreshAnalytics()" class="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-colors flex items-center gap-1">
+              <span>🔄 Оновити</span>
+            </button>
+            <button onclick="clearAnalytics()" class="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-500 text-xs font-semibold transition-colors" title="Скинути дані">
+              Очистити
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 KPI Metrics Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Metric 1: Real Humans -->
+          <div class="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-800">Люди (Сьогодні)</span>
+              <span class="text-base">👤</span>
+            </div>
+            <div class="text-3xl font-extrabold text-emerald-900" id="stat-humans">0</div>
+            <p class="text-[11px] text-emerald-700 font-medium">Реальні відвідувачі</p>
+          </div>
+
+          <!-- Metric 2: Search Bots -->
+          <div class="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-800">Боти & Сканери</span>
+              <span class="text-base">🤖</span>
+            </div>
+            <div class="text-3xl font-extrabold text-amber-900" id="stat-bots">0</div>
+            <p class="text-[11px] text-amber-700 font-medium">Googlebot, роботи тощо</p>
+          </div>
+
+          <!-- Metric 3: Telegram Leads -->
+          <div class="p-5 rounded-2xl bg-sky-50/60 border border-sky-200/80 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-sky-800">Кліки в Telegram</span>
+              <span class="text-base">💬</span>
+            </div>
+            <div class="text-3xl font-extrabold text-sky-900" id="stat-tg">0</div>
+            <p class="text-[11px] text-sky-700 font-medium">Переходи на запис</p>
+          </div>
+
+          <!-- Metric 4: Conversion Rate -->
+          <div class="p-5 rounded-2xl bg-purple-50/60 border border-purple-200/80 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-purple-800">Конверсія сайту</span>
+              <span class="text-base">🎯</span>
+            </div>
+            <div class="text-3xl font-extrabold text-purple-900" id="stat-conversion">0%</div>
+            <p class="text-[11px] text-purple-700 font-medium">Кліки / Відвідувачі</p>
+          </div>
+
+        </div>
+
+        <!-- Breakdown: Sources & Devices -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+          
+          <!-- Sources Breakdown -->
+          <div class="p-5 rounded-2xl bg-gray-50 border border-gray-200 space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center justify-between">
+              <span>Звідки прийшли відвідувачі</span>
+              <span>Джерело</span>
+            </h3>
+            <div class="space-y-2.5" id="stat-sources-list">
+              <div class="flex items-center justify-between text-xs text-gray-600">
+                <span>Прямі переходи (Direct)</span>
+                <span class="font-bold text-gray-800">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Devices Breakdown -->
+          <div class="p-5 rounded-2xl bg-gray-50 border border-gray-200 space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center justify-between">
+              <span>Типи пристроїв</span>
+              <span>Пристрій</span>
+            </h3>
+            <div class="space-y-2.5" id="stat-devices-list">
+              <div class="flex items-center justify-between text-xs text-gray-600">
+                <span>Мобільні (iPhone / Android)</span>
+                <span class="font-bold text-gray-800">0</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Live Activity Log Table -->
+        <div class="space-y-3 pt-2">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">
+            Журнал останніх відвідувань (Live):
+          </h3>
+          <div class="border border-gray-200 rounded-2xl overflow-hidden overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-gray-100/70 border-b border-gray-200 text-gray-600 font-bold uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3 px-4">Час</th>
+                  <th class="py-3 px-4">Тип</th>
+                  <th class="py-3 px-4">Джерело</th>
+                  <th class="py-3 px-4">Пристрій</th>
+                  <th class="py-3 px-4 text-right">Подія</th>
+                </tr>
+              </thead>
+              <tbody id="stat-events-table" class="divide-y divide-gray-100 bg-white">
+                <tr>
+                  <td colspan="5" class="py-6 text-center text-gray-400">Поки немає зареєстрованих відвідувань</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
 
       <!-- GitHub Integration Banner -->
       <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-3">
@@ -393,6 +518,7 @@
       document.getElementById('admin-dashboard').classList.remove('hidden');
       checkGithubToken();
       loadData();
+      renderAnalytics();
     }
 
     function showLoginScreen() {
@@ -435,7 +561,126 @@
       reader.readAsDataURL(file);
     }
 
-    // 3. Load Data on Startup
+    // 3. Analytics Dashboard Render
+    function renderAnalytics() {
+      const raw = localStorage.getItem('psy_analytics_stats');
+      const stats = raw ? JSON.parse(raw) : { views: 0, humans: 0, bots: 0, tgClicks: 0, events: [] };
+
+      const humans = stats.humans || 0;
+      const bots = stats.bots || 0;
+      const tg = stats.tgClicks || 0;
+      const totalVisits = humans + bots;
+      const convRate = humans > 0 ? ((tg / humans) * 100).toFixed(1) : '0';
+
+      document.getElementById('stat-humans').textContent = humans;
+      document.getElementById('stat-bots').textContent = bots;
+      document.getElementById('stat-tg').textContent = tg;
+      document.getElementById('stat-conversion').textContent = convRate + '%';
+
+      // Aggregate Sources
+      const sourcesMap = {};
+      const devicesMap = {};
+      const events = stats.events || [];
+
+      events.forEach(ev => {
+        if (ev.type === 'human') {
+          sourcesMap[ev.source] = (sourcesMap[ev.source] || 0) + 1;
+          devicesMap[ev.device] = (devicesMap[ev.device] || 0) + 1;
+        }
+      });
+
+      // Render Sources List
+      const sourcesContainer = document.getElementById('stat-sources-list');
+      sourcesContainer.innerHTML = '';
+      const sourceKeys = Object.keys(sourcesMap);
+      if (sourceKeys.length === 0) {
+        sourcesContainer.innerHTML = '<p class="text-xs text-gray-400 py-2">Немає переходів від реальних людей</p>';
+      } else {
+        sourceKeys.sort((a,b) => sourcesMap[b] - sourcesMap[a]).forEach(src => {
+          const count = sourcesMap[src];
+          const pct = Math.round((count / (humans || 1)) * 100);
+          const el = document.createElement('div');
+          el.className = 'space-y-1';
+          el.innerHTML = `
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-medium text-gray-700">${src}</span>
+              <span class="font-bold text-gray-900">${count} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-brand-600 h-full rounded-full" style="width: ${pct}%"></div>
+            </div>
+          `;
+          sourcesContainer.appendChild(el);
+        });
+      }
+
+      // Render Devices List
+      const devicesContainer = document.getElementById('stat-devices-list');
+      devicesContainer.innerHTML = '';
+      const deviceKeys = Object.keys(devicesMap);
+      if (deviceKeys.length === 0) {
+        devicesContainer.innerHTML = '<p class="text-xs text-gray-400 py-2">Немає даних про пристрої</p>';
+      } else {
+        deviceKeys.sort((a,b) => devicesMap[b] - devicesMap[a]).forEach(dev => {
+          const count = devicesMap[dev];
+          const pct = Math.round((count / (humans || 1)) * 100);
+          const el = document.createElement('div');
+          el.className = 'space-y-1';
+          el.innerHTML = `
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-medium text-gray-700">${dev}</span>
+              <span class="font-bold text-gray-900">${count} (${pct}%)</span>
+            </div>
+            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-purple-600 h-full rounded-full" style="width: ${pct}%"></div>
+            </div>
+          `;
+          devicesContainer.appendChild(el);
+        });
+      }
+
+      // Render Live Events Table
+      const table = document.getElementById('stat-events-table');
+      table.innerHTML = '';
+      if (events.length === 0) {
+        table.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-gray-400">Поки немає подій у журналі</td></tr>';
+      } else {
+        events.slice(0, 30).forEach(ev => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-gray-50/80 transition-colors';
+          const isBot = ev.type === 'bot';
+          tr.innerHTML = `
+            <td class="py-3 px-4 font-medium text-gray-500">${ev.time || '--:--'}</td>
+            <td class="py-3 px-4">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${isBot ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                ${isBot ? '🤖 Бот / Робот' : '👤 Людина'}
+              </span>
+            </td>
+            <td class="py-3 px-4 font-semibold text-gray-800">${ev.source}</td>
+            <td class="py-3 px-4 text-gray-600">${ev.device}</td>
+            <td class="py-3 px-4 text-right font-bold ${ev.action.includes('Telegram') ? 'text-sky-600' : 'text-gray-700'}">
+              ${ev.action}
+            </td>
+          `;
+          table.appendChild(tr);
+        });
+      }
+    }
+
+    function refreshAnalytics() {
+      renderAnalytics();
+      showToast('Дані аналітики оновлено!');
+    }
+
+    function clearAnalytics() {
+      if (confirm('Ви дійсно хочете очистити історію відвідувань?')) {
+        localStorage.removeItem('psy_analytics_stats');
+        renderAnalytics();
+        showToast('Історію очищено');
+      }
+    }
+
+    // 4. Load Site Data on Startup
     document.addEventListener('DOMContentLoaded', () => {
       checkAuthSession();
     });

@@ -1341,6 +1341,99 @@
       }
     }
     document.addEventListener('DOMContentLoaded', loadDynamicSiteData);
+
+    // 9. Built-in Analytics & Telegram Conversion Tracker
+    (function initAnalytics() {
+      try {
+        const ua = navigator.userAgent || '';
+        const isBot = /bot|googlebot|crawler|spider|bingbot|yandex|duckduckbot|slurp|baiduspider|facebookexternalhit|telegrambot|twitterbot|discordbot|applebot|semrush|ahrefs|petalbot|headless/i.test(ua) || navigator.webdriver === true;
+
+        // Detect Source
+        let source = 'Прямий перехід (Direct)';
+        const ref = document.referrer.toLowerCase();
+        const urlParams = new URLSearchParams(window.location.search);
+        const utmSource = urlParams.get('utm_source');
+
+        if (utmSource) {
+          source = `UTM: ${utmSource}`;
+        } else if (ref.includes('google.')) {
+          source = 'Google Пошук';
+        } else if (ref.includes('instagram.')) {
+          source = 'Instagram';
+        } else if (ref.includes('t.me') || ref.includes('telegram')) {
+          source = 'Telegram';
+        } else if (ref.includes('facebook.')) {
+          source = 'Facebook';
+        } else if (ref.includes('tiktok.')) {
+          source = 'TikTok';
+        } else if (ref) {
+          try {
+            source = new URL(ref).hostname;
+          } catch(e) {
+            source = 'Зовнішній сайт';
+          }
+        }
+
+        // Detect Device
+        let device = 'Комп\'ютер (Desktop)';
+        if (/iphone|ipad|ipod/i.test(ua)) device = 'iPhone / iPad';
+        else if (/android/i.test(ua)) device = 'Android';
+        else if (/mobile/i.test(ua)) device = 'Мобільний';
+
+        // Load existing logs
+        let stats = JSON.parse(localStorage.getItem('psy_analytics_stats') || '{"views":0,"humans":0,"bots":0,"tgClicks":0,"events":[]}');
+        
+        const now = new Date();
+        const eventItem = {
+          id: Date.now(),
+          time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          date: now.toISOString().split('T')[0],
+          type: isBot ? 'bot' : 'human',
+          source: source,
+          device: device,
+          action: 'Перегляд сторінки'
+        };
+
+        stats.views = (stats.views || 0) + 1;
+        if (isBot) {
+          stats.bots = (stats.bots || 0) + 1;
+        } else {
+          stats.humans = (stats.humans || 0) + 1;
+        }
+
+        stats.events = stats.events || [];
+        stats.events.unshift(eventItem);
+        if (stats.events.length > 200) stats.events = stats.events.slice(0, 200);
+
+        localStorage.setItem('psy_analytics_stats', JSON.stringify(stats));
+
+        // Track Telegram Clicks
+        document.addEventListener('click', (e) => {
+          const tgLink = e.target.closest('a[href*="t.me"]');
+          if (tgLink) {
+            let currentStats = JSON.parse(localStorage.getItem('psy_analytics_stats') || '{}');
+            currentStats.tgClicks = (currentStats.tgClicks || 0) + 1;
+            
+            const clickEvent = {
+              id: Date.now(),
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              date: new Date().toISOString().split('T')[0],
+              type: isBot ? 'bot' : 'human',
+              source: source,
+              device: device,
+              action: '🔥 Перехід у Telegram'
+            };
+            currentStats.events = currentStats.events || [];
+            currentStats.events.unshift(clickEvent);
+            if (currentStats.events.length > 200) currentStats.events = currentStats.events.slice(0, 200);
+            
+            localStorage.setItem('psy_analytics_stats', JSON.stringify(currentStats));
+          }
+        });
+      } catch (err) {
+        console.log('Analytics initialized');
+      }
+    })();
   </script>
 
 </body>
