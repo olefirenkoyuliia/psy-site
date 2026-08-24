@@ -59,8 +59,7 @@
             'float-slow': 'floatSlow 6s ease-in-out infinite',
             'float-reverse': 'floatReverse 8s ease-in-out infinite',
             'pulse-glow': 'pulseGlow 2.5s ease-in-out infinite',
-            'marquee': 'marquee 25s linear infinite',
-            'equalizer': 'equalizer 1.2s ease-in-out infinite alternate',
+            'equalizer': 'equalizer 0.8s ease-in-out infinite alternate',
           },
           keyframes: {
             floatSlow: {
@@ -75,13 +74,9 @@
               '0%, 100%': { boxShadow: '0 0 20px rgba(85, 124, 86, 0.2)' },
               '50%': { boxShadow: '0 0 40px rgba(85, 124, 86, 0.5)' },
             },
-            marquee: {
-              '0%': { transform: 'translateX(0%)' },
-              '100%': { transform: 'translateX(-50%)' },
-            },
             equalizer: {
-              '0%': { height: '6px' },
-              '100%': { height: '24px' },
+              '0%': { height: '4px' },
+              '100%': { height: '22px' },
             }
           }
         }
@@ -129,13 +124,6 @@
       will-change: transform;
     }
 
-    /* Infinite Marquee Strip */
-    .marquee-track {
-      display: flex;
-      width: 200%;
-      will-change: transform;
-    }
-
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #FAF8F5; }
@@ -147,6 +135,9 @@
 
   <!-- Interactive Cursor Follower Glow -->
   <div id="cursor-glow" class="hidden md:block"></div>
+
+  <!-- Hidden HTML5 Audio Element for Real Voice Note -->
+  <audio id="greeting-audio" src="audio/greeting.mp3" preload="metadata"></audio>
 
   <!-- Header / Navigation -->
   <header class="fixed top-0 left-0 right-0 z-40 glass-nav border-b border-warm-border/60 transition-all duration-300">
@@ -190,7 +181,7 @@
   </header>
 
   <!-- Hero Section -->
-  <section class="pt-32 pb-14 md:pt-40 md:pb-20 overflow-hidden relative z-10">
+  <section class="pt-32 pb-16 md:pt-40 md:pb-24 overflow-hidden relative z-10">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         
@@ -198,7 +189,7 @@
         <div class="lg:col-span-5 flex justify-center">
           <div class="relative w-full max-w-sm tilt-card" id="hero-tilt-card">
             
-            <!-- Animated background ambient shape -->
+            <!-- Ambient background shape -->
             <div class="absolute -inset-4 bg-gradient-to-tr from-brand-300/40 via-warm-accent/25 to-brand-200/50 rounded-[2.8rem] transform -rotate-3 scale-95 blur-md"></div>
             
             <div class="relative rounded-[2.2rem] overflow-hidden shadow-2xl border-4 border-white bg-white group">
@@ -233,7 +224,7 @@
           </div>
         </div>
 
-        <!-- Right Column: Headline & Interactive Audio Player Mockup -->
+        <!-- Right Column: Headline & Real Audio Player -->
         <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
           
           <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full badge-soft text-xs font-bold tracking-wide uppercase shadow-sm">
@@ -248,18 +239,20 @@
             Мене звати <strong class="text-warm-text font-bold">Юлія Олефіренко</strong>. Я практикуюча психологиня, консультантка за методом символдрами і жінка, яка вчиться приймати себе, насолоджуватися життям та відчувати свою силу.
           </p>
 
-          <!-- Interactive Voice Message Simulation Player (Интерактивное голосовое сообщение) -->
+          <!-- Real HTML5 Audio Player Card (Голосове знайомство) -->
           <div class="p-4 rounded-2xl bg-white border border-warm-border shadow-card flex items-center gap-4 max-w-lg mx-auto lg:mx-0 transition-all hover:border-brand-300">
-            <button onclick="toggleAudio()" id="audio-play-btn" class="w-12 h-12 rounded-full bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center shadow-soft transition-transform active:scale-95 shrink-0">
+            <button onclick="toggleAudio()" id="audio-play-btn" class="w-12 h-12 rounded-full bg-brand-600 hover:bg-brand-700 text-white flex items-center justify-center shadow-soft transition-transform active:scale-95 shrink-0" title="Відтворити голосове знайомство">
               <span id="play-icon" class="text-lg ml-0.5">▶</span>
             </button>
-            <div class="flex-grow space-y-1">
+            <div class="flex-grow space-y-1.5">
               <div class="flex items-center justify-between text-xs">
-                <span class="font-bold text-warm-text">Знайомство від Юлії</span>
-                <span id="audio-timer" class="text-warm-muted font-medium">0:35</span>
+                <span class="font-bold text-warm-text flex items-center gap-1.5">
+                  <span>🎙️</span> Голосове знайомство від Юлії
+                </span>
+                <span id="audio-timer" class="text-warm-muted font-medium">0:00 / 0:35</span>
               </div>
-              <!-- Animated Equalizer Wave Bars -->
-              <div class="flex items-center gap-1 h-6" id="equalizer-bars">
+              <!-- Interactive Animated Equalizer Wave Bars -->
+              <div class="flex items-center gap-1 h-6 cursor-pointer" id="equalizer-bars" onclick="toggleAudio()">
                 <div class="w-1 bg-brand-300 rounded-full h-3"></div>
                 <div class="w-1 bg-brand-400 rounded-full h-5"></div>
                 <div class="w-1 bg-brand-500 rounded-full h-2"></div>
@@ -273,6 +266,10 @@
                 <div class="w-1 bg-brand-500 rounded-full h-2"></div>
                 <div class="w-1 bg-brand-400 rounded-full h-5"></div>
                 <div class="w-1 bg-brand-300 rounded-full h-3"></div>
+              </div>
+              <!-- Progress Bar -->
+              <div class="w-full bg-warm-bg h-1.5 rounded-full overflow-hidden">
+                <div id="audio-progress" class="bg-brand-600 h-full w-0 transition-all duration-200"></div>
               </div>
             </div>
           </div>
@@ -292,43 +289,30 @@
             </a>
           </div>
 
+          <!-- Trust Badges -->
+          <div class="pt-6 grid grid-cols-3 gap-4 border-t border-warm-border text-center lg:text-left">
+            <div>
+              <div class="font-serif-luxury font-bold text-2xl sm:text-3xl text-brand-700">100%</div>
+              <div class="text-xs text-warm-muted font-medium">Конфіденційність</div>
+            </div>
+            <div>
+              <div class="font-serif-luxury font-bold text-2xl sm:text-3xl text-brand-700">50 хв</div>
+              <div class="text-xs text-warm-muted font-medium">Тривалість сесії</div>
+            </div>
+            <div>
+              <div class="font-serif-luxury font-bold text-2xl sm:text-3xl text-brand-700">ФОП</div>
+              <div class="text-xs text-warm-muted font-medium">Офіційна оплата</div>
+            </div>
+          </div>
+
         </div>
 
       </div>
     </div>
   </section>
 
-  <!-- Infinite Running Marquee Ribbon (Бегущая динамическая строка) -->
-  <div class="py-4 bg-brand-900 text-white overflow-hidden whitespace-nowrap border-y border-brand-800 shadow-inner relative z-10">
-    <div class="marquee-track animate-marquee flex items-center gap-8 text-sm font-semibold tracking-wider uppercase">
-      <span class="flex items-center gap-2"><span>🌿</span> Безпечний простір прийняття</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>🔒</span> 100% Конфіденційність</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>🤍</span> Безоціночність і повага</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>✨</span> Кататимно-імагінативна терапія</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>🧘</span> Тілесні практики & КПТ</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>💻</span> Онлайн-зустрічі по всьому світу</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>🌿</span> Безпечний простір прийняття</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>🔒</span> 100% Конфіденційність</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>🤍</span> Безоціночність і повага</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>✨</span> Кататимно-імагінативна терапія</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>🧘</span> Тілесні практики & КПТ</span>
-      <span>•</span>
-      <span class="flex items-center gap-2"><span>💻</span> Онлайн-зустрічі по всьому світу</span>
-    </div>
-  </div>
-
   <!-- Interactive Live Booking Simulator / Time Selector Widget -->
-  <section id="booking-widget" class="py-20 bg-brand-50/70 border-b border-brand-200/60 relative z-10">
+  <section id="booking-widget" class="py-20 bg-brand-50/70 border-y border-brand-200/60 relative z-10">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       
       <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
@@ -420,7 +404,7 @@
   </section>
 
   <!-- Section: About & Warm Welcome -->
-  <section id="about" class="py-16 bg-white border-y border-warm-border relative z-10">
+  <section id="about" class="py-16 bg-white border-b border-warm-border relative z-10">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
       <span class="text-xs font-bold tracking-widest text-brand-600 uppercase">Простір прийняття</span>
       <h2 class="font-serif-luxury text-3xl sm:text-4xl font-bold text-warm-text leading-snug">
@@ -432,7 +416,7 @@
     </div>
   </section>
 
-  <!-- Section: Topics / Requests (З якими темами я працюю) with 3D Tilt Effect -->
+  <!-- Section: Topics / Requests with 3D Tilt Effect -->
   <section id="topics" class="py-20 bg-warm-bg relative z-10">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       
@@ -1126,35 +1110,59 @@
       });
     });
 
-    // 3. Simulated Audio Voice Message Equalizer
-    let isPlaying = false;
-    let audioTimerInterval;
-    let seconds = 35;
+    // 3. Real HTML5 Audio Voice Message Player
+    const audio = document.getElementById('greeting-audio');
+    const playBtn = document.getElementById('audio-play-btn');
+    const playIcon = document.getElementById('play-icon');
+    const timerEl = document.getElementById('audio-timer');
+    const progressBar = document.getElementById('audio-progress');
+    const bars = document.querySelectorAll('#equalizer-bars > div');
 
-    function toggleAudio() {
-      const playIcon = document.getElementById('play-icon');
-      const bars = document.querySelectorAll('#equalizer-bars > div');
-      const timerEl = document.getElementById('audio-timer');
+    function formatTime(s) {
+      if (isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+    }
 
-      isPlaying = !isPlaying;
+    if (audio) {
+      audio.addEventListener('loadedmetadata', () => {
+        timerEl.textContent = `0:00 / ${formatTime(audio.duration)}`;
+      });
 
-      if (isPlaying) {
-        playIcon.textContent = '⏸';
-        bars.forEach((b, i) => {
-          b.style.animation = `equalizer ${0.4 + (i % 5) * 0.15}s ease-in-out infinite alternate`;
-        });
-        audioTimerInterval = setInterval(() => {
-          seconds--;
-          if (seconds <= 0) {
-            toggleAudio();
-            seconds = 35;
-          }
-          timerEl.textContent = `0:${seconds < 10 ? '0' : ''}${seconds}`;
-        }, 1000);
-      } else {
+      audio.addEventListener('timeupdate', () => {
+        const cur = audio.currentTime;
+        const dur = audio.duration || 35;
+        timerEl.textContent = `${formatTime(cur)} / ${formatTime(dur)}`;
+        progressBar.style.width = `${(cur / dur) * 100}%`;
+      });
+
+      audio.addEventListener('ended', () => {
         playIcon.textContent = '▶';
         bars.forEach(b => b.style.animation = 'none');
-        clearInterval(audioTimerInterval);
+        progressBar.style.width = '0%';
+      });
+    }
+
+    function toggleAudio() {
+      if (!audio) return;
+      if (audio.paused) {
+        audio.play().then(() => {
+          playIcon.textContent = '⏸';
+          bars.forEach((b, i) => {
+            b.style.animation = `equalizer ${0.4 + (i % 5) * 0.15}s ease-in-out infinite alternate`;
+          });
+        }).catch(err => {
+          // If file not yet uploaded, simulate playback for demo
+          playIcon.textContent = playIcon.textContent === '▶' ? '⏸' : '▶';
+          bars.forEach((b, i) => {
+            b.style.animation = playIcon.textContent === '⏸' ? `equalizer ${0.4 + (i % 5) * 0.15}s ease-in-out infinite alternate` : 'none';
+          });
+        });
+      } else {
+        audio.pause();
+        playIcon.textContent = '▶';
+        bars.forEach(b => b.style.animation = 'none');
       }
     }
 
@@ -1183,10 +1191,8 @@
       const btn = document.getElementById('booking-tg-btn');
       
       const shortFormat = bookingState.format.includes('Консультування') ? 'Консультування' : 'Психотерапія';
-      const shortDay = bookingState.day.split(' ')[0];
-      const shortTime = bookingState.time.split(' ')[0];
 
-      summaryEl.textContent = `${shortFormat} • ${bookingState.day} • ${shortTime}`;
+      summaryEl.textContent = `${shortFormat} • ${bookingState.day} • ${bookingState.time}`;
 
       const msg = `Привіт, Юліє! Хочу записатися на ${shortFormat}. Мені зручно: ${bookingState.day}, час: ${bookingState.time}.`;
       btn.href = `https://t.me/psy_olefirenkoyuliia?text=${encodeURIComponent(msg)}`;
