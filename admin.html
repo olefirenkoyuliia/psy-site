@@ -258,8 +258,28 @@
             Зберегти токен
           </button>
         </div>
+      <!-- Google Gemini AI Assistant Integration -->
+      <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">🤖</span>
+            <h2 class="font-bold text-gray-900 text-sm sm:text-base">AI-Асистент сайту (Google Gemini AI)</h2>
+          </div>
+          <span id="gemini-status-badge" class="text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+            ✅ Вбудований режим активний
+          </span>
+        </div>
+        <p class="text-xs text-gray-600 leading-relaxed">
+          Для активації повноцінної живої нейромережі підключіть безкоштовний <strong>Google Gemini API Key</strong> (дозволяє боту вести глибокий діалог та відповідати на будь-які запитання користувачів):
+        </p>
+        <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+          <input type="password" id="gemini-token-input" placeholder="AIzaSyxxxxxxxxxxxxxxxxxxxx" class="flex-grow px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+          <button onclick="saveGeminiToken()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition-colors shrink-0">
+            Зберегти AI ключ
+          </button>
+        </div>
         <p class="text-[11px] text-gray-400">
-          Створити токен: <em>GitHub ➔ Settings ➔ Developer Settings ➔ Personal Access Tokens ➔ Tokens (classic) ➔ з галочкою `repo`</em>.
+          Отримати безкоштовний ключ за 1 хвилину: <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-brand-600 underline font-semibold">aistudio.google.com/app/apikey</a> (натисніть <em>«Create API Key»</em>).
         </p>
       </div>
 
@@ -517,6 +537,7 @@
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('admin-dashboard').classList.remove('hidden');
       checkGithubToken();
+      checkGeminiToken();
       loadData();
       renderAnalytics();
     }
@@ -927,6 +948,41 @@
       } else {
         localStorage.removeItem('psy_github_token');
         checkGithubToken();
+      }
+    }
+
+    // Google Gemini Token Storage
+    function checkGeminiToken() {
+      const key = localStorage.getItem('psy_gemini_key') || (appData && appData.geminiKey);
+      const badge = document.getElementById('gemini-status-badge');
+      const input = document.getElementById('gemini-token-input');
+      if (key && input && badge) {
+        input.value = key;
+        badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
+        badge.textContent = '⚡ Жива нейромережа активна';
+      }
+    }
+
+    async function saveGeminiToken() {
+      const val = document.getElementById('gemini-token-input').value.trim();
+      if (val) {
+        localStorage.setItem('psy_gemini_key', val);
+        appData.geminiKey = val;
+        checkGeminiToken();
+
+        // Push to github if token present
+        const ghToken = localStorage.getItem('psy_github_token');
+        if (ghToken) {
+          try {
+            await pushDataToGithub(ghToken, 'data.json', JSON.stringify(appData, null, 2), 'Update Gemini AI Key via admin');
+          } catch(e) {}
+        }
+        showToast('Google Gemini AI ключ збережено!');
+      } else {
+        localStorage.removeItem('psy_gemini_key');
+        delete appData.geminiKey;
+        checkGeminiToken();
+        showToast('AI ключ видалено (активний вбудований режим)');
       }
     }
 

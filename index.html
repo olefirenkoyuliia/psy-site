@@ -1628,13 +1628,71 @@
       indicator.classList.remove('hidden');
       scrollChatToBottom();
 
-      // 3. Process AI Response
-      setTimeout(() => {
+      // 3. Process AI Response (Live Gemini API or Built-in Psychological Engine)
+      fetchGeminiAiResponse(text).then(reply => {
         indicator.classList.add('hidden');
-        const reply = generateAiPsychologistResponse(text);
         appendChatMessage('bot', reply.text, reply.cta);
         scrollChatToBottom();
-      }, 600);
+      }).catch(() => {
+        indicator.classList.add('hidden');
+        const fallbackReply = generateAiPsychologistResponse(text);
+        appendChatMessage('bot', fallbackReply.text, fallbackReply.cta);
+        scrollChatToBottom();
+      });
+    }
+
+    async function fetchGeminiAiResponse(userMessage) {
+      const apiKey = localStorage.getItem('psy_gemini_key') || (window.siteAppData && window.siteAppData.geminiKey);
+      if (!apiKey) {
+        // Instant simulated response delay for realism
+        await new Promise(r => setTimeout(r, 500));
+        return generateAiPsychologistResponse(userMessage);
+      }
+
+      const SYSTEM_PROMPT = `Ти — чуйний, професійний та турботливий AI-асистент практикуючої психологині Юлії Олефіренко.
+Сайт: https://olefirenko.pp.ua
+Спеціалізація Юлії: символдрама (кататимно-імагінативна психотерапія), КПТ, тілесні практики.
+Консультації: Онлайн (Zoom / Google Meet), тривалість 50 хвилин.
+Вартість: перша консультація — 1000 грн, подальші сесії — 1200 грн. Оплата на ФОП (ПриватБанк).
+Telegram Юлії: https://t.me/psy_olefirenkoyuliia
+
+Твоє завдання:
+1. Відповідати виключно українською мовою з теплом, емпатією та повагою.
+2. Відповідати на запитання клієнта (про тривогу, самооцінку, вигорання, стосунки, метод символдрами). Давати короткі практичні техніки підтримки за потреби.
+3. Відповіді повинні бути лаконічними (до 2-3 невеликих абзаців або маркованих пунктів), щоб їх було зручно читати у віджеті чату.
+4. Не ставити медичних діагнозів, не призначати ліків.
+5. Наприкінці м'яко пропонувати записатися на індивідуальну консультацію до Юлії.`;
+
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: userMessage }]
+              }
+            ],
+            systemInstruction: {
+              parts: [{ text: SYSTEM_PROMPT }]
+            }
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (generatedText) {
+            return { text: generatedText, cta: true };
+          }
+        }
+      } catch (err) {
+        console.warn('Gemini API fallback:', err);
+      }
+
+      return generateAiPsychologistResponse(userMessage);
     }
 
     function appendChatMessage(sender, text, cta) {
