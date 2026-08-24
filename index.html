@@ -1654,26 +1654,63 @@
       status.className = 'text-[11px] text-amber-300 font-medium';
       status.classList.remove('hidden');
 
-      // Test key
+      // Dynamic Model Discovery and Verification
       try {
-        const testRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${val}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: 'ping' }] }] })
-        });
+        let activeModel = 'gemini-1.5-flash-latest';
+        let foundModel = false;
 
-        if (testRes.ok) {
+        // Query available models for this specific API key
+        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${val}`);
+        if (listRes.ok) {
+          const listData = await listRes.json();
+          if (listData.models && listData.models.length > 0) {
+            const candidates = listData.models.filter(m => m.supportedGenerationMethods?.includes('generateContent'));
+            if (candidates.length > 0) {
+              const bestModel = candidates.find(m => m.name.includes('flash')) || candidates[0];
+              activeModel = bestModel.name.replace('models/', '');
+              foundModel = true;
+            }
+          }
+        }
+
+        // Test generation with selected or fallback model
+        const testModels = foundModel ? [activeModel] : ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-pro', 'gemini-1.5-flash'];
+        let testSuccess = false;
+        let testError = '';
+
+        for (const m of testModels) {
+          try {
+            const testRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${val}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents: [{ parts: [{ text: 'ping' }] }] })
+            });
+
+            if (testRes.ok) {
+              activeModel = m;
+              testSuccess = true;
+              break;
+            } else {
+              const errData = await testRes.json().catch(() => ({}));
+              testError = errData.error?.message || `HTTP ${testRes.status}`;
+            }
+          } catch(e) {
+            testError = e.message;
+          }
+        }
+
+        if (testSuccess) {
           localStorage.setItem('psy_gemini_key', val);
+          localStorage.setItem('psy_gemini_model', activeModel);
           sessionStorage.setItem('psy_gemini_key', val);
           updateAiChatBadge();
-          status.textContent = '✅ Ключ успішно перевірено та підключено!';
+          status.textContent = `✅ Успішно підключено (${activeModel})!`;
           status.className = 'text-[11px] text-emerald-300 font-bold';
           setTimeout(() => {
             document.getElementById('ai-chat-settings-panel').classList.add('hidden');
           }, 1500);
         } else {
-          const errData = await testRes.json().catch(() => ({}));
-          status.textContent = '❌ Помилка Google: ' + (errData.error?.message || 'Невірний ключ');
+          status.textContent = '❌ Помилка Google: ' + testError;
           status.className = 'text-[11px] text-red-300 font-bold';
         }
       } catch (err) {
@@ -1700,7 +1737,7 @@
         localStorage.setItem('psy_gemini_key', cleanedKey);
         updateAiChatBadge();
         input.value = '';
-        appendChatMessage('bot', '⚡ **Google Gemini AI успішно підключено та активовано!**\n\nТепер я працюю як жива мисляча нейромережа. Спробуйте задати будь-яке запитання або описати свій сон!');
+        appendChatMessage('bot', '⚡ **Google Gemini AI успішно збережено!** Зачекайте секунду для перевірки або відкрийте ⚙️ у шапці для статусу.');
         return;
       }
 
@@ -1735,7 +1772,8 @@
       const subtitle = document.getElementById('ai-chat-status-subtitle') || document.querySelector('#ai-chat-window p');
       if (subtitle) {
         if (apiKey) {
-          subtitle.textContent = '⚡ Нейромережа Gemini AI активна';
+          const modelName = localStorage.getItem('psy_gemini_model') || 'Gemini AI';
+          subtitle.textContent = `⚡ ${modelName} активний`;
           subtitle.className = 'text-[11px] text-emerald-300 font-bold';
         } else {
           subtitle.textContent = 'Психологічний гід онлайн';
@@ -1767,9 +1805,10 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
 5. Не ставити медичних діагнозів, не призначати ліків.
 6. Наприкінці м'яко запропонувати записатися на індивідуальну консультацію до Юлії.`;
 
-      // Try multiple model endpoints with universal payload
+      // Try preferred model from discovery or fallback list
       const cleanedApiKey = apiKey.trim().replace(/^['"]|['"]$/g, '');
-      const models = ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-pro'];
+      const savedModel = localStorage.getItem('psy_gemini_model');
+      const models = savedModel ? [savedModel, 'gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-pro'] : ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-pro', 'gemini-1.5-flash'];
       
       const promptPayload = `${SYSTEM_PROMPT}\n\n---\nПитання відвідувача сайту:\n"${userMessage}"\n\nТвоя відповідь як AI-асистента Юлії Олефіренко (українською мовою, структуровано, емпатично):`;
 
@@ -1795,6 +1834,7 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
             const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
             if (generatedText) {
               console.log(`✅ Gemini AI (${model}) successfully generated response`);
+              localStorage.setItem('psy_gemini_model', model);
               return { text: generatedText, cta: true };
             }
           } else {
