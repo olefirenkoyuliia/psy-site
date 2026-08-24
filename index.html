@@ -1692,24 +1692,24 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
 5. Не ставити медичних діагнозів, не призначати ліків.
 6. Наприкінці м'яко запропонувати записатися на індивідуальну консультацію до Юлії.`;
 
-      // Try multiple model endpoints
-      const models = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash'];
+      // Try multiple model endpoints with universal payload
+      const cleanedApiKey = apiKey.trim().replace(/^['"]|['"]$/g, '');
+      const models = ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-pro'];
+      
+      const promptPayload = `${SYSTEM_PROMPT}\n\n---\nПитання відвідувача сайту:\n"${userMessage}"\n\nТвоя відповідь як AI-асистента Юлії Олефіренко (українською мовою, структуровано, емпатично):`;
+
       for (const model of models) {
         try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${cleanedApiKey}`;
           const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               contents: [
                 {
-                  role: 'user',
-                  parts: [{ text: userMessage }]
+                  parts: [{ text: promptPayload }]
                 }
-              ],
-              systemInstruction: {
-                parts: [{ text: SYSTEM_PROMPT }]
-              }
+              ]
             })
           });
 
@@ -1717,15 +1717,15 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
             const data = await res.json();
             const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
             if (generatedText) {
-              console.log(`Gemini AI (${model}) successfully generated response`);
+              console.log(`✅ Gemini AI (${model}) successfully generated response`);
               return { text: generatedText, cta: true };
             }
           } else {
             const errData = await res.json().catch(() => ({}));
-            console.warn(`Gemini API error with ${model}:`, errData);
+            console.warn(`⚠️ Gemini API error with ${model} (HTTP ${res.status}):`, errData);
           }
         } catch (err) {
-          console.warn(`Gemini network error with ${model}:`, err);
+          console.warn(`⚠️ Gemini network error with ${model}:`, err);
         }
       }
 
