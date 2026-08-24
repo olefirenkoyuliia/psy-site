@@ -179,7 +179,7 @@
   <div id="cursor-glow" class="hidden md:block"></div>
 
   <!-- Hidden HTML5 Audio Element for Real Voice Note -->
-  <audio id="greeting-audio" src="audio/greeting.mp3" preload="metadata"></audio>
+  <audio id="greeting-audio" src="audio/greeting.mp3" preload="auto" playsinline webkit-playsinline></audio>
 
   <!-- Header / Navigation -->
   <header class="fixed top-0 left-0 right-0 z-40 glass-nav border-b border-warm-border/60 transition-all duration-300">
@@ -1294,91 +1294,64 @@
       });
     });
 
-    // 3. Real HTML5 Audio Voice Message Player with iOS Fallback
-    const audio = document.getElementById('greeting-audio');
+    // 3. Real HTML5 Audio Voice Message Player
+    const audioEl = document.getElementById('greeting-audio');
     const playBtn = document.getElementById('audio-play-btn');
     const playIcon = document.getElementById('play-icon');
     const timerEl = document.getElementById('audio-timer');
     const progressBar = document.getElementById('audio-progress');
     const bars = document.querySelectorAll('#equalizer-bars > div');
-    let simInterval = null;
-    let simTime = 0;
-    const simDuration = 35;
 
     function formatTime(s) {
-      if (isNaN(s)) return '0:00';
+      if (isNaN(s) || s <= 0) return '0:00';
       const m = Math.floor(s / 60);
       const sec = Math.floor(s % 60);
       return `${m}:${sec < 10 ? '0' : ''}${sec}`;
     }
 
-    if (audio) {
-      audio.addEventListener('loadedmetadata', () => {
-        if (timerEl && audio.duration && !isNaN(audio.duration)) {
-          timerEl.textContent = `0:00 / ${formatTime(audio.duration)}`;
+    if (audioEl) {
+      audioEl.addEventListener('loadedmetadata', () => {
+        if (timerEl && audioEl.duration && !isNaN(audioEl.duration)) {
+          timerEl.textContent = `0:00 / ${formatTime(audioEl.duration)}`;
         }
       });
 
-      audio.addEventListener('timeupdate', () => {
-        const cur = audio.currentTime;
-        const dur = audio.duration || simDuration;
+      audioEl.addEventListener('timeupdate', () => {
+        const cur = audioEl.currentTime;
+        const dur = audioEl.duration || 24;
         if (timerEl) timerEl.textContent = `${formatTime(cur)} / ${formatTime(dur)}`;
         if (progressBar) progressBar.style.width = `${(cur / dur) * 100}%`;
       });
 
-      audio.addEventListener('ended', () => {
+      audioEl.addEventListener('ended', () => {
         if (playIcon) playIcon.textContent = '▶';
         bars.forEach(b => b.style.animation = 'none');
         if (progressBar) progressBar.style.width = '0%';
-        if (timerEl) timerEl.textContent = `0:00 / ${formatTime(audio.duration || simDuration)}`;
+        if (timerEl) timerEl.textContent = `0:00 / ${formatTime(audioEl.duration || 24)}`;
+      });
+
+      audioEl.addEventListener('pause', () => {
+        if (playIcon) playIcon.textContent = '▶';
+        bars.forEach(b => b.style.animation = 'none');
+      });
+
+      audioEl.addEventListener('play', () => {
+        if (playIcon) playIcon.textContent = '⏸';
+        bars.forEach((b, i) => {
+          b.style.animation = `equalizer ${0.4 + (i % 5) * 0.15}s ease-in-out infinite alternate`;
+        });
       });
     }
 
     function toggleAudio() {
-      const isPlaying = playIcon && playIcon.textContent === '⏸';
-
-      if (isPlaying) {
-        if (audio && !audio.paused) audio.pause();
-        clearInterval(simInterval);
-        if (playIcon) playIcon.textContent = '▶';
-        bars.forEach(b => b.style.animation = 'none');
-        return;
-      }
-
-      if (audio && audio.src && audio.src.includes('.mp3') && !audio.error) {
-        audio.play().then(() => {
-          if (playIcon) playIcon.textContent = '⏸';
-          bars.forEach((b, i) => {
-            b.style.animation = `equalizer ${0.4 + (i % 5) * 0.15}s ease-in-out infinite alternate`;
-          });
-        }).catch(() => {
-          startSimulatedAudio();
+      if (!audioEl) return;
+      if (audioEl.paused) {
+        audioEl.play().catch(err => {
+          console.warn('Audio playback error:', err);
         });
       } else {
-        startSimulatedAudio();
+        audioEl.pause();
       }
-    }
-
-    function startSimulatedAudio() {
-      if (playIcon) playIcon.textContent = '⏸';
-      bars.forEach((b, i) => {
-        b.style.animation = `equalizer ${0.4 + (i % 5) * 0.15}s ease-in-out infinite alternate`;
-      });
-      clearInterval(simInterval);
-      simInterval = setInterval(() => {
-        simTime += 1;
-        if (simTime > simDuration) {
-          simTime = 0;
-          clearInterval(simInterval);
-          if (playIcon) playIcon.textContent = '▶';
-          bars.forEach(b => b.style.animation = 'none');
-          if (progressBar) progressBar.style.width = '0%';
-          if (timerEl) timerEl.textContent = `0:00 / 0:35`;
-          return;
-        }
-        if (timerEl) timerEl.textContent = `${formatTime(simTime)} / 0:35`;
-        if (progressBar) progressBar.style.width = `${(simTime / simDuration) * 100}%`;
-      }, 1000);
     }
 
     // 4. Interactive Live Booking Simulator
