@@ -1128,16 +1128,22 @@
       if (val) {
         localStorage.setItem('psy_gemini_key', val);
         appData.geminiKey = val;
+        const model = localStorage.getItem('psy_gemini_model');
+        if (model) appData.geminiModel = model;
         checkGeminiToken();
 
         // Push to github if token present
         const ghToken = localStorage.getItem('psy_github_token');
         if (ghToken) {
           try {
-            await pushDataToGithub(ghToken, 'data.json', JSON.stringify(appData, null, 2), 'Update Gemini AI Key via admin');
-          } catch(e) {}
+            await pushDataToGithub(ghToken, 'data.json', JSON.stringify(appData, null, 2), 'Update Gemini AI Key in data.json');
+            showToast('Ключ AI збережено та опубліковано на GitHub!');
+          } catch(e) {
+            showToast('Збережено локально. Помилка GitHub: ' + e.message, '⚠️');
+          }
+        } else {
+          showToast('Збережено в браузері! Щоб ключ діяв для всіх пристроїв, введіть GitHub токен зверху.', '⚠️');
         }
-        showToast('Google Gemini AI ключ збережено!');
       } else {
         localStorage.removeItem('psy_gemini_key');
         delete appData.geminiKey;
