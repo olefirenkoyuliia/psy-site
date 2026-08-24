@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Адмін-панель — Юлія Олефіренко</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Cormorant Garamond"', 'serif'],
+          },
+          colors: {
+            brand: {
+              50: '#F4F7F4',
+              100: '#E6ECE6',
+              500: '#557C56',
+              600: '#436344',
+              700: '#354E36',
+              900: '#1F2D20',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen">
+
+  <!-- Top Navbar -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-9 h-9 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-700 font-bold">
+          ⚙️
+        </span>
+        <div>
+          <h1 class="font-bold text-gray-900 text-sm sm:text-base">Панель керування сайтом</h1>
+          <p class="text-[11px] text-gray-500">Юлія Олефіренко • Редагування контенту</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="index.html" target="_blank" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+          <span>Переглянути сайт</span>
+          <span>↗</span>
+        </a>
+        <button onclick="saveAllChanges()" id="save-main-btn" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-2">
+          <span>💾 Зберегти зміни</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+    <!-- GitHub Integration Banner -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">🚀</span>
+          <h2 class="font-bold text-gray-900 text-sm sm:text-base">Автоматична публікація на GitHub</h2>
+        </div>
+        <span id="github-status-badge" class="text-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium">
+          ⚠️ Токен не підключено
+        </span>
+      </div>
+      <p class="text-xs text-gray-600 leading-relaxed">
+        Введіть ваш <strong>GitHub Personal Access Token</strong>, щоб усі зміни та нові фотографії сертифікатів публікувалися на сайті в 1 клік:
+      </p>
+      <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
+        <input type="password" id="github-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="flex-grow px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
+        <button onclick="saveGithubToken()" class="px-5 py-2.5 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-colors shrink-0">
+          Зберегти токен
+        </button>
+      </div>
+      <p class="text-[11px] text-gray-400">
+        Створити токен: <em>GitHub ➔ Settings ➔ Developer Settings ➔ Personal Access Tokens ➔ Tokens (classic) ➔ з галочкою `repo`</em>.
+      </p>
+    </div>
+
+    <!-- Section 1: Main Texts & Profile -->
+    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+      <div class="border-b border-gray-100 pb-4 flex items-center gap-2.5">
+        <span class="text-xl">📝</span>
+        <h2 class="font-bold text-gray-900 text-base sm:text-lg">Головні тексти та опис</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Ім'я на сайті:</label>
+          <input type="text" id="field-name" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Спеціалізація (підзаголовок):</label>
+          <input type="text" id="field-role" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="sm:col-span-2 space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Головний заголовок першого екрану (H1):</label>
+          <input type="text" id="field-heroTitle" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none font-semibold">
+        </div>
+
+        <div class="sm:col-span-2 space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Текст привітання (Абзац 1):</label>
+          <textarea id="field-heroDesc1" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
+        </div>
+
+        <div class="sm:col-span-2 space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Текст привітання (Абзац 2):</label>
+          <textarea id="field-heroDesc2" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
+        </div>
+
+        <div class="sm:col-span-2 space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Цитата в блоці «Про мене»:</label>
+          <input type="text" id="field-quote" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Посилання на Telegram:</label>
+          <input type="text" id="field-telegram" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Посилання на Instagram:</label>
+          <input type="text" id="field-instagram" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Pricing & Session formats -->
+    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+      <div class="border-b border-gray-100 pb-4 flex items-center gap-2.5">
+        <span class="text-xl">💳</span>
+        <h2 class="font-bold text-gray-900 text-base sm:text-lg">Вартість та умови консультацій</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Ціна першої сесії:</label>
+          <input type="text" id="field-firstPrice" placeholder="1 000 грн" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none font-bold text-brand-700">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Ціна наступних зустрічей:</label>
+          <input type="text" id="field-regularPrice" placeholder="1 200 грн" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none font-bold text-brand-700">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Тривалість консультації:</label>
+          <input type="text" id="field-duration" placeholder="50 хвилин" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Умови оплати:</label>
+          <input type="text" id="field-payment" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Certificates Manager -->
+    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+      <div class="border-b border-gray-100 pb-4 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">🎓</span>
+          <h2 class="font-bold text-gray-900 text-base sm:text-lg">Сертифікати та Дипломи</h2>
+        </div>
+        <button onclick="openAddCertModal()" class="px-4 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold transition-all flex items-center gap-1.5">
+          <span>+ Додати сертифікат</span>
+        </button>
+      </div>
+
+      <!-- Certificates Grid in Admin -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="admin-certs-grid">
+        <!-- Dynamic items will be injected here -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal for Adding New Certificate -->
+  <div id="add-cert-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-6 sm:p-8 space-y-5 shadow-2xl border border-gray-100">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="font-bold text-gray-900 text-base">Додати новий документ</h3>
+        <button onclick="closeAddCertModal()" class="text-gray-400 hover:text-gray-600 text-xl font-light">✕</button>
+      </div>
+
+      <div class="space-y-4">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Назва сертифіката:</label>
+          <input type="text" id="new-cert-title" placeholder="Наприклад: Підвищення кваліфікації" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Категорія / Підпис:</label>
+          <input type="text" id="new-cert-category" placeholder="Наприклад: Символдрама / Практикум" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Виберіть фото документа:</label>
+          <input type="file" id="new-cert-file" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
+        </div>
+      </div>
+
+      <div class="pt-3 flex items-center justify-end gap-3 border-t border-gray-100">
+        <button onclick="closeAddCertModal()" class="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 text-xs font-bold hover:bg-gray-200">
+          Скасувати
+        </button>
+        <button onclick="confirmAddCert()" class="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 shadow-sm">
+          Додати в список
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl text-xs font-bold hidden items-center gap-3 transition-all transform translate-y-3">
+    <span id="toast-icon">✅</span>
+    <span id="toast-msg">Зміни успішно збережено!</span>
+  </div>
+
+  <!-- Admin Logic Script -->
+  <script>
+    let appData = {};
+    const REPO_OWNER = 'olefirenkoyuliia';
+    const REPO_NAME = 'psy-site';
+
+    // 1. Load Data on Startup
+    document.addEventListener('DOMContentLoaded', async () => {
+      checkGithubToken();
+      await loadData();
+    });
+
+    async function loadData() {
+      try {
+        const local = localStorage.getItem('psy_site_data');
+        if (local) {
+          appData = JSON.parse(local);
+        } else {
+          const res = await fetch('data.json?t=' + Date.now());
+          appData = await res.json();
+        }
+      } catch (e) {
+        console.error('Error loading data.json:', e);
+      }
+      populateForm();
+      renderAdminCertificates();
+    }
+
+    function populateForm() {
+      if (!appData.profile) return;
+      document.getElementById('field-name').value = appData.profile.name || '';
+      document.getElementById('field-role').value = appData.profile.role || '';
+      document.getElementById('field-heroTitle').value = appData.profile.heroTitle || '';
+      document.getElementById('field-heroDesc1').value = appData.profile.heroDesc1 || '';
+      document.getElementById('field-heroDesc2').value = appData.profile.heroDesc2 || '';
+      document.getElementById('field-quote').value = appData.profile.quote || '';
+      document.getElementById('field-telegram').value = appData.profile.telegram || '';
+      document.getElementById('field-instagram').value = appData.profile.instagram || '';
+
+      if (appData.pricing) {
+        document.getElementById('field-firstPrice').value = appData.pricing.firstSessionPrice || '';
+        document.getElementById('field-regularPrice').value = appData.pricing.regularSessionPrice || '';
+        document.getElementById('field-duration').value = appData.pricing.duration || '';
+        document.getElementById('field-payment').value = appData.pricing.paymentDetails || '';
+      }
+    }
+
+    function renderAdminCertificates() {
+      const container = document.getElementById('admin-certs-grid');
+      container.innerHTML = '';
+
+      if (!appData.certificates || appData.certificates.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-400 py-4 sm:col-span-3 text-center">Немає доданих сертифікатів</p>';
+        return;
+      }
+
+      appData.certificates.forEach((cert, idx) => {
+        const card = document.createElement('div');
+        card.className = 'p-3 rounded-xl border border-gray-200 bg-gray-50 flex items-center gap-3 relative group';
+        card.innerHTML = `
+          <div class="w-14 h-18 rounded-lg overflow-hidden bg-gray-200 shrink-0 border border-gray-300">
+            <img src="${cert.image}" alt="${cert.title}" class="w-full h-full object-cover">
+          </div>
+          <div class="flex-grow min-w-0 pr-6">
+            <p class="text-xs font-bold text-gray-800 truncate">${cert.title}</p>
+            <p class="text-[11px] text-gray-500 truncate">${cert.category || 'Документ'}</p>
+          </div>
+          <button onclick="deleteCert(${idx})" class="absolute top-3 right-3 text-gray-400 hover:text-red-600 p-1 transition-colors" title="Видалити">
+            🗑️
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Modal Controls
+    function openAddCertModal() {
+      document.getElementById('add-cert-modal').classList.remove('hidden');
+      document.getElementById('add-cert-modal').classList.add('flex');
+    }
+    function closeAddCertModal() {
+      document.getElementById('add-cert-modal').classList.add('hidden');
+      document.getElementById('add-cert-modal').classList.remove('flex');
+    }
+
+    function confirmAddCert() {
+      const title = document.getElementById('new-cert-title').value.trim();
+      const category = document.getElementById('new-cert-category').value.trim();
+      const fileInput = document.getElementById('new-cert-file');
+
+      if (!title) {
+        alert('Введіть назву сертифіката');
+        return;
+      }
+
+      if (fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          appData.certificates.push({
+            id: String(Date.now()),
+            title: title,
+            category: category || 'Підвищення кваліфікації',
+            image: e.target.result // Base64 data URL
+          });
+          renderAdminCertificates();
+          closeAddCertModal();
+          showToast('Сертифікат додано до списку!');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('Будь ласка, оберіть фото документа');
+      }
+    }
+
+    function deleteCert(idx) {
+      if (confirm('Видалити цей сертифікат?')) {
+        appData.certificates.splice(idx, 1);
+        renderAdminCertificates();
+        showToast('Сертифікат видалено');
+      }
+    }
+
+    // Save All Changes
+    async function saveAllChanges() {
+      const saveBtn = document.getElementById('save-main-btn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span>⏳ Збереження...</span>';
+
+      // Gather form data
+      appData.profile.name = document.getElementById('field-name').value;
+      appData.profile.role = document.getElementById('field-role').value;
+      appData.profile.heroTitle = document.getElementById('field-heroTitle').value;
+      appData.profile.heroDesc1 = document.getElementById('field-heroDesc1').value;
+      appData.profile.heroDesc2 = document.getElementById('field-heroDesc2').value;
+      appData.profile.quote = document.getElementById('field-quote').value;
+      appData.profile.telegram = document.getElementById('field-telegram').value;
+      appData.profile.instagram = document.getElementById('field-instagram').value;
+
+      appData.pricing = {
+        firstSessionPrice: document.getElementById('field-firstPrice').value,
+        regularSessionPrice: document.getElementById('field-regularPrice').value,
+        duration: document.getElementById('field-duration').value,
+        paymentDetails: document.getElementById('field-payment').value
+      };
+
+      // Save locally
+      localStorage.setItem('psy_site_data', JSON.stringify(appData));
+
+      // Check if GitHub token is present to push live
+      const token = localStorage.getItem('psy_github_token');
+      if (token) {
+        try {
+          await pushDataToGithub(token, appData);
+          showToast('Зміни збережено та опубліковано на сайт!');
+        } catch (err) {
+          console.error('GitHub Push failed:', err);
+          showToast('Збережено локально. Помилка GitHub: ' + err.message, '⚠️');
+        }
+      } else {
+        showToast('Збережено локально (для публікації введіть GitHub токен)');
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<span>💾 Зберегти зміни</span>';
+    }
+
+    // GitHub API Push
+    async function pushDataToGithub(token, data) {
+      const path = 'data.json';
+      const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`;
+
+      // Get current SHA
+      let sha = null;
+      try {
+        const getRes = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (getRes.ok) {
+          const fileData = await getRes.json();
+          sha = fileData.sha;
+        }
+      } catch (e) {}
+
+      // UTF-8 base64 encoding
+      const jsonStr = JSON.stringify(data, null, 2);
+      const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+
+      const body = {
+        message: 'Update website content via admin panel',
+        content: encoded,
+        branch: 'main'
+      };
+      if (sha) body.sha = sha;
+
+      const putRes = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!putRes.ok) {
+        const errJson = await putRes.json();
+        throw new Error(errJson.message || 'Не вдалося оновити файл');
+      }
+    }
+
+    // GitHub Token Storage
+    function checkGithubToken() {
+      const token = localStorage.getItem('psy_github_token');
+      const badge = document.getElementById('github-status-badge');
+      if (token) {
+        document.getElementById('github-token-input').value = token;
+        badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
+        badge.textContent = '✅ Підключено до GitHub';
+      }
+    }
+
+    function saveGithubToken() {
+      const val = document.getElementById('github-token-input').value.trim();
+      if (val) {
+        localStorage.setItem('psy_github_token', val);
+        checkGithubToken();
+        showToast('GitHub токен збережено!');
+      } else {
+        localStorage.removeItem('psy_github_token');
+        checkGithubToken();
+      }
+    }
+
+    function showToast(msg, icon = '✅') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      document.getElementById('toast-icon').textContent = icon;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 3500);
+    }
+  </script>
+</body>
+</html>

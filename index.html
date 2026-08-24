@@ -847,7 +847,7 @@
       </div>
 
       <!-- Diplomas Grid -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6" id="diplomas-grid">
         
         <!-- Diploma 1 -->
         <div class="group relative bg-white p-2.5 rounded-2xl border border-warm-border shadow-card hover:shadow-hover transition-all duration-300 cursor-pointer overflow-hidden" onclick="openLightbox('images/IMG_5720.PNG', 'Диплом психолога')">
@@ -1253,6 +1253,51 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeLightbox();
     });
+
+    // 8. Dynamic Data Sync (with data.json / admin updates)
+    async function loadDynamicSiteData() {
+      try {
+        let data = null;
+        const local = localStorage.getItem('psy_site_data');
+        if (local) {
+          data = JSON.parse(local);
+        } else {
+          const res = await fetch('data.json?t=' + Date.now());
+          if (res.ok) data = await res.json();
+        }
+
+        if (!data) return;
+
+        // Render dynamic certificates if present
+        if (data.certificates && data.certificates.length > 0) {
+          const grid = document.getElementById('diplomas-grid');
+          if (grid) {
+            grid.innerHTML = '';
+            data.certificates.forEach(cert => {
+              const item = document.createElement('div');
+              item.className = 'group relative bg-white p-2.5 rounded-2xl border border-warm-border shadow-card hover:shadow-hover transition-all duration-300 cursor-pointer overflow-hidden';
+              item.onclick = () => openLightbox(cert.image, cert.title);
+              item.innerHTML = `
+                <div class="aspect-[3/4] rounded-xl overflow-hidden bg-warm-sand/30 flex items-center justify-center">
+                  <img src="${cert.image}" alt="${cert.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                </div>
+                <div class="p-2 text-center">
+                  <p class="text-xs font-bold text-warm-text truncate">${cert.title}</p>
+                  <p class="text-[11px] text-warm-muted truncate">${cert.category || 'Документ'}</p>
+                </div>
+                <div class="absolute inset-0 bg-brand-900/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl">
+                  <span class="p-2.5 bg-white/95 rounded-full text-brand-800 shadow-md">🔍</span>
+                </div>
+              `;
+              grid.appendChild(item);
+            });
+          }
+        }
+      } catch (err) {
+        console.log('Using default static content:', err);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', loadDynamicSiteData);
   </script>
 
 </body>
