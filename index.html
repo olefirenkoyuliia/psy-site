@@ -1184,30 +1184,9 @@
             <p id="ai-chat-status-subtitle" class="text-[11px] text-brand-200">Психологічний гід онлайн</p>
           </div>
         </div>
-        <div class="flex items-center gap-1">
-          <button onclick="toggleAiSettings()" class="text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors text-sm" title="Налаштування AI ключа">
-            ⚙️
-          </button>
-          <button onclick="toggleAiChat()" class="text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors text-lg" title="Згорнути чат">
-            ✕
-          </button>
-        </div>
-      </div>
-
-      <!-- Inline AI Key Settings Panel (Collapsible) -->
-      <div id="ai-chat-settings-panel" class="hidden p-3.5 bg-brand-950 text-white border-b border-brand-800 space-y-2 text-xs shrink-0">
-        <div class="flex items-center justify-between font-bold">
-          <span class="text-brand-300">🔑 Підключення Google Gemini AI:</span>
-          <button onclick="toggleAiSettings()" class="text-gray-400 hover:text-white text-xs">✕</button>
-        </div>
-        <p class="text-[11px] text-gray-300">Введіть ваш безкоштовний ключ Gemini (AIzaSy...):</p>
-        <div class="flex gap-2">
-          <input type="password" id="inline-gemini-key-input" placeholder="AIzaSy..." class="flex-grow px-3 py-1.5 rounded-lg bg-brand-900 border border-brand-700 text-white text-xs outline-none focus:border-emerald-400">
-          <button onclick="saveInlineGeminiKey()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-bold text-xs text-white shrink-0">
-            Зберегти
-          </button>
-        </div>
-        <div id="inline-gemini-status" class="text-[11px] text-emerald-300 font-medium hidden"></div>
+        <button onclick="toggleAiChat()" class="text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors text-lg" title="Згорнути чат">
+          ✕
+        </button>
       </div>
 
       <!-- Chat Messages Stream -->

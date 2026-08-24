@@ -258,26 +258,51 @@
             Зберегти токен
           </button>
         </div>
-      <!-- Google Gemini AI Assistant Integration -->
-      <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-3">
-        <div class="flex items-center justify-between">
+      <!-- Google Gemini AI Assistant Integration with Live Debugger -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-5">
+        <div class="border-b border-gray-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <span class="text-xl">🤖</span>
-            <h2 class="font-bold text-gray-900 text-sm sm:text-base">AI-Асистент сайту (Google Gemini AI)</h2>
+            <span class="text-2xl">🤖</span>
+            <div>
+              <h2 class="font-bold text-gray-900 text-base sm:text-lg">AI-Асистент сайту (Google Gemini AI)</h2>
+              <p class="text-xs text-gray-500">Налаштування та онлайн-тестування живої нейромережі</p>
+            </div>
           </div>
-          <span id="gemini-status-badge" class="text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
-            ✅ Вбудований режим активний
+          <span id="gemini-status-badge" class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200 font-bold self-start sm:self-auto">
+            ⚪ Не перевірено
           </span>
         </div>
+
         <p class="text-xs text-gray-600 leading-relaxed">
-          Для активації повноцінної живої нейромережі підключіть безкоштовний <strong>Google Gemini API Key</strong> (дозволяє боту вести глибокий діалог та відповідати на будь-які запитання користувачів):
+          Введіть ваш безкоштовний <strong>Google Gemini API Key</strong> з <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-brand-600 underline font-semibold">Google AI Studio</a>. Ви зможете одразу протестувати з'єднання з серверами Google та переглянути логи:
         </p>
-        <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
-          <input type="password" id="gemini-token-input" placeholder="AIzaSyxxxxxxxxxxxxxxxxxxxx" class="flex-grow px-4 py-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
-          <button onclick="saveGeminiToken()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition-colors shrink-0">
-            Зберегти AI ключ
-          </button>
+
+        <div class="space-y-3">
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <input type="password" id="gemini-token-input" placeholder="AIzaSyxxxxxxxxxxxxxxxxxxxx" class="flex-grow px-4 py-3 rounded-xl border border-gray-300 text-xs font-mono focus:ring-2 focus:ring-brand-500 outline-none">
+            <button onclick="testGeminiConnection()" id="test-gemini-btn" class="px-5 py-3 bg-gray-800 hover:bg-black text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shrink-0">
+              <span>🧪 Протестувати з'єднання</span>
+            </button>
+            <button onclick="saveGeminiToken()" class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm shrink-0">
+              💾 Зберегти
+            </button>
+          </div>
+
+          <!-- Live Debugger Console Box -->
+          <div id="gemini-debug-box" class="hidden p-4 rounded-2xl bg-gray-900 text-gray-100 font-mono text-xs space-y-2 border border-gray-800 shadow-inner">
+            <div class="flex items-center justify-between text-[11px] text-gray-400 border-b border-gray-800 pb-2">
+              <span class="font-bold flex items-center gap-1.5 text-brand-300">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Термінал діагностики Google Gemini API
+              </span>
+              <span id="gemini-debug-time">--:--:--</span>
+            </div>
+            <div id="gemini-debug-logs" class="space-y-1.5 max-h-56 overflow-y-auto pt-1 leading-relaxed text-[11px]">
+              <!-- Dynamic logs injected here -->
+            </div>
+          </div>
         </div>
+
         <p class="text-[11px] text-gray-400">
           Отримати безкоштовний ключ за 1 хвилину: <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-brand-600 underline font-semibold">aistudio.google.com/app/apikey</a> (натисніть <em>«Create API Key»</em>).
         </p>
@@ -951,20 +976,155 @@
       }
     }
 
-    // Google Gemini Token Storage
+    // Google Gemini Token Storage & Diagnostics
     function checkGeminiToken() {
       const key = localStorage.getItem('psy_gemini_key') || (appData && appData.geminiKey);
+      const model = localStorage.getItem('psy_gemini_model') || (appData && appData.geminiModel);
       const badge = document.getElementById('gemini-status-badge');
       const input = document.getElementById('gemini-token-input');
       if (key && input && badge) {
         input.value = key;
-        badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
-        badge.textContent = '⚡ Жива нейромережа активна';
+        badge.className = 'text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold self-start sm:self-auto';
+        badge.textContent = `⚡ Підключено (${model || 'Gemini AI'})`;
       }
     }
 
+    function addDebugLog(msg, type = 'info') {
+      const logs = document.getElementById('gemini-debug-logs');
+      const p = document.createElement('p');
+      const time = new Date().toLocaleTimeString();
+      let colorClass = 'text-gray-300';
+      if (type === 'success') colorClass = 'text-emerald-400 font-bold';
+      else if (type === 'error') colorClass = 'text-rose-400 font-bold';
+      else if (type === 'warn') colorClass = 'text-amber-300';
+      else if (type === 'step') colorClass = 'text-sky-300 font-semibold';
+
+      p.className = `${colorClass} break-words`;
+      p.innerHTML = `<span class="text-gray-500">[${time}]</span> ${msg}`;
+      logs.appendChild(p);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    async function testGeminiConnection() {
+      const input = document.getElementById('gemini-token-input');
+      const btn = document.getElementById('test-gemini-btn');
+      const badge = document.getElementById('gemini-status-badge');
+      const debugBox = document.getElementById('gemini-debug-box');
+      const logs = document.getElementById('gemini-debug-logs');
+      const timeEl = document.getElementById('gemini-debug-time');
+
+      const apiKey = input.value.trim().replace(/^['"]|['"]$/g, '');
+      if (!apiKey) {
+        alert('Введіть Google Gemini API Key для тестування');
+        return;
+      }
+
+      debugBox.classList.remove('hidden');
+      logs.innerHTML = '';
+      timeEl.textContent = new Date().toLocaleTimeString();
+
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Тестування...</span>';
+      badge.className = 'text-xs px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-bold self-start sm:self-auto';
+      badge.textContent = '⏳ Перевірка з\'єднання...';
+
+      addDebugLog(`[Крок 1/3] Початок перевірки API ключа (${apiKey.substring(0, 8)}...)...`, 'step');
+
+      try {
+        // Step 1: List models
+        addDebugLog(`[Крок 2/3] Запит списку доступних моделей на серверах Google...`, 'step');
+        const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        const listRes = await fetch(listUrl);
+        const listData = await listRes.json();
+
+        if (!listRes.ok) {
+          addDebugLog(`❌ Помилка Google API (HTTP ${listRes.status}): ${listData.error?.message || 'Невідома помилка'}`, 'error');
+          if (listData.error?.status === 'API_KEY_INVALID' || listData.error?.message?.includes('API key not valid')) {
+            addDebugLog(`💡 Порада: Перевірте чи скопійовано весь ключ повністю з Google AI Studio (починається на AIzaSy...)`, 'warn');
+          }
+          badge.className = 'text-xs px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold self-start sm:self-auto';
+          badge.textContent = '❌ Помилка ключа';
+          btn.disabled = false;
+          btn.innerHTML = '<span>🧪 Протестувати з\'єднання</span>';
+          return;
+        }
+
+        const models = listData.models || [];
+        addDebugLog(`✓ Успішно! Отримано доступ до ${models.length} моделей Google:`, 'info');
+        const genModels = models.filter(m => m.supportedGenerationMethods?.includes('generateContent'));
+        const genModelNames = genModels.map(m => m.name.replace('models/', ''));
+        addDebugLog(`  Моделі для генерації тексту: ${genModelNames.join(', ')}`, 'info');
+
+        if (genModelNames.length === 0) {
+          addDebugLog(`⚠️ У вашому проекті немає доступних моделей для generateContent.`, 'warn');
+        }
+
+        // Step 2: Try actual generation
+        addDebugLog(`[Крок 3/3] Тестова генерація повідомлення через найшвидшу модель...`, 'step');
+        const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-flash', 'gemini-pro', ...genModelNames];
+        let verifiedModel = null;
+        let sampleReply = '';
+
+        for (const m of candidateModels) {
+          if (!genModelNames.includes(m) && genModelNames.length > 0 && !m.includes('flash')) continue;
+          try {
+            addDebugLog(`  Спроба відправки запиту на модель: ${m}...`, 'info');
+            const genRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: 'Привіт! Скажи одне речення українською мовою: "З\'єднання з AI асистентом успішно встановлено".' }] }]
+              })
+            });
+
+            if (genRes.ok) {
+              const genData = await genRes.json();
+              sampleReply = genData.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (sampleReply) {
+                verifiedModel = m;
+                addDebugLog(`✓ Модель ${m} успішно відповіла!`, 'success');
+                break;
+              }
+            } else {
+              const errGen = await genRes.json().catch(() => ({}));
+              addDebugLog(`  Модель ${m} повернула HTTP ${genRes.status}: ${errGen.error?.message}`, 'warn');
+            }
+          } catch (e) {
+            addDebugLog(`  Мережевий збій з ${m}: ${e.message}`, 'warn');
+          }
+        }
+
+        if (verifiedModel) {
+          addDebugLog(`🎉 ТЕСТ УСПІШНИЙ! Нейромережа готова до роботи.`, 'success');
+          addDebugLog(`Відповідь від ${verifiedModel}: "${sampleReply.trim()}"`, 'success');
+
+          // Save locally
+          localStorage.setItem('psy_gemini_key', apiKey);
+          localStorage.setItem('psy_gemini_model', verifiedModel);
+          appData.geminiKey = apiKey;
+          appData.geminiModel = verifiedModel;
+
+          badge.className = 'text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold self-start sm:self-auto';
+          badge.textContent = `✅ Успішно (${verifiedModel})`;
+          showToast(`Нейромережу ${verifiedModel} успішно підключено!`);
+        } else {
+          addDebugLog(`❌ Не вдалося знайти активну модель генерації серед дозволених у вашому проекті.`, 'error');
+          badge.className = 'text-xs px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold self-start sm:self-auto';
+          badge.textContent = '❌ Немає доступної моделі';
+        }
+
+      } catch (err) {
+        addDebugLog(`❌ Загальна помилка тестування: ${err.message}`, 'error');
+        badge.className = 'text-xs px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold self-start sm:self-auto';
+        badge.textContent = '❌ Помилка з\'єднання';
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<span>🧪 Протестувати з\'єднання</span>';
+    }
+
     async function saveGeminiToken() {
-      const val = document.getElementById('gemini-token-input').value.trim();
+      const val = document.getElementById('gemini-token-input').value.trim().replace(/^['"]|['"]$/g, '');
       if (val) {
         localStorage.setItem('psy_gemini_key', val);
         appData.geminiKey = val;
@@ -981,6 +1141,7 @@
       } else {
         localStorage.removeItem('psy_gemini_key');
         delete appData.geminiKey;
+        delete appData.geminiModel;
         checkGeminiToken();
         showToast('AI ключ видалено (активний вбудований режим)');
       }
