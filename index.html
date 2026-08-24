@@ -160,6 +160,12 @@
       will-change: transform;
     }
 
+    /* Tap/Click interactions */
+    button, a, [onclick] {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #FAF8F5; }
@@ -167,7 +173,7 @@
     ::-webkit-scrollbar-thumb:hover { background: #A9C1A9; }
   </style>
 </head>
-<body class="antialiased selection:bg-brand-200 selection:text-brand-900 relative">
+<body class="antialiased selection:bg-brand-200 selection:text-brand-900 relative" ontouchstart="">
 
   <!-- Interactive Cursor Follower Glow -->
   <div id="cursor-glow" class="hidden md:block"></div>
@@ -1155,8 +1161,8 @@
   </footer>
 
   <!-- Floating Mobile Sticky CTA Bar -->
-  <div class="fixed bottom-4 left-4 right-4 z-40 md:hidden">
-    <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-full bg-brand-600 text-white font-bold text-sm shadow-2xl border border-white/20 backdrop-blur-md active:scale-95 transition-transform">
+  <div class="fixed bottom-4 left-4 right-4 z-40 md:hidden pointer-events-none">
+    <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="pointer-events-auto w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-full bg-brand-600 text-white font-bold text-sm shadow-2xl border border-white/20 backdrop-blur-md active:scale-95 transition-transform">
       <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
         <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/>
       </svg>
@@ -1165,10 +1171,10 @@
   </div>
 
   <!-- AI Assistant Chat Widget (Floating Interactive Agent) -->
-  <div id="ai-chat-widget" class="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
+  <div id="ai-chat-widget" class="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end pointer-events-none">
     
     <!-- Chat Window Container (Hidden by default) -->
-    <div id="ai-chat-window" class="hidden w-[360px] sm:w-[410px] max-w-[94vw] h-[530px] max-h-[82vh] bg-white rounded-3xl shadow-2xl border border-warm-border flex flex-col overflow-hidden mb-3 transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
+    <div id="ai-chat-window" class="hidden pointer-events-auto w-[360px] sm:w-[410px] max-w-[94vw] h-[530px] max-h-[82vh] bg-white rounded-3xl shadow-2xl border border-warm-border flex flex-col overflow-hidden mb-3 transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
       
       <!-- Chat Header -->
       <div class="bg-brand-900 text-white p-4 flex items-center justify-between shadow-sm shrink-0">
@@ -1184,7 +1190,7 @@
             <p id="ai-chat-status-subtitle" class="text-[11px] text-brand-200">Психологічний гід онлайн</p>
           </div>
         </div>
-        <button onclick="toggleAiChat()" class="text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors text-lg" title="Згорнути чат">
+        <button type="button" onclick="toggleAiChat()" class="text-white/70 hover:text-white p-1.5 rounded-full hover:bg-white/10 transition-colors text-lg" title="Згорнути чат">
           ✕
         </button>
       </div>
@@ -1205,16 +1211,16 @@
 
         <!-- Quick Starter Chips -->
         <div id="ai-starter-chips" class="flex flex-wrap gap-1.5 pt-1">
-          <button onclick="sendQuickPrompt('Як працює метод символдрами?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
+          <button type="button" onclick="sendQuickPrompt('Як працює метод символдрами?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
             🌿 Метод символдрами
           </button>
-          <button onclick="sendQuickPrompt('Як впоратися з тривогою та напругою?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
+          <button type="button" onclick="sendQuickPrompt('Як впоратися з тривогою та напругою?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
             💭 Як впоратися з тривогою?
           </button>
-          <button onclick="sendQuickPrompt('Скільки коштує консультація та як проходить?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
+          <button type="button" onclick="sendQuickPrompt('Скільки коштує консультація та як проходить?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
             💳 Формати та ціни
           </button>
-          <button onclick="sendQuickPrompt('Як записатися на першу консультацію?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
+          <button type="button" onclick="sendQuickPrompt('Як записатися на першу консультацію?')" class="px-3 py-1.5 rounded-full bg-white hover:bg-brand-50 text-brand-800 border border-brand-200 text-xs font-semibold shadow-sm transition-all hover:scale-105">
             📅 Як записатися?
           </button>
         </div>
@@ -1240,7 +1246,7 @@
     </div>
 
     <!-- Floating Toggle Button -->
-    <button onclick="toggleAiChat()" id="ai-chat-toggle-btn" class="group flex items-center gap-2.5 px-5 py-3.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-2xl border-2 border-white/80 hover:shadow-glow transition-all duration-300 transform hover:scale-105">
+    <button type="button" onclick="toggleAiChat()" id="ai-chat-toggle-btn" class="pointer-events-auto group flex items-center gap-2.5 px-5 py-3.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-2xl border-2 border-white/80 hover:shadow-glow transition-all duration-300 transform hover:scale-105">
       <span class="relative flex h-3 w-3">
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-400"></span>
