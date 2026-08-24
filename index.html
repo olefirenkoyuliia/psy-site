@@ -1165,7 +1165,7 @@
   </div>
 
   <!-- AI Assistant Chat Widget (Floating Interactive Agent) -->
-  <div id="ai-chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+  <div id="ai-chat-widget" class="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
     
     <!-- Chat Window Container (Hidden by default) -->
     <div id="ai-chat-window" class="hidden w-[360px] sm:w-[410px] max-w-[94vw] h-[530px] max-h-[82vh] bg-white rounded-3xl shadow-2xl border border-warm-border flex flex-col overflow-hidden mb-3 transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
@@ -1832,8 +1832,7 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
 - Починай відповідь одразу зі слів "Вітаю!" або "Доброго дня!".`;
 
       // Try preferred model from discovery or cutting-edge 2026 flash models
-      const cleanedApiKey = apiKey.trim().replace(/^['"]|['"]$/g, '');
-      const savedModel = localStorage.getItem('psy_gemini_model');
+      const savedModel = localStorage.getItem('psy_gemini_model') || (window.siteAppData && window.siteAppData.geminiModel);
       const models = savedModel ? [savedModel, 'gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemma-4-26b-a4b-it'] : ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemma-4-26b-a4b-it'];
       
       const promptPayload = `${SYSTEM_PROMPT}\n\n---\nПитання відвідувача сайту:\n"${userMessage}"\n\nГотова відповідь для відвідувача (без службових думок):`;
@@ -1876,7 +1875,7 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
       }
 
       // If an explicit API key was provided by user, report the exact Google error:
-      if (apiKey && lastErrorMsg) {
+      if (rawKey && lastErrorMsg) {
         return {
           text: `⚠️ **Помилка відповіді від Google Gemini API:**\n_${lastErrorMsg}_\n\nБудь ласка, перевірте ваш ключ на [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey).`,
           cta: false
