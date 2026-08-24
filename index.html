@@ -1751,8 +1751,8 @@
       const subtitle = document.getElementById('ai-chat-status-subtitle') || document.querySelector('#ai-chat-window p');
       if (subtitle) {
         if (apiKey) {
-          const modelName = localStorage.getItem('psy_gemini_model') || 'Gemini AI';
-          subtitle.textContent = `⚡ ${modelName} активний`;
+          const modelName = localStorage.getItem('psy_gemini_model') || (window.siteAppData && window.siteAppData.geminiModel) || 'Gemini 3.6 Flash';
+          subtitle.textContent = `⚡ ${modelName} онлайн`;
           subtitle.className = 'text-[11px] text-emerald-300 font-bold';
         } else {
           subtitle.textContent = 'Психологічний гід онлайн';
@@ -1799,11 +1799,16 @@
     }
 
     async function fetchGeminiAiResponse(userMessage) {
-      const apiKey = localStorage.getItem('psy_gemini_key') || (window.siteAppData && window.siteAppData.geminiKey);
-      if (!apiKey) {
+      const rawKey = localStorage.getItem('psy_gemini_key') || (window.siteAppData && window.siteAppData.geminiKey);
+      if (!rawKey) {
         console.log('No Gemini API Key found, using local psychological knowledge engine');
         await new Promise(r => setTimeout(r, 500));
         return generateAiPsychologistResponse(userMessage);
+      }
+
+      let cleanedApiKey = rawKey.trim().replace(/^['"]|['"]$/g, '');
+      if (cleanedApiKey.startsWith('QVEu') || cleanedApiKey.endsWith('=')) {
+        try { cleanedApiKey = atob(cleanedApiKey); } catch(e) {}
       }
 
       const SYSTEM_PROMPT = `Ти — чуйний, висококваліфікований та турботливий AI-асистент практикуючої психологині Юлії Олефіренко.
