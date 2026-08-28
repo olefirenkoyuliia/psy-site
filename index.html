@@ -1446,18 +1446,65 @@
     async function loadDynamicSiteData() {
       try {
         let data = null;
-        const local = localStorage.getItem('psy_site_data');
-        if (local) {
-          data = JSON.parse(local);
+        const res = await fetch('data.json?t=' + Date.now());
+        if (res.ok) {
+          data = await res.json();
         } else {
-          const res = await fetch('data.json?t=' + Date.now());
-          if (res.ok) data = await res.json();
+          const local = localStorage.getItem('psy_site_data');
+          if (local) data = JSON.parse(local);
         }
 
         if (!data) return;
         window.siteAppData = data;
 
-        // Render dynamic certificates if present
+        // 1. Bind Profile Texts
+        if (data.profile) {
+          if (data.profile.name) {
+            document.querySelectorAll('[data-bind="profile.name"]').forEach(el => el.textContent = data.profile.name);
+          }
+          if (data.profile.role) {
+            document.querySelectorAll('[data-bind="profile.role"]').forEach(el => el.textContent = data.profile.role);
+          }
+          if (data.profile.heroTitle) {
+            const h1 = document.querySelector('h1');
+            if (h1) h1.textContent = data.profile.heroTitle;
+          }
+          if (data.profile.heroDesc1) {
+            const descEl = document.querySelector('p.text-base.sm\\:text-lg');
+            if (descEl) {
+              descEl.innerHTML = `Мене звати <strong class="text-warm-text font-bold">${data.profile.name || 'Юлія Олефіренко'}</strong>. ${data.profile.heroDesc1}`;
+            }
+          }
+          if (data.profile.quote) {
+            const quoteTextEl = document.querySelector('.font-serif-luxury.italic');
+            if (quoteTextEl) quoteTextEl.textContent = `«${data.profile.quote}»`;
+          }
+          if (data.profile.telegram) {
+            document.querySelectorAll('a[href*="t.me"]').forEach(a => {
+              if (!a.href.includes('?text=')) a.href = data.profile.telegram;
+            });
+          }
+          if (data.profile.instagram) {
+            document.querySelectorAll('a[href*="instagram.com"]').forEach(a => {
+              a.href = data.profile.instagram;
+            });
+          }
+        }
+
+        // 2. Bind Pricing
+        if (data.pricing) {
+          if (data.pricing.firstSessionPrice) {
+            document.querySelectorAll('[data-bind="pricing.firstSessionPrice"]').forEach(el => el.textContent = data.pricing.firstSessionPrice);
+          }
+          if (data.pricing.regularSessionPrice) {
+            document.querySelectorAll('[data-bind="pricing.regularSessionPrice"]').forEach(el => el.textContent = data.pricing.regularSessionPrice);
+          }
+          if (data.pricing.paymentDetails) {
+            document.querySelectorAll('[data-bind="pricing.paymentDetails"]').forEach(el => el.textContent = data.pricing.paymentDetails);
+          }
+        }
+
+        // 3. Render Certificates
         if (data.certificates && data.certificates.length > 0) {
           const grid = document.getElementById('diplomas-grid');
           if (grid) {
@@ -1482,15 +1529,8 @@
             });
           }
         }
-        // Sync Audio Source if uploaded locally or from admin
-        const localAudio = localStorage.getItem('psy_site_audio');
-        const audioEl = document.getElementById('greeting-audio');
-        if (localAudio && audioEl) {
-          audioEl.src = localAudio;
-          audioEl.load();
-        }
 
-        // Update AI Chat Status Badge
+        // 4. Update AI Chat Badge
         updateAiChatBadge();
       } catch (err) {
         console.log('Using default static content:', err);
