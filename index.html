@@ -1574,11 +1574,12 @@
       } catch (err) {}
     }
 
-    // Instant startup & cross-tab / focus listeners
+    // Instant startup & cross-tab / focus / interval listeners
     loadDynamicSiteData();
     document.addEventListener('DOMContentLoaded', loadDynamicSiteData);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) loadDynamicSiteData(); });
     window.addEventListener('focus', loadDynamicSiteData);
+    setInterval(loadDynamicSiteData, 4000);
     window.addEventListener('storage', (e) => {
       if (e.key === 'psy_site_data' && e.newValue) {
         try { applyDynamicSiteData(JSON.parse(e.newValue)); } catch(err) {}
