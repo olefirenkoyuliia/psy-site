@@ -1553,6 +1553,8 @@
     }
     loadDynamicSiteData();
     document.addEventListener('DOMContentLoaded', loadDynamicSiteData);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) loadDynamicSiteData(); });
+    window.addEventListener('focus', loadDynamicSiteData);
 
     // 9. Built-in Analytics & Telegram Conversion Tracker
     (function initAnalytics() {
