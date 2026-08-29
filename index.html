@@ -392,11 +392,11 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="book-formats">
             <button type="button" onclick="selectSlot('format', 'Консультування (до 10 зустрічей)', this)" class="slot-btn format-btn active p-4 rounded-2xl border-2 border-brand-600 bg-brand-50 text-left font-bold text-sm text-brand-900 transition-all flex items-center justify-between">
               <span>💬 Консультування (1–10 сесій)</span>
-              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-brand-200">1 000 грн</span>
+              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-brand-200" data-bind="pricing.firstSessionPrice">1 000 грн</span>
             </button>
             <button type="button" onclick="selectSlot('format', 'Психотерапія (глибинна робота)', this)" class="slot-btn format-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/30 text-left font-bold text-sm text-warm-text transition-all flex items-center justify-between hover:border-brand-400">
               <span>🌊 Психотерапія (глибинний метод)</span>
-              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-warm-border">1 000 грн</span>
+              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-warm-border" data-bind="pricing.regularSessionPrice">1 200 грн</span>
             </button>
           </div>
         </div>
@@ -447,9 +447,9 @@
             <div id="summary-text" class="font-bold text-base sm:text-lg text-white">
               Консультування • Будні дні • День (14–18)
             </div>
-            <div class="text-xs text-brand-200">Перша консультація: 1 000 грн (50 хв)</div>
+            <div class="text-xs text-brand-200" id="booking-price-hint">Перша консультація: <span data-bind="pricing.firstSessionPrice">1 000 грн</span> (<span data-bind="pricing.duration">50 хв</span>)</div>
           </div>
-          <a id="booking-tg-btn" href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-white hover:bg-brand-50 text-brand-900 font-bold text-sm shadow-2xl transition-all transform hover:scale-105 shrink-0">
+          <a id="booking-tg-btn" href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-white hover:bg-brand-50 text-brand-900 font-bold text-sm shadow-2xl transition-all transform hover:scale-105 shrink-0" data-bind-telegram>
             <span>Забронювати в Telegram</span>
             <span>➔</span>
           </a>
@@ -1501,6 +1501,9 @@
           if (data.pricing.regularSessionPrice) {
             document.querySelectorAll('[data-bind="pricing.regularSessionPrice"]').forEach(el => el.textContent = data.pricing.regularSessionPrice);
           }
+          if (data.pricing.duration) {
+            document.querySelectorAll('[data-bind="pricing.duration"]').forEach(el => el.textContent = data.pricing.duration);
+          }
           if (data.pricing.paymentDetails) {
             document.querySelectorAll('[data-bind="pricing.paymentDetails"]').forEach(el => el.textContent = data.pricing.paymentDetails);
           }
@@ -1538,6 +1541,7 @@
         console.log('Using default static content:', err);
       }
     }
+    loadDynamicSiteData();
     document.addEventListener('DOMContentLoaded', loadDynamicSiteData);
 
     // 9. Built-in Analytics & Telegram Conversion Tracker
