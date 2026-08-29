@@ -1453,108 +1453,135 @@
       if (e.key === 'Escape') closeLightbox();
     });
 
-    // 8. Dynamic Data Sync (with data.json / admin updates)
+    // 8. Dynamic Data Sync (Zero-Delay Multi-Tiered Architecture)
+    function applyDynamicSiteData(data) {
+      if (!data) return;
+      window.siteAppData = data;
+
+      // 1. Bind Profile Texts
+      if (data.profile) {
+        if (data.profile.name) {
+          document.querySelectorAll('[data-bind="profile.name"]').forEach(el => el.textContent = data.profile.name);
+        }
+        if (data.profile.role) {
+          document.querySelectorAll('[data-bind="profile.role"]').forEach(el => el.textContent = data.profile.role);
+        }
+        if (data.profile.heroTitle) {
+          document.querySelectorAll('[data-bind="profile.heroTitle"]').forEach(el => el.textContent = data.profile.heroTitle);
+          const h1 = document.querySelector('h1');
+          if (h1) h1.textContent = data.profile.heroTitle;
+        }
+        if (data.profile.heroDesc1) {
+          const descEl = document.getElementById('hero-bio-desc') || document.querySelector('p.text-base.sm\\:text-lg');
+          if (descEl) {
+            descEl.innerHTML = `Мене звати <strong class="text-warm-text font-bold">${data.profile.name || 'Юлія Олефіренко'}</strong>. ${data.profile.heroDesc1}`;
+          }
+        }
+        if (data.profile.quote) {
+          document.querySelectorAll('[data-bind="profile.quote"]').forEach(el => el.textContent = `«${data.profile.quote}»`);
+        }
+        if (data.profile.quoteDesc) {
+          document.querySelectorAll('[data-bind="profile.quoteDesc"]').forEach(el => el.textContent = data.profile.quoteDesc);
+        }
+        if (data.profile.telegram) {
+          document.querySelectorAll('a[href*="t.me"]').forEach(a => {
+            if (!a.href.includes('?text=')) a.href = data.profile.telegram;
+          });
+        }
+        if (data.profile.instagram) {
+          document.querySelectorAll('a[href*="instagram.com"]').forEach(a => {
+            a.href = data.profile.instagram;
+          });
+        }
+      }
+
+      // 2. Bind Pricing
+      if (data.pricing) {
+        if (data.pricing.firstSessionPrice) {
+          document.querySelectorAll('[data-bind="pricing.firstSessionPrice"]').forEach(el => el.textContent = data.pricing.firstSessionPrice);
+        }
+        if (data.pricing.regularSessionPrice) {
+          document.querySelectorAll('[data-bind="pricing.regularSessionPrice"]').forEach(el => el.textContent = data.pricing.regularSessionPrice);
+        }
+        if (data.pricing.duration) {
+          document.querySelectorAll('[data-bind="pricing.duration"]').forEach(el => el.textContent = data.pricing.duration);
+        }
+        if (data.pricing.paymentDetails) {
+          document.querySelectorAll('[data-bind="pricing.paymentDetails"]').forEach(el => el.textContent = data.pricing.paymentDetails);
+        }
+      }
+
+      // 3. Render Certificates
+      if (data.certificates && data.certificates.length > 0) {
+        const grid = document.getElementById('diplomas-grid');
+        if (grid) {
+          grid.innerHTML = '';
+          data.certificates.forEach(cert => {
+            const item = document.createElement('div');
+            item.className = 'group relative bg-white p-2.5 rounded-2xl border border-warm-border shadow-card hover:shadow-hover transition-all duration-300 cursor-pointer overflow-hidden';
+            item.onclick = () => openLightbox(cert.image, cert.title);
+            item.innerHTML = `
+              <div class="aspect-[3/4] rounded-xl overflow-hidden bg-warm-sand/30 flex items-center justify-center">
+                <img src="${cert.image}" alt="${cert.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+              </div>
+              <div class="p-2 text-center">
+                <p class="text-xs font-bold text-warm-text truncate">${cert.title}</p>
+                <p class="text-[11px] text-warm-muted truncate">${cert.category || 'Документ'}</p>
+              </div>
+              <div class="absolute inset-0 bg-brand-900/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl">
+                <span class="p-2.5 bg-white/95 rounded-full text-brand-800 shadow-md">🔍</span>
+              </div>
+            `;
+            grid.appendChild(item);
+          });
+        }
+      }
+
+      // 4. Update AI Chat Badge
+      updateAiChatBadge();
+    }
+
     async function loadDynamicSiteData() {
+      // Step 1: Render cached local data immediately (0ms)
       try {
-        let data = null;
-        const res = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
-        if (res.ok) {
-          data = await res.json();
-          try { localStorage.setItem('psy_site_data', JSON.stringify(data)); } catch(e) {}
-        } else {
-          const local = localStorage.getItem('psy_site_data');
-          if (local) data = JSON.parse(local);
-        }
+        const local = localStorage.getItem('psy_site_data');
+        if (local) applyDynamicSiteData(JSON.parse(local));
+      } catch (e) {}
 
-        if (!data) return;
-        window.siteAppData = data;
+      // Step 2: Fetch latest data directly from raw github (bypasses GitHub Pages 30s CDN delay)
+      try {
+        const t = Date.now();
+        const urls = [
+          `https://raw.githubusercontent.com/olefirenkoyuliia/psy-site/main/data.json?t=${t}`,
+          `data.json?t=${t}`
+        ];
 
-        // 1. Bind Profile Texts
-        if (data.profile) {
-          if (data.profile.name) {
-            document.querySelectorAll('[data-bind="profile.name"]').forEach(el => el.textContent = data.profile.name);
-          }
-          if (data.profile.role) {
-            document.querySelectorAll('[data-bind="profile.role"]').forEach(el => el.textContent = data.profile.role);
-          }
-          if (data.profile.heroTitle) {
-            const h1 = document.querySelector('h1');
-            if (h1) h1.textContent = data.profile.heroTitle;
-          }
-          if (data.profile.heroDesc1) {
-            const descEl = document.querySelector('p.text-base.sm\\:text-lg');
-            if (descEl) {
-              descEl.innerHTML = `Мене звати <strong class="text-warm-text font-bold">${data.profile.name || 'Юлія Олефіренко'}</strong>. ${data.profile.heroDesc1}`;
+        for (const url of urls) {
+          try {
+            const res = await fetch(url, { cache: 'no-store' });
+            if (res.ok) {
+              const freshData = await res.json();
+              applyDynamicSiteData(freshData);
+              try { localStorage.setItem('psy_site_data', JSON.stringify(freshData)); } catch(e) {}
+              break;
             }
-          }
-          if (data.profile.quote) {
-            const quoteTextEl = document.querySelector('.font-serif-luxury.italic');
-            if (quoteTextEl) quoteTextEl.textContent = `«${data.profile.quote}»`;
-          }
-          if (data.profile.telegram) {
-            document.querySelectorAll('a[href*="t.me"]').forEach(a => {
-              if (!a.href.includes('?text=')) a.href = data.profile.telegram;
-            });
-          }
-          if (data.profile.instagram) {
-            document.querySelectorAll('a[href*="instagram.com"]').forEach(a => {
-              a.href = data.profile.instagram;
-            });
-          }
+          } catch(err) {}
         }
-
-        // 2. Bind Pricing
-        if (data.pricing) {
-          if (data.pricing.firstSessionPrice) {
-            document.querySelectorAll('[data-bind="pricing.firstSessionPrice"]').forEach(el => el.textContent = data.pricing.firstSessionPrice);
-          }
-          if (data.pricing.regularSessionPrice) {
-            document.querySelectorAll('[data-bind="pricing.regularSessionPrice"]').forEach(el => el.textContent = data.pricing.regularSessionPrice);
-          }
-          if (data.pricing.duration) {
-            document.querySelectorAll('[data-bind="pricing.duration"]').forEach(el => el.textContent = data.pricing.duration);
-          }
-          if (data.pricing.paymentDetails) {
-            document.querySelectorAll('[data-bind="pricing.paymentDetails"]').forEach(el => el.textContent = data.pricing.paymentDetails);
-          }
-        }
-
-        // 3. Render Certificates
-        if (data.certificates && data.certificates.length > 0) {
-          const grid = document.getElementById('diplomas-grid');
-          if (grid) {
-            grid.innerHTML = '';
-            data.certificates.forEach(cert => {
-              const item = document.createElement('div');
-              item.className = 'group relative bg-white p-2.5 rounded-2xl border border-warm-border shadow-card hover:shadow-hover transition-all duration-300 cursor-pointer overflow-hidden';
-              item.onclick = () => openLightbox(cert.image, cert.title);
-              item.innerHTML = `
-                <div class="aspect-[3/4] rounded-xl overflow-hidden bg-warm-sand/30 flex items-center justify-center">
-                  <img src="${cert.image}" alt="${cert.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                </div>
-                <div class="p-2 text-center">
-                  <p class="text-xs font-bold text-warm-text truncate">${cert.title}</p>
-                  <p class="text-[11px] text-warm-muted truncate">${cert.category || 'Документ'}</p>
-                </div>
-                <div class="absolute inset-0 bg-brand-900/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl">
-                  <span class="p-2.5 bg-white/95 rounded-full text-brand-800 shadow-md">🔍</span>
-                </div>
-              `;
-              grid.appendChild(item);
-            });
-          }
-        }
-
-        // 4. Update AI Chat Badge
-        updateAiChatBadge();
       } catch (err) {
-        console.log('Using default static content:', err);
+        console.log('Sync note:', err);
       }
     }
+
+    // Instant startup & cross-tab / focus listeners
     loadDynamicSiteData();
     document.addEventListener('DOMContentLoaded', loadDynamicSiteData);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) loadDynamicSiteData(); });
     window.addEventListener('focus', loadDynamicSiteData);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'psy_site_data' && e.newValue) {
+        try { applyDynamicSiteData(JSON.parse(e.newValue)); } catch(err) {}
+      }
+    });
 
     // 9. Built-in Analytics & Telegram Conversion Tracker
     (function initAnalytics() {
