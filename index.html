@@ -1474,7 +1474,12 @@
         if (data.profile.heroDesc1) {
           const descEl = document.getElementById('hero-bio-desc') || document.querySelector('p.text-base.sm\\:text-lg');
           if (descEl) {
-            descEl.innerHTML = `Мене звати <strong class="text-warm-text font-bold">${data.profile.name || 'Юлія Олефіренко'}</strong>. ${data.profile.heroDesc1}`;
+            let descText = data.profile.heroDesc1;
+            const prefix = `Мене звати ${data.profile.name || 'Юлія Олефіренко'}.`;
+            if (descText.startsWith(prefix)) {
+              descText = descText.substring(prefix.length).trim();
+            }
+            descEl.innerHTML = `Мене звати <strong class="text-warm-text font-bold">${data.profile.name || 'Юлія Олефіренко'}</strong>. ${descText}`;
           }
         }
         if (data.profile.quote) {
