@@ -852,7 +852,7 @@
     async function saveAllChanges() {
       const saveBtn = document.getElementById('save-main-btn');
       saveBtn.disabled = true;
-      saveBtn.innerHTML = '<span>⏳ Збереження...</span>';
+      saveBtn.innerHTML = '<span>⏳ Збереження на сайт...</span>';
 
       // Gather form data
       appData.profile.name = document.getElementById('field-name').value;
@@ -885,33 +885,48 @@
         localStorage.setItem('psy_site_audio', pendingAudioBase64);
       }
 
-      // Check if GitHub token is present to push live
-      const token = localStorage.getItem('psy_github_token');
+      // Check GitHub token to publish live to server
+      const token = localStorage.getItem('psy_github_token') || document.getElementById('github-token-input').value.trim();
       if (token) {
+        localStorage.setItem('psy_github_token', token);
         try {
-          // 1. Push data.json
-          await pushDataToGithub(token, 'data.json', JSON.stringify(appData, null, 2), 'Update website data via admin');
+          // 1. Push data.json to GitHub
+          await pushDataToGithub(token, 'data.json', JSON.stringify(appData, null, 2), 'Update website data via admin panel');
 
           // 2. If new audio selected, push audio/greeting.mp3
           if (pendingAudioBase64) {
             const rawBase64 = pendingAudioBase64.split(',')[1];
-            await pushBinaryToGithub(token, 'audio/greeting.mp3', rawBase64, 'Update greeting.mp3 via admin');
-            document.getElementById('audio-status-badge').className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
-            document.getElementById('audio-status-badge').textContent = '✅ Аудіо збережено';
+            await pushBinaryToGithub(token, 'audio/greeting.mp3', rawBase64, 'Update greeting.mp3 via admin panel');
+            const badge = document.getElementById('audio-status-badge');
+            if (badge) {
+              badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
+              badge.textContent = '✅ Аудіо збережено на сервері';
+            }
             pendingAudioBase64 = null;
           }
 
-          showToast('Зміни та аудіо збережено на GitHub!');
+          showToast('🎉 Всі зміни та аудіо успішно опубліковано на сайті!');
         } catch (err) {
           console.error('GitHub Push failed:', err);
+          alert('⚠️ Помилка публікації на GitHub: ' + err.message + '\nЗміни збережено в локальному браузері.');
           showToast('Збережено локально. Помилка GitHub: ' + err.message, '⚠️');
         }
       } else {
-        showToast('Збережено в браузері (для сайту введіть GitHub токен)');
+        alert('⚠️ GitHub токен не знайдено! Введіть GitHub токен у верхньому блоці, щоб зміни стали видимі всім відвідувачам сайту.');
+        showToast('Збережено в браузері (для публікації введіть GitHub токен)', '⚠️');
       }
 
       saveBtn.disabled = false;
-      saveBtn.innerHTML = '<span>💾 Зберегти</span>';
+      saveBtn.innerHTML = '<span>💾 Зберегти всі зміни</span>';
+    }
+
+    function utf8ToBase64(str) {
+      const bytes = new TextEncoder().encode(str);
+      let bin = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        bin += String.fromCharCode(bytes[i]);
+      }
+      return btoa(bin);
     }
 
     // GitHub API Push for Text/JSON
@@ -926,7 +941,7 @@
         }
       } catch (e) {}
 
-      const encoded = btoa(unescape(encodeURIComponent(contentStr)));
+      const encoded = utf8ToBase64(contentStr);
       const body = { message: commitMsg, content: encoded, branch: 'main' };
       if (sha) body.sha = sha;
 
@@ -971,10 +986,18 @@
     function checkGithubToken() {
       const token = localStorage.getItem('psy_github_token');
       const badge = document.getElementById('github-status-badge');
+      const input = document.getElementById('github-token-input');
       if (token) {
-        document.getElementById('github-token-input').value = token;
-        badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
-        badge.textContent = '✅ Підключено до GitHub';
+        if (input) input.value = token;
+        if (badge) {
+          badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
+          badge.textContent = '✅ Підключено до GitHub';
+        }
+      } else {
+        if (badge) {
+          badge.className = 'text-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium';
+          badge.textContent = '⚠️ Токен не збережено';
+        }
       }
     }
 
@@ -983,10 +1006,11 @@
       if (val) {
         localStorage.setItem('psy_github_token', val);
         checkGithubToken();
-        showToast('GitHub токен збережено!');
+        showToast('GitHub токен збережено в браузері!');
       } else {
         localStorage.removeItem('psy_github_token');
         checkGithubToken();
+        showToast('GitHub токен видалено');
       }
     }
 
