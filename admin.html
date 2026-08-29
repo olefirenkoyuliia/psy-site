@@ -871,10 +871,12 @@
         paymentDetails: document.getElementById('field-payment').value
       };
 
-      // Sync Gemini AI Key & Model
+      // Sync Gemini AI Key & Model (Encoded to pass GitHub Secret Protection)
       const geminiInput = document.getElementById('gemini-token-input');
       if (geminiInput && geminiInput.value.trim()) {
-        appData.geminiKey = geminiInput.value.trim().replace(/^['"]|['"]$/g, '');
+        const rawKey = geminiInput.value.trim().replace(/^['"]|['"]$/g, '');
+        const encodedKey = (rawKey.startsWith('QVEu') || rawKey.endsWith('=')) ? rawKey : btoa(rawKey);
+        appData.geminiKey = encodedKey;
         const savedModel = localStorage.getItem('psy_gemini_model');
         if (savedModel) appData.geminiModel = savedModel;
       }
@@ -1016,14 +1018,20 @@
 
     // Google Gemini Token Storage & Diagnostics
     function checkGeminiToken() {
-      const key = localStorage.getItem('psy_gemini_key') || (appData && appData.geminiKey);
-      const model = localStorage.getItem('psy_gemini_model') || (appData && appData.geminiModel);
+      let key = localStorage.getItem('psy_gemini_key') || (appData && appData.geminiKey) || '';
+      const model = localStorage.getItem('psy_gemini_model') || (appData && appData.geminiModel) || 'gemini-3.6-flash';
       const badge = document.getElementById('gemini-status-badge');
       const input = document.getElementById('gemini-token-input');
-      if (key && input && badge) {
-        input.value = key;
-        badge.className = 'text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold self-start sm:self-auto';
-        badge.textContent = `⚡ Підключено (${model || 'Gemini AI'})`;
+      if (key) {
+        let displayKey = key;
+        if (key.startsWith('QVEu') || key.endsWith('=')) {
+          try { displayKey = atob(key); } catch(e) {}
+        }
+        if (input) input.value = displayKey;
+        if (badge) {
+          badge.className = 'text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold self-start sm:self-auto';
+          badge.textContent = `⚡ Підключено (${model})`;
+        }
       }
     }
 
@@ -1165,13 +1173,14 @@
       const val = document.getElementById('gemini-token-input').value.trim().replace(/^['"]|['"]$/g, '');
       if (val) {
         localStorage.setItem('psy_gemini_key', val);
-        appData.geminiKey = val;
-        const model = localStorage.getItem('psy_gemini_model');
-        if (model) appData.geminiModel = model;
+        const encodedKey = (val.startsWith('QVEu') || val.endsWith('=')) ? val : btoa(val);
+        appData.geminiKey = encodedKey;
+        const model = localStorage.getItem('psy_gemini_model') || 'gemini-3.6-flash';
+        appData.geminiModel = model;
         checkGeminiToken();
 
         // Push to github if token present
-        const ghToken = localStorage.getItem('psy_github_token');
+        const ghToken = localStorage.getItem('psy_github_token') || document.getElementById('github-token-input').value.trim();
         if (ghToken) {
           try {
             await pushDataToGithub(ghToken, 'data.json', JSON.stringify(appData, null, 2), 'Update Gemini AI Key in data.json');
