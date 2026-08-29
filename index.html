@@ -1548,28 +1548,30 @@
         if (local) applyDynamicSiteData(JSON.parse(local));
       } catch (e) {}
 
-      // Step 2: Fetch latest data directly from raw github (bypasses GitHub Pages 30s CDN delay)
+      // Step 2: Fetch 0-delay real-time data from GitHub Git DB
       try {
-        const t = Date.now();
-        const urls = [
-          `https://raw.githubusercontent.com/olefirenkoyuliia/psy-site/main/data.json?t=${t}`,
-          `data.json?t=${t}`
-        ];
-
-        for (const url of urls) {
-          try {
-            const res = await fetch(url, { cache: 'no-store' });
-            if (res.ok) {
-              const freshData = await res.json();
-              applyDynamicSiteData(freshData);
-              try { localStorage.setItem('psy_site_data', JSON.stringify(freshData)); } catch(e) {}
-              break;
-            }
-          } catch(err) {}
+        const ghRes = await fetch('https://api.github.com/repos/olefirenkoyuliia/psy-site/contents/data.json');
+        if (ghRes.ok) {
+          const ghJson = await ghRes.json();
+          if (ghJson.content) {
+            const bytes = Uint8Array.from(atob(ghJson.content.replace(/\s/g, '')), c => c.charCodeAt(0));
+            const freshData = JSON.parse(new TextDecoder().decode(bytes));
+            applyDynamicSiteData(freshData);
+            try { localStorage.setItem('psy_site_data', JSON.stringify(freshData)); } catch(e) {}
+            return;
+          }
         }
-      } catch (err) {
-        console.log('Sync note:', err);
-      }
+      } catch(err) {}
+
+      // Step 3: Fallback to local relative data.json
+      try {
+        const res = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) {
+          const freshData = await res.json();
+          applyDynamicSiteData(freshData);
+          try { localStorage.setItem('psy_site_data', JSON.stringify(freshData)); } catch(e) {}
+        }
+      } catch (err) {}
     }
 
     // Instant startup & cross-tab / focus listeners

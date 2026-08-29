@@ -733,17 +733,40 @@
     });
 
     async function loadData() {
+      let loaded = false;
+      const ghToken = localStorage.getItem('psy_github_token');
+      const headers = ghToken ? { 'Authorization': `Bearer ${ghToken}` } : {};
+
+      // 1. Try GitHub Contents API (0s delay from Git DB)
       try {
-        const res = await fetch('data.json?t=' + Date.now());
-        if (res.ok) {
-          appData = await res.json();
-        } else {
-          const local = localStorage.getItem('psy_site_data');
-          if (local) appData = JSON.parse(local);
+        const ghRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json`, { headers });
+        if (ghRes.ok) {
+          const ghJson = await ghRes.json();
+          if (ghJson.content) {
+            const bytes = Uint8Array.from(atob(ghJson.content.replace(/\s/g, '')), c => c.charCodeAt(0));
+            appData = JSON.parse(new TextDecoder().decode(bytes));
+            localStorage.setItem('psy_site_data', JSON.stringify(appData));
+            loaded = true;
+          }
         }
-      } catch (e) {
-        console.error('Error loading data.json:', e);
+      } catch (e) {}
+
+      // 2. Fallback to data.json
+      if (!loaded) {
+        try {
+          const res = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            appData = await res.json();
+            loaded = true;
+          }
+        } catch (e) {}
       }
+
+      if (!loaded) {
+        const local = localStorage.getItem('psy_site_data');
+        if (local) appData = JSON.parse(local);
+      }
+
       populateForm();
       renderAdminCertificates();
 
