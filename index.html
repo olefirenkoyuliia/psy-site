@@ -835,7 +835,7 @@
           </div>
         </div>
 
-        <!-- Result Screen (Personalized Psychological Blueprint) -->
+        <!-- Result Screen (Summary of Answers & Direct Telegram Dispatch) -->
         <div id="quiz-step-result" class="quiz-step hidden space-y-6">
           <div class="p-6 sm:p-8 rounded-3xl bg-brand-50 border-2 border-brand-200 space-y-4">
             <div class="flex items-center gap-3">
@@ -843,29 +843,33 @@
                 ✨
               </span>
               <div>
-                <span class="text-xs font-bold text-brand-800 uppercase tracking-wider">Ваш діагностичний фокус</span>
+                <span class="text-xs font-bold text-brand-800 uppercase tracking-wider">Опитування завершено</span>
                 <h4 id="quiz-result-title" class="font-serif-luxury text-xl sm:text-2xl font-bold text-warm-text">
-                  Фокус: Робота з тривожністю та відновлення опор
+                  Ваші відповіді для знайомства з Юлією
                 </h4>
               </div>
             </div>
 
             <p id="quiz-result-desc" class="text-sm text-warm-text leading-relaxed">
-              Ваш стан свідчить про накопичену перевтому та потребу у безпечному просторі прийняття. Метод символдрами (робота з підсвідомими образами) допоможе м'яко вивільнити напруження та відкрити внутрішні ресурси відновлення.
+              Дякуємо за ваші відповіді! Ця інформація допоможе психологині заздалегідь краще зрозуміти вашу ситуацію та зробити першу зустріч максимально продуктивною та комфортною.
             </p>
 
-            <div class="pt-3 border-t border-brand-200/80 text-xs text-warm-muted space-y-1.5">
-              <div class="flex items-center gap-2">
-                <span class="text-brand-700 font-bold">•</span>
-                <span><strong>Ключовий запит:</strong> <span id="res-bullet-1" class="font-medium text-warm-text">Тривожність та напруження</span></span>
+            <div class="pt-3 border-t border-brand-200/80 text-xs text-warm-muted space-y-2">
+              <div class="flex items-start gap-2">
+                <span class="text-brand-700 font-bold mt-0.5">1.</span>
+                <span><strong>Що найбільше турбує:</strong> <span id="res-bullet-1" class="font-medium text-warm-text"></span></span>
               </div>
-              <div class="flex items-center gap-2">
-                <span class="text-brand-700 font-bold">•</span>
-                <span><strong>Бажаний результат:</strong> <span id="res-bullet-2" class="font-medium text-warm-text">Внутрішній спокій та ресурс</span></span>
+              <div class="flex items-start gap-2">
+                <span class="text-brand-700 font-bold mt-0.5">2.</span>
+                <span><strong>Як проявляється:</strong> <span id="res-bullet-2" class="font-medium text-warm-text"></span></span>
               </div>
-              <div class="flex items-center gap-2">
-                <span class="text-brand-700 font-bold">•</span>
-                <span><strong>Рекомендований формат:</strong> Онлайн-сесія (Google Meet, 50 хвилин, 1 200 грн)</span>
+              <div class="flex items-start gap-2">
+                <span class="text-brand-700 font-bold mt-0.5">3.</span>
+                <span><strong>Досвід у психолога:</strong> <span id="res-bullet-3" class="font-medium text-warm-text"></span></span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="text-brand-700 font-bold mt-0.5">4.</span>
+                <span><strong>Бажаний результат:</strong> <span id="res-bullet-4" class="font-medium text-warm-text"></span></span>
               </div>
             </div>
           </div>
@@ -873,18 +877,16 @@
           <!-- Direct Send to Telegram CTA Card -->
           <div class="p-6 rounded-3xl bg-brand-900 text-white space-y-4 shadow-xl">
             <div class="space-y-1">
-              <span class="text-xs text-brand-300 font-semibold uppercase tracking-wider">Готовий запит для першої сесії:</span>
-              <p class="text-xs text-white/90 italic bg-white/10 p-3.5 rounded-xl border border-white/15" id="quiz-draft-text">
-                «Привіт, Юліє! Я пройшов(ла) експрес-тест на сайті. Мій основний фокус: [Тривожність]. Хочу записатися на консультацію.»
-              </p>
+              <span class="text-xs text-brand-300 font-semibold uppercase tracking-wider">Текст повідомлення для відправки в Telegram:</span>
+              <p class="text-xs text-white/90 font-mono bg-white/10 p-3.5 rounded-xl border border-white/15 whitespace-pre-line" id="quiz-draft-text"></p>
             </div>
             <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <a id="quiz-tg-send-btn" href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto flex-grow inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-full bg-white hover:bg-brand-50 text-brand-900 font-bold text-sm shadow-lg transition-all transform hover:scale-[1.02] active:scale-95" data-bind-telegram>
                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/></svg>
-                <span>Надіслати Юлії в Telegram та обрати час</span>
+                <span>Надіслати відповіді Юлії в Telegram</span>
               </a>
               <a href="#booking-widget" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-4 rounded-full bg-brand-800 hover:bg-brand-700 text-white font-semibold text-xs border border-brand-700 transition-all">
-                <span>🗓️ До вибору часу</span>
+                <span>🗓️ Обрати час</span>
               </a>
               <button onclick="restartQuiz()" type="button" class="text-xs text-brand-300 hover:text-white underline py-2 px-3 transition-colors">
                 Пройти знову
@@ -2575,34 +2577,22 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
       }
       document.getElementById('quiz-step-result')?.classList.remove('hidden');
 
-      document.getElementById('quiz-step-title').textContent = '✨ Ваш персональний діагностичний профіль';
+      document.getElementById('quiz-step-title').textContent = '✨ Ваші відповіді на запитання';
       document.getElementById('quiz-step-pct').textContent = '100%';
       document.getElementById('quiz-progress-bar').style.width = '100%';
 
-      const focus = quizState.answers.focus || 'Тривожність та напруження';
-      const goal = quizState.answers.goal || 'Внутрішній спокій та опора';
+      const focus = quizState.answers.focus || 'Не вказано';
+      const symptom = quizState.answers.symptom || 'Не вказано';
+      const experience = quizState.answers.experience || 'Не вказано';
+      const goal = quizState.answers.goal || 'Не вказано';
 
-      let title = `Фокус: ${focus}`;
-      let desc = `Ваш стан свідчить про накопичену перевтому та потребу у безпечному просторі прийняття. Метод символдрами (робота з образами підсвідомості) допоможе м'яко вивільнити напруження, обійти внутрішнього критика та знайти справжні опори для відновлення життєвих сил.`;
-
-      if (focus.includes('вигоран') || focus.includes('Втома')) {
-        title = `Фокус: Емоційне відновлення та робота з вигоранням`;
-        desc = `Ви відчуваєте виснаження ресурсів. У роботі з Юлією основний акцент буде зроблено на поверненні контакту зі своїми потребами, дбайливому відновленні енергії та знятті синдрому надвідповідальності.`;
-      } else if (focus.includes('Самооцінка') || focus.includes('критик')) {
-        title = `Фокус: Зміцнення самооцінки та прийняття себе`;
-        desc = `Ваш внутрішній критик забирає багато сил. Символдрама дозволяє вибудувати міцну самоцінність, навчитися підтримувати себе та відчувати впевненість у власних рішеннях без страху оцінки.`;
-      } else if (focus.includes('Стосунки') || focus.includes('кордони')) {
-        title = `Фокус: Гармонія у стосунках та особисті кордони`;
-        desc = `Складнощі у взаємодії часто пов'язані з небезпекою відстоювати свої межі. На консультаціях ми дослідимо ваші моделі близькості та навчимося говорити «ні» без почуття провини.`;
-      }
-
-      document.getElementById('quiz-result-title').textContent = title;
-      document.getElementById('quiz-result-desc').textContent = desc;
       document.getElementById('res-bullet-1').textContent = focus;
-      document.getElementById('res-bullet-2').textContent = goal;
+      document.getElementById('res-bullet-2').textContent = symptom;
+      document.getElementById('res-bullet-3').textContent = experience;
+      document.getElementById('res-bullet-4').textContent = goal;
 
-      const draft = `Привіт, Юліє! Я пройшов(ла) експрес-діагностику на сайті. Мій стан: ${focus}. Бажаний результат: ${goal}. Досвід: ${quizState.answers.experience || 'перший раз'}. Хочу записатися на онлайн-консультацію.`;
-      document.getElementById('quiz-draft-text').textContent = `«${draft}»`;
+      const draft = `Привіт, Юліє! Відправляю свої відповіді на опитування з сайту:\n\n1. Що турбує: ${focus}\n2. Як проявляється: ${symptom}\n3. Досвід у психолога: ${experience}\n4. Бажаний результат: ${goal}\n\nХочу записатися до вас на онлайн-консультацію.`;
+      document.getElementById('quiz-draft-text').textContent = draft;
 
       const tgBtn = document.getElementById('quiz-tg-send-btn');
       if (tgBtn) {
@@ -2611,7 +2601,7 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
 
       // Track quiz completion to server
       if (typeof trackEvent === 'function') {
-        trackEvent('quiz_completed', { focus, goal });
+        trackEvent('quiz_completed', { focus, symptom, experience, goal });
       }
     }
 
