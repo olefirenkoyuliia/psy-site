@@ -575,12 +575,16 @@
     const REPO_OWNER = 'olefirenkoyuliia';
     const REPO_NAME = 'psy-site';
 
-    // Default credentials
+    // Default credentials (Strong Master Password)
     const DEFAULT_USER = 'admin';
-    const DEFAULT_PASS = 'yuliia2026';
+    const DEFAULT_PASS = 'Psy#Olefirenko2026!';
 
     // 1. Authentication System
     function getStoredAuth() {
+      const storedPass = localStorage.getItem('psy_admin_pass');
+      if (storedPass === 'yuliia2026') {
+        localStorage.removeItem('psy_admin_pass');
+      }
       return {
         user: localStorage.getItem('psy_admin_user') || DEFAULT_USER,
         pass: localStorage.getItem('psy_admin_pass') || DEFAULT_PASS
