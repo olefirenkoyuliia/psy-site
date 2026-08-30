@@ -11,8 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS & SortableJS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -426,12 +427,17 @@
 
       <!-- Section 4: Certificates Manager -->
       <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
-        <div class="border-b border-gray-100 pb-4 flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <span class="text-xl">🎓</span>
-            <h2 class="font-bold text-gray-900 text-base sm:text-lg">Сертифікати та Дипломи</h2>
+        <div class="border-b border-gray-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl">🎓</span>
+              <h2 class="font-bold text-gray-900 text-base sm:text-lg">Сертифікати та Дипломи</h2>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 flex items-center gap-1.5">
+              <span>🖐️</span> <span>Перетягуйте картки мишкою або пальцем, щоб змінити порядок їх відображення на сайті.</span>
+            </p>
           </div>
-          <button onclick="openAddCertModal()" class="px-4 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold transition-all flex items-center gap-1.5">
+          <button onclick="openAddCertModal()" class="px-4 py-2.5 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shrink-0 shadow-sm">
             <span>+ Додати сертифікат</span>
           </button>
         </div>
@@ -858,18 +864,20 @@
 
       appData.certificates.forEach((cert, idx) => {
         const card = document.createElement('div');
-        card.className = 'p-3.5 rounded-2xl border border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm transition-all flex flex-col justify-between gap-3 relative group';
+        card.setAttribute('data-id', cert.id || String(idx));
+        card.className = 'cert-drag-card p-3.5 rounded-2xl border border-gray-200 bg-white hover:border-brand-300 hover:shadow-md transition-all flex flex-col justify-between gap-3 relative select-none';
         card.innerHTML = `
           <div class="flex items-start gap-3">
             <div class="w-16 h-20 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity" onclick="openEditCertModal(${idx})" title="Натисніть для редагування">
-              <img src="${cert.image}" alt="${cert.title}" class="w-full h-full object-cover">
+              <img src="${cert.image}" alt="${cert.title}" class="w-full h-full object-cover pointer-events-none">
             </div>
             <div class="flex-grow min-w-0">
-              <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center justify-between gap-1">
                 <span class="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 border border-brand-100">#${idx + 1}</span>
                 <div class="flex items-center gap-1">
-                  ${idx > 0 ? `<button onclick="moveCert(${idx}, -1)" class="text-gray-400 hover:text-gray-700 p-1 text-xs" title="Перемістити вище">▲</button>` : ''}
-                  ${idx < appData.certificates.length - 1 ? `<button onclick="moveCert(${idx}, 1)" class="text-gray-400 hover:text-gray-700 p-1 text-xs" title="Перемістити нижче">▼</button>` : ''}
+                  ${idx > 0 ? `<button onclick="moveCert(${idx}, -1)" class="text-gray-400 hover:text-gray-700 p-0.5 text-xs" title="Перемістити вище">▲</button>` : ''}
+                  ${idx < appData.certificates.length - 1 ? `<button onclick="moveCert(${idx}, 1)" class="text-gray-400 hover:text-gray-700 p-0.5 text-xs" title="Перемістити нижче">▼</button>` : ''}
+                  <span class="drag-handle cursor-grab active:cursor-grabbing text-gray-400 hover:text-brand-700 hover:bg-brand-50 p-1 rounded-md text-base leading-none" title="Затисніть і перетягніть для зміни порядку">⠿</span>
                 </div>
               </div>
               <p class="text-xs font-bold text-gray-900 mt-1.5 truncate" title="${cert.title}">${cert.title}</p>
@@ -887,6 +895,28 @@
         `;
         container.appendChild(card);
       });
+
+      // Initialize Sortable Drag & Drop
+      if (typeof Sortable !== 'undefined') {
+        if (window.adminSortableInstance) {
+          try { window.adminSortableInstance.destroy(); } catch(e) {}
+        }
+        window.adminSortableInstance = new Sortable(container, {
+          animation: 200,
+          handle: '.drag-handle',
+          draggable: '.cert-drag-card',
+          ghostClass: 'opacity-40',
+          chosenClass: 'scale-105',
+          dragClass: 'shadow-2xl',
+          onEnd: function(evt) {
+            if (evt.oldIndex === evt.newIndex || evt.oldIndex === undefined || evt.newIndex === undefined) return;
+            const movedItem = appData.certificates.splice(evt.oldIndex, 1)[0];
+            appData.certificates.splice(evt.newIndex, 0, movedItem);
+            renderAdminCertificates();
+            showToast('Порядок сертифікатів оновлено! Натисніть «Зберегти всі зміни»', '🖐️');
+          }
+        });
+      }
     }
 
     // Add Modal Controls
