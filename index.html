@@ -2088,6 +2088,13 @@
       appendChatMessage('user', text);
       input.value = '';
 
+      // Track Chat Inquiry for Psychologist Analytics Dashboard
+      if (typeof trackEvent === 'function') {
+        trackEvent('chat_message', {
+          question: text
+        });
+      }
+
       // Hide starter chips after first message
       const chips = document.getElementById('ai-starter-chips');
       if (chips) chips.classList.add('hidden');

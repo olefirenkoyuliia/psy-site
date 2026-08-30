@@ -239,6 +239,76 @@
 
       </div>
 
+      <!-- SECTION: Client Inquiries & AI Chat Analytics -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
+        <div class="border-b border-gray-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">💬</span>
+            <div>
+              <h2 class="font-bold text-gray-900 text-base sm:text-lg">Аналітика звернень та запитів клієнтів</h2>
+              <p class="text-xs text-gray-500">З якими темами та питаннями приходять люди: діалоги в чаті та анкети</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="chat-count-badge" class="px-3 py-1 rounded-full bg-brand-50 text-brand-800 text-xs font-bold border border-brand-200">
+              0 звернень
+            </span>
+            <button onclick="refreshAnalytics()" class="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-colors flex items-center gap-1">
+              <span>🔄 Оновити</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Topics Summary / Demand Analytics -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Топ тем (З чим звертаються найчастіше):</h3>
+            <span class="text-[11px] text-gray-400 font-medium">Автоматична семантична категоризація</span>
+          </div>
+          <div id="analytics-topics-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-xs text-gray-400 col-span-full text-center py-6">
+              Поки немає звернень у чат для аналітики
+            </div>
+          </div>
+        </div>
+
+        <!-- Inquiries Filter & Tabs -->
+        <div class="pt-2 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <!-- Tabs Switcher -->
+            <div class="inline-flex p-1 bg-gray-100 rounded-xl text-xs font-semibold text-gray-600">
+              <button type="button" id="tab-btn-chats" onclick="switchInquiryTab('chats')" class="px-4 py-2 rounded-lg bg-white text-gray-900 shadow-sm transition-all">
+                💬 Питання в AI-чат (<span id="tab-count-chats">0</span>)
+              </button>
+              <button type="button" id="tab-btn-quizzes" onclick="switchInquiryTab('quizzes')" class="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 transition-all">
+                🧭 Відповіді опитування (<span id="tab-count-quizzes">0</span>)
+              </button>
+            </div>
+
+            <!-- Search Filter -->
+            <div class="relative w-full sm:w-72">
+              <input type="text" id="inquiry-search" oninput="filterInquiries()" placeholder="Пошук по тексту запитання або темі..." class="w-full pl-8 pr-4 py-2 rounded-xl border border-gray-200 text-xs focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-gray-50/50">
+              <span class="absolute left-2.5 top-2.5 text-xs text-gray-400">🔍</span>
+            </div>
+          </div>
+
+          <!-- Chat Inquiries List -->
+          <div id="inquiries-chats-container" class="space-y-3">
+            <div class="p-8 text-center bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 text-xs">
+              Завантаження журналу повідомлень...
+            </div>
+          </div>
+
+          <!-- Quiz Submissions List -->
+          <div id="inquiries-quizzes-container" class="hidden space-y-3">
+            <div class="p-8 text-center bg-gray-50 rounded-2xl border border-gray-100 text-gray-400 text-xs">
+              Завантаження відповідей на опитування...
+            </div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- GitHub Integration Banner -->
       <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between">
@@ -767,9 +837,204 @@
             table.appendChild(tr);
           });
         }
+
+        // Render Inquiries & Chat Analytics
+        renderChatAnalytics(stats);
+
       } catch(err) {
         console.error('Analytics load error:', err);
       }
+    }
+
+    let globalStatsCache = null;
+    let activeInquiryTab = 'chats';
+
+    function renderChatAnalytics(stats) {
+      globalStatsCache = stats;
+      const chats = stats.chatInquiries || [];
+      const quizzes = stats.quizSubmissions || [];
+      const topics = stats.topicAnalytics || [];
+
+      // Badges & Counters
+      const chatBadge = document.getElementById('chat-count-badge');
+      if (chatBadge) chatBadge.textContent = `${chats.length + quizzes.length} звернень`;
+
+      const tabCountChats = document.getElementById('tab-count-chats');
+      if (tabCountChats) tabCountChats.textContent = chats.length;
+
+      const tabCountQuizzes = document.getElementById('tab-count-quizzes');
+      if (tabCountQuizzes) tabCountQuizzes.textContent = quizzes.length;
+
+      // Render Topics Demand Cards
+      const topicsGrid = document.getElementById('analytics-topics-grid');
+      if (topicsGrid) {
+        topicsGrid.innerHTML = '';
+        if (topics.length === 0) {
+          topicsGrid.innerHTML = '<div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 text-xs text-gray-400 col-span-full text-center py-6">Поки немає звернень у чат для аналітики</div>';
+        } else {
+          topics.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'p-4 rounded-2xl bg-gray-50/80 border border-gray-200 space-y-2 hover:border-brand-300 transition-colors';
+            card.innerHTML = `
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-gray-800">${item.topic}</span>
+                <span class="font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md border border-brand-100">${item.count} (${item.percentage}%)</span>
+              </div>
+              <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                <div class="bg-gradient-to-r from-brand-500 to-brand-700 h-full rounded-full" style="width: ${Math.max(item.percentage, 5)}%"></div>
+              </div>
+            `;
+            topicsGrid.appendChild(card);
+          });
+        }
+      }
+
+      filterInquiries();
+    }
+
+    function switchInquiryTab(tab) {
+      activeInquiryTab = tab;
+      const btnChats = document.getElementById('tab-btn-chats');
+      const btnQuizzes = document.getElementById('tab-btn-quizzes');
+      const chatsContainer = document.getElementById('inquiries-chats-container');
+      const quizzesContainer = document.getElementById('inquiries-quizzes-container');
+
+      if (tab === 'chats') {
+        btnChats.className = 'px-4 py-2 rounded-lg bg-white text-gray-900 shadow-sm transition-all';
+        btnQuizzes.className = 'px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 transition-all';
+        chatsContainer.classList.remove('hidden');
+        quizzesContainer.classList.add('hidden');
+      } else {
+        btnQuizzes.className = 'px-4 py-2 rounded-lg bg-white text-gray-900 shadow-sm transition-all';
+        btnChats.className = 'px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 transition-all';
+        quizzesContainer.classList.remove('hidden');
+        chatsContainer.classList.add('hidden');
+      }
+
+      filterInquiries();
+    }
+
+    function filterInquiries() {
+      if (!globalStatsCache) return;
+      const query = (document.getElementById('inquiry-search')?.value || '').toLowerCase().trim();
+      const chats = globalStatsCache.chatInquiries || [];
+      const quizzes = globalStatsCache.quizSubmissions || [];
+
+      // Render Chats
+      const chatsContainer = document.getElementById('inquiries-chats-container');
+      if (chatsContainer) {
+        chatsContainer.innerHTML = '';
+        const filteredChats = chats.filter(c => 
+          !query || c.question.toLowerCase().includes(query) || c.topic.toLowerCase().includes(query) || (c.reply && c.reply.toLowerCase().includes(query))
+        );
+
+        if (filteredChats.length === 0) {
+          chatsContainer.innerHTML = `
+            <div class="p-8 text-center bg-gray-50 rounded-2xl border border-gray-200 text-gray-400 text-xs">
+              ${query ? 'За цим пошуковим запитом нічого не знайдено' : 'Журнал запитань в AI-чат порожній'}
+            </div>
+          `;
+        } else {
+          filteredChats.forEach(chat => {
+            const card = document.createElement('div');
+            card.className = 'p-5 rounded-2xl bg-white border border-gray-200/90 shadow-sm space-y-3 hover:border-brand-300 transition-all';
+            card.innerHTML = `
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2.5 text-xs text-gray-500">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded-lg bg-brand-50 text-brand-800 font-bold text-[11px] border border-brand-200/80">
+                    ${chat.topic}
+                  </span>
+                  <span class="font-medium text-gray-700">📍 ${chat.city}</span>
+                  <span class="text-gray-400">•</span>
+                  <span>📱 ${chat.device}</span>
+                </div>
+                <span class="font-medium text-gray-400">${chat.date} ${chat.time}</span>
+              </div>
+              
+              <div class="space-y-1.5">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-gray-500">Питання відвідувача:</div>
+                <div class="p-3.5 rounded-xl bg-gray-50 text-gray-900 text-xs sm:text-sm font-medium border border-gray-200/60 leading-relaxed">
+                  "${escapeAdminHtml(chat.question)}"
+                </div>
+              </div>
+
+              ${chat.reply ? `
+                <div class="space-y-1 text-xs pt-1">
+                  <div class="text-[11px] font-bold uppercase tracking-wider text-brand-700 flex items-center gap-1">
+                    <span>🤖</span> <span>Відповідь AI-асистента:</span>
+                  </div>
+                  <div class="p-3 rounded-xl bg-brand-50/50 text-gray-700 text-xs border border-brand-100 leading-relaxed">
+                    ${escapeAdminHtml(chat.reply)}
+                  </div>
+                </div>
+              ` : ''}
+            `;
+            chatsContainer.appendChild(card);
+          });
+        }
+      }
+
+      // Render Quizzes
+      const quizzesContainer = document.getElementById('inquiries-quizzes-container');
+      if (quizzesContainer) {
+        quizzesContainer.innerHTML = '';
+        const filteredQuizzes = quizzes.filter(q => 
+          !query || q.focus.toLowerCase().includes(query) || q.symptom.toLowerCase().includes(query) || q.experience.toLowerCase().includes(query) || q.goal.toLowerCase().includes(query)
+        );
+
+        if (filteredQuizzes.length === 0) {
+          quizzesContainer.innerHTML = `
+            <div class="p-8 text-center bg-gray-50 rounded-2xl border border-gray-200 text-gray-400 text-xs">
+              ${query ? 'За цим пошуковим запитом нічого не знайдено' : 'Поки немає збережених відповідей з опитування'}
+            </div>
+          `;
+        } else {
+          filteredQuizzes.forEach(quiz => {
+            const card = document.createElement('div');
+            card.className = 'p-5 rounded-2xl bg-white border border-gray-200/90 shadow-sm space-y-3 hover:border-brand-300 transition-all';
+            card.innerHTML = `
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2.5 text-xs text-gray-500">
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold text-[11px] border border-emerald-200/80">
+                    🧭 Компас запиту (Опитування)
+                  </span>
+                  <span class="font-medium text-gray-700">📍 ${quiz.city}</span>
+                  <span class="text-gray-400">•</span>
+                  <span>📱 ${quiz.device}</span>
+                </div>
+                <span class="font-medium text-gray-400">${quiz.date} ${quiz.time}</span>
+              </div>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-gray-800">
+                <div class="p-3 rounded-xl bg-gray-50 border border-gray-200/70 space-y-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">1. Що найбільше турбує:</span>
+                  <p class="font-semibold text-gray-900">${escapeAdminHtml(quiz.focus)}</p>
+                </div>
+                <div class="p-3 rounded-xl bg-gray-50 border border-gray-200/70 space-y-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">2. Як проявляється:</span>
+                  <p class="font-semibold text-gray-900">${escapeAdminHtml(quiz.symptom)}</p>
+                </div>
+                <div class="p-3 rounded-xl bg-gray-50 border border-gray-200/70 space-y-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">3. Досвід у психолога:</span>
+                  <p class="font-semibold text-gray-900">${escapeAdminHtml(quiz.experience)}</p>
+                </div>
+                <div class="p-3 rounded-xl bg-gray-50 border border-gray-200/70 space-y-1">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">4. Бажаний результат:</span>
+                  <p class="font-semibold text-brand-800">${escapeAdminHtml(quiz.goal)}</p>
+                </div>
+              </div>
+            `;
+            quizzesContainer.appendChild(card);
+          });
+        }
+      }
+    }
+
+    function escapeAdminHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.innerText = str;
+      return div.innerHTML;
     }
 
     async function refreshAnalytics() {
