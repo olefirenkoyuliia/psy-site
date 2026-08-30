@@ -65,6 +65,7 @@ export async function onRequestGet(context) {
       let actionTitle = 'Перегляд сайту';
       if (row.event_type === 'tg_click') actionTitle = 'Клік у Telegram 💬';
       if (row.event_type === 'booking_click') actionTitle = 'Запис на час 📅';
+      if (row.event_type === 'quiz_completed') actionTitle = 'Пройдено тест стану 🧭';
       if (row.event_type === 'instagram_click') actionTitle = 'Перехід в Instagram 📸';
       if (row.event_type === 'audio_play') actionTitle = 'Прослуховування аудіо 🎙️';
       if (row.event_type === 'chat_open') actionTitle = 'Чат з AI-асистентом 🤖';

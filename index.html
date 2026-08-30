@@ -306,16 +306,17 @@
       </a>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-warm-muted">
+      <nav class="hidden md:flex items-center gap-5 text-sm font-medium text-warm-muted">
         <a href="#about" class="hover:text-brand-700 transition-colors">Про мене</a>
+        <a href="#quiz" class="text-brand-700 font-bold hover:text-brand-800 transition-colors flex items-center gap-1"><span>🧭</span> Діагностика</a>
         <a href="#booking-widget" class="hover:text-brand-700 transition-colors">Підбір часу</a>
         <a href="#topics" class="hover:text-brand-700 transition-colors">Запити</a>
         <a href="#method" class="hover:text-brand-700 transition-colors">Підхід</a>
         <a href="#pricing" class="hover:text-brand-700 transition-colors">Ціни</a>
         <a href="#diplomas" class="hover:text-brand-700 transition-colors">Освіта</a>
         <a href="#faq" class="hover:text-brand-700 transition-colors">FAQ</a>
-        <a href="https://www.instagram.com/psy_olefirenkoyulia" target="_blank" rel="noopener noreferrer" class="hover:text-pink-600 transition-colors flex items-center gap-1.5 font-semibold text-gray-700" data-bind-instagram>
-          <svg class="w-4 h-4 fill-current text-pink-600" viewBox="0 0 24 24">
+        <a href="https://www.instagram.com/psy_olefirenkoyulia" target="_blank" rel="noopener noreferrer" class="hover:text-pink-600 transition-colors flex items-center gap-1 font-semibold text-gray-700" data-bind-instagram>
+          <svg class="w-3.5 h-3.5 fill-current text-pink-600" viewBox="0 0 24 24">
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
           </svg>
           <span>Instagram</span>
@@ -350,8 +351,8 @@
             <div class="relative rounded-[2.2rem] overflow-hidden shadow-2xl border-4 border-white bg-white group">
               <img src="images/IMG_5187.JPG" alt="Юлія Олефіренко — практикуюча психологиня та психотерапевт онлайн" width="400" height="470" loading="eager" fetchpriority="high" class="w-full h-[470px] object-cover object-center transform group-hover:scale-105 transition-transform duration-700 ease-out">
               
-              <!-- Floating Live Online Indicator Badge -->
-              <div class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/80 shadow-lg">
+              <!-- Floating Live Online Indicator Badge (Interactive Modal Trigger) -->
+              <div onclick="openOnlineModal()" class="cursor-pointer group/online absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/80 shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-xl active:scale-95">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
                     <span class="relative flex h-3 w-3">
@@ -359,11 +360,11 @@
                       <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                     </span>
                     <div>
-                      <p class="text-xs font-bold text-warm-text">Прийом онлайн</p>
+                      <p class="text-xs font-bold text-warm-text group-hover/online:text-brand-700 transition-colors">Прийом онлайн • Запис відкрито</p>
                       <p class="text-[11px] text-warm-muted">Zoom / Google Meet • <span data-bind="pricing.duration">50 хвилин</span></p>
                     </div>
                   </div>
-                  <span class="text-xs px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 font-bold border border-brand-200">
+                  <span class="text-xs px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 font-bold border border-brand-200 group-hover/online:bg-brand-600 group-hover/online:text-white transition-colors">
                     🟢 Онлайн
                   </span>
                 </div>
@@ -690,6 +691,207 @@
               <span>Почуття самотності, залежність від думки та схвалення оточуючих</span>
             </li>
           </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Section: Interactive Diagnostic Quiz (Компас вашого запиту) -->
+  <section id="quiz" class="py-20 bg-gradient-to-b from-brand-50/90 via-warm-bg to-white border-t border-warm-border relative z-10">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-100/80 text-brand-800 text-xs font-bold uppercase tracking-wider">
+          <span>🧭</span> Експрес-діагностика за 2 хвилини
+        </div>
+        <h2 class="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-warm-text">
+          Не впевнені, з чого розпочати?
+        </h2>
+        <p class="text-warm-muted text-base">
+          Дайте відповідь на 4 прості запитання. Це допоможе вам краще відчути свій фокус, а психологині — підібрати найдієвіший підхід для першої сесії.
+        </p>
+      </div>
+
+      <!-- Quiz Main Card -->
+      <div class="bg-white p-6 sm:p-10 rounded-3xl border border-warm-border shadow-hover relative overflow-hidden" id="quiz-container">
+        
+        <!-- Progress Bar & Step Header -->
+        <div class="mb-8" id="quiz-header">
+          <div class="flex items-center justify-between text-xs font-bold text-warm-muted uppercase tracking-wider mb-2">
+            <span id="quiz-step-title">Крок 1 з 4: Ваш основний стан</span>
+            <span id="quiz-step-pct" class="text-brand-700 font-bold">25%</span>
+          </div>
+          <div class="w-full bg-warm-bg h-2 rounded-full overflow-hidden">
+            <div id="quiz-progress-bar" class="bg-brand-600 h-full rounded-full transition-all duration-500 w-1/4"></div>
+          </div>
+        </div>
+
+        <!-- Step 1: Main Focus / Worry -->
+        <div id="quiz-step-1" class="quiz-step space-y-5">
+          <h3 class="font-serif-luxury text-xl sm:text-2xl font-bold text-warm-text">
+            1. Що найбільше турбує або виснажує вас останнім часом?
+          </h3>
+          <p class="text-xs text-warm-muted">Оберіть варіант, який найбільше відгукується вашому стану прямо зараз:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button type="button" onclick="selectQuizOption(1, 'Тривожність та внутрішнє напруження', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">🌊</span>
+              <span><strong>Тривожність</strong>, постійний фоновий стрес, нав'язливі думки чи страхи</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(1, 'Емоційне вигорання та втрата сил', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">🔋</span>
+              <span><strong>Вигорання</strong>, хронічна втома, втрата мотивації та відчуття спустошення</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(1, 'Самооцінка та внутрішній критик', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">🪞</span>
+              <span><strong>Невпевненість у собі</strong>, сильний внутрішній критик, синдром самозванця</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(1, 'Складнощі у стосунках та особисті кордони', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">💔</span>
+              <span><strong>Стосунки</strong>, конфлікти, страх відмовити («сказати ні»), самотність</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(1, 'Втрата орієнтирів та кризовий період', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3 sm:col-span-2">
+              <span class="text-xl">🧭</span>
+              <span><strong>Криза та невизначеність</strong>, відчуття застрягання, пошук нових сенсів та життєвої опори</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Everyday Life Manifestation -->
+        <div id="quiz-step-2" class="quiz-step hidden space-y-5">
+          <h3 class="font-serif-luxury text-xl sm:text-2xl font-bold text-warm-text">
+            2. Як цей стан проявляється у вашому щоденному житті?
+          </h3>
+          <p class="text-xs text-warm-muted">Оберіть найбільш характерний для вас прояв:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button type="button" onclick="selectQuizOption(2, 'Складно розслабитися, проблеми зі сном', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">💤</span>
+              <span><strong>Тілесна напруга</strong>, проблеми зі сном, не можу розслабитися навіть у вихідні</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(2, 'Прокрастинація та відсторонення від людей', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">🚪</span>
+              <span><strong>Прокрастинація</strong>, відкладаю важливе, хочеться закритися від усіх</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(2, 'Емоційні гойдалки або відчуття оніміння', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">🌪️</span>
+              <span><strong>Емоційні гойдалки</strong>, плаксивість, дратівливість або повна апатія</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(2, 'Зручність для інших на шкоду собі', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">🛡️</span>
+              <span><strong>Намагаюся бути зручною/им</strong> для інших, виснажуюся, але не можу зупинитися</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Previous Experience -->
+        <div id="quiz-step-3" class="quiz-step hidden space-y-5">
+          <h3 class="font-serif-luxury text-xl sm:text-2xl font-bold text-warm-text">
+            3. Чи мали ви раніше досвід роботи з психологом?
+          </h3>
+          <p class="text-xs text-warm-muted">Це допоможе зробити початок максимально комфортним для вас:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button type="button" onclick="selectQuizOption(3, 'Перший досвід (трохи хвилююся)', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex flex-col gap-2">
+              <span class="text-2xl">🌱</span>
+              <span class="font-bold">Це мій перший досвід</span>
+              <span class="text-xs text-warm-muted">Трохи хвилююся, хочеться м'якого та безпечного старту</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(3, 'Маю досвід, шукаю глибинний метод', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex flex-col gap-2">
+              <span class="text-2xl">🌿</span>
+              <span class="font-bold">Вже був(ла) у терапії</span>
+              <span class="text-xs text-warm-muted">Знайомий(а) із процесом, хочу новий рівень через символдраму</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(3, 'Пробував(ла) самостійно, потрібен фахівець', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex flex-col gap-2">
+              <span class="text-2xl">🔍</span>
+              <span class="font-bold">Пробував(ла) самостійно</span>
+              <span class="text-xs text-warm-muted">Читаю книги, медитую, але відчуваю потребу в професійному супроводі</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Desired Outcome -->
+        <div id="quiz-step-4" class="quiz-step hidden space-y-5">
+          <h3 class="font-serif-luxury text-xl sm:text-2xl font-bold text-warm-text">
+            4. Який результат для вас зараз найбільш цінний та бажаний?
+          </h3>
+          <p class="text-xs text-warm-muted">Оберіть ваш головний вектор на терапію:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button type="button" onclick="selectQuizOption(4, 'Зняти тривожність та відчути спокій', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">🕊️</span>
+              <span><strong>Внутрішній спокій</strong>, зняття напруги, повернення відчуття контролю над життям</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(4, 'Відновити внутрішній ресурс і сили', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">🔋</span>
+              <span><strong>Життєва енергія</strong>, відчуття радості, відновлення сили та наснаги</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(4, 'Здобути впевненість та прийняти себе', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">💎</span>
+              <span><strong>Опора на себе</strong>, звільнення від самокритики, відчуття власної цінності</span>
+            </button>
+            <button type="button" onclick="selectQuizOption(4, 'Здорове спілкування та чіткі особисті межі', this)" class="quiz-opt-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/40 hover:border-brand-400 text-left text-sm font-medium text-warm-text transition-all flex items-start gap-3">
+              <span class="text-xl">🛡️</span>
+              <span><strong>Здорові кордони</strong>, гармонія у стосунках, вміння вільно висловлювати свої почуття</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Result Screen (Personalized Psychological Blueprint) -->
+        <div id="quiz-step-result" class="quiz-step hidden space-y-6">
+          <div class="p-6 sm:p-8 rounded-3xl bg-brand-50 border-2 border-brand-200 space-y-4">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-xl shadow-sm">
+                ✨
+              </span>
+              <div>
+                <span class="text-xs font-bold text-brand-800 uppercase tracking-wider">Ваш діагностичний фокус</span>
+                <h4 id="quiz-result-title" class="font-serif-luxury text-xl sm:text-2xl font-bold text-warm-text">
+                  Фокус: Робота з тривожністю та відновлення опор
+                </h4>
+              </div>
+            </div>
+
+            <p id="quiz-result-desc" class="text-sm text-warm-text leading-relaxed">
+              Ваш стан свідчить про накопичену перевтому та потребу у безпечному просторі прийняття. Метод символдрами (робота з підсвідомими образами) допоможе м'яко вивільнити напруження та відкрити внутрішні ресурси відновлення.
+            </p>
+
+            <div class="pt-3 border-t border-brand-200/80 text-xs text-warm-muted space-y-1.5">
+              <div class="flex items-center gap-2">
+                <span class="text-brand-700 font-bold">•</span>
+                <span><strong>Ключовий запит:</strong> <span id="res-bullet-1" class="font-medium text-warm-text">Тривожність та напруження</span></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-brand-700 font-bold">•</span>
+                <span><strong>Бажаний результат:</strong> <span id="res-bullet-2" class="font-medium text-warm-text">Внутрішній спокій та ресурс</span></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-brand-700 font-bold">•</span>
+                <span><strong>Рекомендований формат:</strong> Онлайн-сесія (Zoom / Google Meet, 50 хвилин, 1 200 грн)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Direct Send to Telegram CTA Card -->
+          <div class="p-6 rounded-3xl bg-brand-900 text-white space-y-4 shadow-xl">
+            <div class="space-y-1">
+              <span class="text-xs text-brand-300 font-semibold uppercase tracking-wider">Готовий запит для першої сесії:</span>
+              <p class="text-xs text-white/90 italic bg-white/10 p-3.5 rounded-xl border border-white/15" id="quiz-draft-text">
+                «Привіт, Юліє! Я пройшов(ла) експрес-тест на сайті. Мій основний фокус: [Тривожність]. Хочу записатися на консультацію.»
+              </p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+              <a id="quiz-tg-send-btn" href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto flex-grow inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-full bg-white hover:bg-brand-50 text-brand-900 font-bold text-sm shadow-lg transition-all transform hover:scale-[1.02] active:scale-95" data-bind-telegram>
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/></svg>
+                <span>Надіслати Юлії в Telegram та обрати час</span>
+              </a>
+              <a href="#booking-widget" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-4 rounded-full bg-brand-800 hover:bg-brand-700 text-white font-semibold text-xs border border-brand-700 transition-all">
+                <span>🗓️ До вибору часу</span>
+              </a>
+              <button onclick="restartQuiz()" type="button" class="text-xs text-brand-300 hover:text-white underline py-2 px-3 transition-colors">
+                Пройти знову
+              </button>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -2317,7 +2519,189 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
         cta: true
       };
     }
+
+    // 11. Interactive Psychological Diagnostic Quiz Engine
+    const quizState = {
+      step: 1,
+      answers: {
+        focus: '',
+        symptom: '',
+        experience: '',
+        goal: ''
+      }
+    };
+
+    function selectQuizOption(step, value, btn) {
+      if (step === 1) quizState.answers.focus = value;
+      if (step === 2) quizState.answers.symptom = value;
+      if (step === 3) quizState.answers.experience = value;
+      if (step === 4) quizState.answers.goal = value;
+
+      // Animate selection
+      btn.classList.add('border-2', 'border-brand-600', 'bg-brand-50', 'text-brand-900');
+      
+      setTimeout(() => {
+        if (step < 4) {
+          quizState.step = step + 1;
+          updateQuizUI();
+        } else {
+          calculateQuizResult();
+        }
+      }, 250);
+    }
+
+    function updateQuizUI() {
+      const step = quizState.step;
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById('quiz-step-' + i);
+        if (el) el.classList.toggle('hidden', i !== step);
+      }
+      document.getElementById('quiz-step-result')?.classList.add('hidden');
+
+      const titles = [
+        'Крок 1 з 4: Ваш основний стан',
+        'Крок 2 з 4: Щоденні прояви',
+        'Крок 3 з 4: Попередній досвід',
+        'Крок 4 з 4: Бажаний результат'
+      ];
+      document.getElementById('quiz-step-title').textContent = titles[step - 1];
+      document.getElementById('quiz-step-pct').textContent = (step * 25) + '%';
+      document.getElementById('quiz-progress-bar').style.width = (step * 25) + '%';
+    }
+
+    function calculateQuizResult() {
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById('quiz-step-' + i)?.classList.add('hidden');
+      }
+      document.getElementById('quiz-step-result')?.classList.remove('hidden');
+
+      document.getElementById('quiz-step-title').textContent = '✨ Ваш персональний діагностичний профіль';
+      document.getElementById('quiz-step-pct').textContent = '100%';
+      document.getElementById('quiz-progress-bar').style.width = '100%';
+
+      const focus = quizState.answers.focus || 'Тривожність та напруження';
+      const goal = quizState.answers.goal || 'Внутрішній спокій та опора';
+
+      let title = `Фокус: ${focus}`;
+      let desc = `Ваш стан свідчить про накопичену перевтому та потребу у безпечному просторі прийняття. Метод символдрами (робота з образами підсвідомості) допоможе м'яко вивільнити напруження, обійти внутрішнього критика та знайти справжні опори для відновлення життєвих сил.`;
+
+      if (focus.includes('вигоран') || focus.includes('Втома')) {
+        title = `Фокус: Емоційне відновлення та робота з вигоранням`;
+        desc = `Ви відчуваєте виснаження ресурсів. У роботі з Юлією основний акцент буде зроблено на поверненні контакту зі своїми потребами, дбайливому відновленні енергії та знятті синдрому надвідповідальності.`;
+      } else if (focus.includes('Самооцінка') || focus.includes('критик')) {
+        title = `Фокус: Зміцнення самооцінки та прийняття себе`;
+        desc = `Ваш внутрішній критик забирає багато сил. Символдрама дозволяє вибудувати міцну самоцінність, навчитися підтримувати себе та відчувати впевненість у власних рішеннях без страху оцінки.`;
+      } else if (focus.includes('Стосунки') || focus.includes('кордони')) {
+        title = `Фокус: Гармонія у стосунках та особисті кордони`;
+        desc = `Складнощі у взаємодії часто пов'язані з небезпекою відстоювати свої межі. На консультаціях ми дослідимо ваші моделі близькості та навчимося говорити «ні» без почуття провини.`;
+      }
+
+      document.getElementById('quiz-result-title').textContent = title;
+      document.getElementById('quiz-result-desc').textContent = desc;
+      document.getElementById('res-bullet-1').textContent = focus;
+      document.getElementById('res-bullet-2').textContent = goal;
+
+      const draft = `Привіт, Юліє! Я пройшов(ла) експрес-діагностику на сайті. Мій стан: ${focus}. Бажаний результат: ${goal}. Досвід: ${quizState.answers.experience || 'перший раз'}. Хочу записатися на онлайн-консультацію.`;
+      document.getElementById('quiz-draft-text').textContent = `«${draft}»`;
+
+      const tgBtn = document.getElementById('quiz-tg-send-btn');
+      if (tgBtn) {
+        tgBtn.href = `https://t.me/psy_olefirenkoyuliia?text=${encodeURIComponent(draft)}`;
+      }
+
+      // Track quiz completion to server
+      if (typeof trackEvent === 'function') {
+        trackEvent('quiz_completed', { focus, goal });
+      }
+    }
+
+    function restartQuiz() {
+      quizState.step = 1;
+      quizState.answers = { focus: '', symptom: '', experience: '', goal: '' };
+      document.querySelectorAll('.quiz-opt-btn').forEach(b => {
+        b.classList.remove('border-2', 'border-brand-600', 'bg-brand-50', 'text-brand-900');
+        b.classList.add('border', 'border-warm-border', 'bg-warm-bg/40', 'text-warm-text');
+      });
+      updateQuizUI();
+    }
+
+    // 12. Online Status Modal Hub
+    function openOnlineModal() {
+      const modal = document.getElementById('online-status-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      }
+    }
+
+    function closeOnlineModal() {
+      const modal = document.getElementById('online-status-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    function startQuizFromModal() {
+      closeOnlineModal();
+      const quizSection = document.getElementById('quiz');
+      if (quizSection) {
+        quizSection.scrollIntoView({ behavior: 'smooth' });
+        quizSection.classList.add('ring-4', 'ring-brand-400', 'transition-all');
+        setTimeout(() => quizSection.classList.remove('ring-4', 'ring-brand-400'), 1500);
+      }
+    }
   </script>
+
+  <!-- Modal: Live Online Status & Quick Action Hub -->
+  <div id="online-status-modal" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-warm-border shadow-2xl space-y-6 relative transform transition-transform animate-modal">
+      
+      <button onclick="closeOnlineModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center text-sm font-bold transition-colors" title="Закрити">
+        ✕
+      </button>
+
+      <div class="flex items-center gap-3.5">
+        <span class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-2xl shadow-sm">
+          🟢
+        </span>
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Запис на цей тиждень відкрито</span>
+          <h3 class="font-serif-luxury text-xl sm:text-2xl font-bold text-warm-text">Юлія зараз на зв'язку</h3>
+        </div>
+      </div>
+
+      <div class="space-y-2 text-sm text-warm-text bg-warm-bg/50 p-4 rounded-2xl border border-warm-border">
+        <div class="flex items-center gap-2">
+          <span class="text-brand-600 font-bold">✓</span>
+          <span><strong>Формат:</strong> Онлайн у Zoom або Google Meet</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-brand-600 font-bold">✓</span>
+          <span><strong>Тривалість:</strong> 50 хвилин (вартість: 1 200 грн)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-brand-600 font-bold">✓</span>
+          <span><strong>Безпека:</strong> 100% конфіденційність та простір прийняття</span>
+        </div>
+      </div>
+
+      <div class="space-y-3 pt-1">
+        <button onclick="startQuizFromModal()" class="w-full py-3.5 px-6 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-soft transition-all flex items-center justify-center gap-2">
+          <span>🧭 Пройти експрес-діагностику запиту (2 хв)</span>
+          <span>➔</span>
+        </button>
+        <button onclick="closeOnlineModal(); document.getElementById('booking-widget')?.scrollIntoView({behavior:'smooth'});" class="w-full py-3.5 px-6 rounded-2xl bg-warm-card hover:bg-brand-100 text-brand-900 font-bold text-sm transition-all flex items-center justify-center gap-2">
+          <span>📅 Підібрати зручний день та час</span>
+        </button>
+        <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 px-6 rounded-2xl border border-warm-border hover:bg-sky-50 text-gray-800 font-bold text-sm transition-all flex items-center justify-center gap-2" data-bind-telegram>
+          <svg class="w-4 h-4 fill-current text-sky-600" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/></svg>
+          <span>Написати прямо в Telegram</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
 
 </body>
 </html>
