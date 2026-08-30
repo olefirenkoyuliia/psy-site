@@ -1,12 +1,12 @@
 export async function onRequestGet(context) {
   const { request, env } = context;
 
-  // 1. Try KV Storage if configured
-  if (env.SITE_KV) {
+  // 1. Query Cloudflare D1 SQL Database (Tier 1: 1-3ms edge response)
+  if (env.DB) {
     try {
-      const cached = await env.SITE_KV.get('site_data', 'json');
-      if (cached) {
-        return new Response(JSON.stringify(cached), {
+      const row = await env.DB.prepare("SELECT data FROM site_data WHERE key = 'main'").first();
+      if (row && row.data) {
+        return new Response(row.data, {
           headers: {
             'Content-Type': 'application/json; charset=utf-8',
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -14,14 +14,16 @@ export async function onRequestGet(context) {
           }
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('D1 read error:', e);
+    }
   }
 
-  // 2. Try fetching from origin / GitHub API
+  // 2. Try fetching from origin / local static data.json
   try {
     const url = new URL(request.url);
     const localUrl = new URL('/data.json', url.origin);
-    const res = await env.ASSETS ? env.ASSETS.fetch(localUrl) : await fetch(localUrl);
+    const res = await (env.ASSETS ? env.ASSETS.fetch(localUrl) : fetch(localUrl));
     if (res.ok) {
       const data = await res.json();
       return new Response(JSON.stringify(data), {

@@ -3,6 +3,11 @@ compatibility_date = "2026-08-30"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "."
 
+[[d1_databases]]
+binding = "DB"
+database_name = "psy_db"
+database_id = "b5219b50-1217-415c-83a1-1b33f1b46bcc"
+
 [vars]
 REPO_OWNER = "olefirenkoyuliia"
 REPO_NAME = "psy-site"

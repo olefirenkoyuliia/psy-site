@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS site_data (
+  key TEXT PRIMARY KEY,
+  data TEXT NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS analytics_events (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  event_type TEXT NOT NULL,
+  visitor_id TEXT,
+  source TEXT,
+  device TEXT,
+  metadata TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
