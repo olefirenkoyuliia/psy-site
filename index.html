@@ -352,10 +352,10 @@
               <img src="images/IMG_5187.JPG" alt="Юлія Олефіренко — практикуюча психологиня та психотерапевт онлайн" width="400" height="470" loading="eager" fetchpriority="high" class="w-full h-[470px] object-cover object-center transform group-hover:scale-105 transition-transform duration-700 ease-out">
               
               <!-- Floating Live Online Indicator Badge (Interactive Modal Trigger) -->
-              <div onclick="openOnlineModal()" class="cursor-pointer group/online absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/80 shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-xl active:scale-95">
-                <div class="flex items-center justify-between">
+              <button type="button" id="hero-online-btn" onclick="openOnlineModal(event)" class="w-[calc(100%-2rem)] text-left cursor-pointer group/online absolute bottom-4 left-4 right-4 z-30 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/80 shadow-lg transition-transform duration-200 hover:scale-[1.02] active:scale-95 touch-manipulation select-none outline-none focus:ring-2 focus:ring-brand-500">
+                <div class="flex items-center justify-between pointer-events-none">
                   <div class="flex items-center gap-3">
-                    <span class="relative flex h-3 w-3">
+                    <span class="relative flex h-3 w-3 shrink-0">
                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                     </span>
@@ -364,11 +364,11 @@
                       <p class="text-[11px] text-warm-muted">Google Meet • <span data-bind="pricing.duration">50 хвилин</span></p>
                     </div>
                   </div>
-                  <span class="text-xs px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 font-bold border border-brand-200 group-hover/online:bg-brand-600 group-hover/online:text-white transition-colors">
+                  <span class="text-xs px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 font-bold border border-brand-200 group-hover/online:bg-brand-600 group-hover/online:text-white transition-colors shrink-0">
                     🟢 Онлайн
                   </span>
                 </div>
-              </div>
+              </button>
             </div>
 
             <!-- Floating Top Badge -->
@@ -1594,20 +1594,22 @@
       }
     });
 
-    // 2. 3D Perspective Tilt on Mousemove for Cards
-    document.querySelectorAll('.tilt-card').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        const rotateX = (-y / rect.height) * 10;
-        const rotateY = (x / rect.width) * 10;
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    // 2. 3D Perspective Tilt on Mousemove for Cards (Desktop only)
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      document.querySelectorAll('.tilt-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          const rotateX = (-y / rect.height) * 8;
+          const rotateY = (x / rect.width) * 8;
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
       });
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-      });
-    });
+    }
 
     // 3. Real HTML5 Audio Voice Message Player
     const audioEl = document.getElementById('greeting-audio');
@@ -2616,7 +2618,11 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
     }
 
     // 12. Online Status Modal Hub
-    function openOnlineModal() {
+    function openOnlineModal(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       const modal = document.getElementById('online-status-modal');
       if (modal) {
         modal.classList.remove('hidden');
@@ -2624,7 +2630,10 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
       }
     }
 
-    function closeOnlineModal() {
+    function closeOnlineModal(e) {
+      if (e) {
+        e.stopPropagation();
+      }
       const modal = document.getElementById('online-status-modal');
       if (modal) {
         modal.classList.add('hidden');
@@ -2641,13 +2650,23 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
         setTimeout(() => quizSection.classList.remove('ring-4', 'ring-brand-400'), 1500);
       }
     }
+
+    // Direct Mobile Touch Listener for Online Button
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroOnlineBtn = document.getElementById('hero-online-btn');
+      if (heroOnlineBtn) {
+        heroOnlineBtn.addEventListener('touchend', (e) => {
+          openOnlineModal(e);
+        }, { passive: false });
+      }
+    });
   </script>
 
   <!-- Modal: Live Online Status & Quick Action Hub -->
-  <div id="online-status-modal" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
-    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-warm-border shadow-2xl space-y-6 relative transform transition-transform animate-modal">
+  <div id="online-status-modal" onclick="if(event.target === this) closeOnlineModal(event)" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity cursor-pointer">
+    <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-warm-border shadow-2xl space-y-6 relative transform transition-transform animate-modal cursor-default">
       
-      <button onclick="closeOnlineModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center text-sm font-bold transition-colors" title="Закрити">
+      <button onclick="closeOnlineModal(event)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center text-sm font-bold transition-colors" title="Закрити">
         ✕
       </button>
 
