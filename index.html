@@ -59,7 +59,7 @@
         "url": "https://olefirenko.pp.ua/",
         "image": "https://olefirenko.pp.ua/images/IMG_5187.JPG",
         "description": "Індивідуальні психологічні консультації та психотерапія онлайн за методом символдрами, КПТ та тілесних практик.",
-        "priceRange": "1000 - 1200 UAH",
+        "priceRange": "1200 UAH",
         "currenciesAccepted": "UAH",
         "paymentAccepted": "Оплата за реквізитами ФОП (ПриватБанк)",
         "areaServed": {
@@ -88,17 +88,17 @@
               "@type": "Offer",
               "itemOffered": {
                 "@type": "Service",
-                "name": "Первинна психологічна консультація",
-                "description": "Знайомство, визначення запиту, первинна діагностика та формування плану терапії (50 хв)"
+                "name": "Психологічна консультація",
+                "description": "Знайомство, визначення запиту, короткострокове опрацювання ситуації (50 хв)"
               },
-              "price": "1000",
+              "price": "1200",
               "priceCurrency": "UAH"
             },
             {
               "@type": "Offer",
               "itemOffered": {
                 "@type": "Service",
-                "name": "Регулярна психотерапевтична сесія (символдрама, КПТ)",
+                "name": "Психотерапевтична сесія (символдрама, КПТ)",
                 "description": "Глибинне опрацювання внутрішніх конфліктів, робота з образами, підвищення самооцінки (50 хв)"
               },
               "price": "1200",
@@ -499,7 +499,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="book-formats">
             <button type="button" onclick="selectSlot('format', 'Консультування (до 10 зустрічей)', this)" class="slot-btn format-btn active p-4 rounded-2xl border-2 border-brand-600 bg-brand-50 text-left font-bold text-sm text-brand-900 transition-all flex items-center justify-between">
               <span>💬 Консультування (1–10 сесій)</span>
-              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-brand-200" data-bind="pricing.firstSessionPrice">1 000 грн</span>
+              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-brand-200" data-bind="pricing.regularSessionPrice">1 200 грн</span>
             </button>
             <button type="button" onclick="selectSlot('format', 'Психотерапія (глибинна робота)', this)" class="slot-btn format-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/30 text-left font-bold text-sm text-warm-text transition-all flex items-center justify-between hover:border-brand-400">
               <span>🌊 Психотерапія (глибинний метод)</span>
@@ -554,7 +554,7 @@
             <div id="summary-text" class="font-bold text-base sm:text-lg text-white">
               Консультування • Будні дні • День (14–18)
             </div>
-            <div class="text-xs text-brand-200" id="booking-price-hint">Перша консультація: <span data-bind="pricing.firstSessionPrice">1 000 грн</span> (<span data-bind="pricing.duration">50 хв</span>)</div>
+            <div class="text-xs text-brand-200" id="booking-price-hint">Вартість сесії: <span data-bind="pricing.regularSessionPrice">1 200 грн</span> (<span data-bind="pricing.duration">50 хвилин</span>)</div>
           </div>
           <a id="booking-tg-btn" href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-white hover:bg-brand-50 text-brand-900 font-bold text-sm shadow-2xl transition-all transform hover:scale-105 shrink-0" data-bind-telegram>
             <span>Забронювати в Telegram</span>
@@ -847,7 +847,7 @@
               <h3 class="font-serif-luxury text-3xl font-bold text-warm-text">
                 Консультування
               </h3>
-              <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.firstSessionPrice">1 000 грн</span>
+              <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</span>
             </div>
             <p class="text-sm text-warm-muted leading-relaxed">
               Підходить, якщо є певна конкретна ситуація або питання, які хочеться розібрати та знайти рішення.
@@ -855,7 +855,7 @@
             <div class="space-y-2.5 pt-3 border-t border-warm-border text-sm text-warm-text">
               <div class="flex items-center gap-2.5">
                 <span class="text-brand-600 font-bold">•</span>
-                <span>До 10 зустрічей</span>
+                <span>Формат: 1–10 зустрічей</span>
               </div>
               <div class="flex items-center gap-2.5">
                 <span class="text-brand-600 font-bold">•</span>
@@ -920,21 +920,17 @@
       </div>
 
       <!-- Pricing Summary Card -->
-      <div class="max-w-4xl mx-auto mt-10 bg-white p-8 sm:p-10 rounded-3xl border border-warm-border shadow-card flex flex-col md:flex-row items-center justify-between gap-6">
-        <div class="space-y-2 text-center md:text-left">
+      <div class="max-w-4xl mx-auto mt-10 bg-white p-8 sm:p-10 rounded-3xl border border-warm-border shadow-card flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="space-y-2 text-center sm:text-left">
           <h4 class="font-serif-luxury text-2xl sm:text-3xl font-bold text-warm-text">Вартість консультацій</h4>
           <p class="text-sm text-warm-muted" data-bind="pricing.paymentDetails">Оплата здійснюється на розрахунковий рахунок ФОП (ПриватБанк)</p>
-          <p class="text-xs text-warm-muted">Можна закріпити постійний зручний час або погоджувати кожну зустріч окремо.</p>
+          <p class="text-xs text-warm-muted">Єдина прозора вартість для будь-якого формату співпраці. Можна закріпити постійний зручний час.</p>
         </div>
-        <div class="flex flex-wrap items-center justify-center gap-8">
-          <div class="text-center">
-            <div class="text-xs text-warm-muted uppercase tracking-wider font-semibold">Перша консультація</div>
-            <div class="font-serif-luxury text-3xl sm:text-4xl font-bold text-brand-700" data-bind="pricing.firstSessionPrice">1 000 грн</div>
-          </div>
-          <div class="h-12 w-px bg-warm-border hidden sm:block"></div>
-          <div class="text-center">
-            <div class="text-xs text-warm-muted uppercase tracking-wider font-semibold">Наступні сесії</div>
+        <div class="flex items-center justify-center">
+          <div class="text-center px-6 py-4 bg-brand-50/70 rounded-2xl border border-brand-200/80 min-w-[200px]">
+            <div class="text-xs text-brand-800 uppercase tracking-wider font-bold mb-1">Вартість 1 сесії</div>
             <div class="font-serif-luxury text-3xl sm:text-4xl font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</div>
+            <div class="text-xs text-warm-muted font-medium mt-1">Тривалість: <span data-bind="pricing.duration">50 хвилин</span></div>
           </div>
         </div>
       </div>
