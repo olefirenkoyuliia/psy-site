@@ -383,9 +383,9 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         
-        <!-- Left Column: Portrait with 3D Tilt & Floating Elements -->
+        <!-- Left Column: Portrait with Floating Elements -->
         <div class="lg:col-span-5 flex justify-center">
-          <div class="relative w-full max-w-sm tilt-card" id="hero-tilt-card">
+          <div class="relative w-full max-w-sm" id="hero-tilt-card">
             
             <!-- Ambient background shape -->
             <div class="absolute -inset-4 bg-gradient-to-tr from-brand-300/40 via-warm-accent/25 to-brand-200/50 rounded-[2.8rem] transform -rotate-3 scale-95 blur-md"></div>
@@ -394,7 +394,7 @@
               <img src="images/IMG_5187.JPG" alt="Юлія Олефіренко — практикуюча психологиня та психотерапевт онлайн" width="400" height="470" loading="eager" fetchpriority="high" class="w-full h-[470px] object-cover object-center transform group-hover:scale-105 transition-transform duration-700 ease-out">
               
               <!-- Floating Live Online Indicator Badge (Interactive Modal Trigger) -->
-              <button type="button" id="hero-online-btn" onclick="openOnlineModal(event)" class="w-[calc(100%-2rem)] text-left cursor-pointer group/online absolute bottom-4 left-4 right-4 z-30 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/80 shadow-lg transition-transform duration-200 hover:scale-[1.02] active:scale-95 touch-manipulation select-none outline-none focus:ring-2 focus:ring-brand-500">
+              <button type="button" id="hero-online-btn" onclick="openOnlineModal(event)" class="w-[calc(100%-2rem)] text-left cursor-pointer group/online absolute bottom-4 left-4 right-4 z-30 bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/80 shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-95 touch-manipulation select-none outline-none focus:ring-2 focus:ring-brand-500">
                 <div class="flex items-center justify-between pointer-events-none">
                   <div class="flex items-center gap-3">
                     <span class="relative flex h-3 w-3 shrink-0">
@@ -2704,10 +2704,13 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
       }
     }
 
-    // Direct Mobile Touch Listener for Online Button
+    // Direct Listener for Online Button (All platforms: Mac, Windows, iOS, Android)
     document.addEventListener('DOMContentLoaded', () => {
       const heroOnlineBtn = document.getElementById('hero-online-btn');
       if (heroOnlineBtn) {
+        heroOnlineBtn.addEventListener('click', (e) => {
+          openOnlineModal(e);
+        });
         heroOnlineBtn.addEventListener('touchend', (e) => {
           openOnlineModal(e);
         }, { passive: false });
