@@ -502,6 +502,57 @@
     </div>
   </div>
 
+  <!-- Modal for Editing Certificate -->
+  <div id="edit-cert-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-6 sm:p-8 space-y-5 shadow-2xl border border-gray-100">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">
+          <span>✏️</span> Редагувати сертифікат / документ
+        </h3>
+        <button onclick="closeEditCertModal()" class="text-gray-400 hover:text-gray-600 text-xl font-light">✕</button>
+      </div>
+
+      <input type="hidden" id="edit-cert-index">
+
+      <div class="space-y-4">
+        <!-- Preview -->
+        <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
+          <div class="w-16 h-20 rounded-lg overflow-hidden bg-gray-200 shrink-0 border border-gray-300">
+            <img id="edit-cert-preview" src="" alt="Прев'ю" class="w-full h-full object-cover">
+          </div>
+          <div class="text-xs text-gray-600">
+            <p class="font-bold text-gray-800 mb-1">Поточний документ</p>
+            <p>Змініть назву або опис нижче. Якщо потрібно замінити саме фото, виберіть новий файл.</p>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Назва сертифіката (заголовок):</label>
+          <input type="text" id="edit-cert-title" placeholder="Наприклад: Підвищення кваліфікації" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Категорія / Опис (підзаголовок):</label>
+          <input type="text" id="edit-cert-category" placeholder="Наприклад: Символдрама / Спеціалізація" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-gray-700">Замінити фото документа (необов'язково):</label>
+          <input type="file" id="edit-cert-file" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
+        </div>
+      </div>
+
+      <div class="pt-3 flex items-center justify-end gap-3 border-t border-gray-100">
+        <button onclick="closeEditCertModal()" class="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 text-xs font-bold hover:bg-gray-200">
+          Скасувати
+        </button>
+        <button onclick="confirmSaveEditedCert()" class="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 shadow-sm flex items-center gap-1.5">
+          <span>💾</span> Зберегти зміни
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Notification Toast -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl text-xs font-bold hidden items-center gap-3 transition-all transform translate-y-3">
     <span id="toast-icon">✅</span>
@@ -807,25 +858,42 @@
 
       appData.certificates.forEach((cert, idx) => {
         const card = document.createElement('div');
-        card.className = 'p-3 rounded-xl border border-gray-200 bg-gray-50 flex items-center gap-3 relative group';
+        card.className = 'p-3.5 rounded-2xl border border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm transition-all flex flex-col justify-between gap-3 relative group';
         card.innerHTML = `
-          <div class="w-14 h-18 rounded-lg overflow-hidden bg-gray-200 shrink-0 border border-gray-300">
-            <img src="${cert.image}" alt="${cert.title}" class="w-full h-full object-cover">
+          <div class="flex items-start gap-3">
+            <div class="w-16 h-20 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity" onclick="openEditCertModal(${idx})" title="Натисніть для редагування">
+              <img src="${cert.image}" alt="${cert.title}" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-grow min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 border border-brand-100">#${idx + 1}</span>
+                <div class="flex items-center gap-1">
+                  ${idx > 0 ? `<button onclick="moveCert(${idx}, -1)" class="text-gray-400 hover:text-gray-700 p-1 text-xs" title="Перемістити вище">▲</button>` : ''}
+                  ${idx < appData.certificates.length - 1 ? `<button onclick="moveCert(${idx}, 1)" class="text-gray-400 hover:text-gray-700 p-1 text-xs" title="Перемістити нижче">▼</button>` : ''}
+                </div>
+              </div>
+              <p class="text-xs font-bold text-gray-900 mt-1.5 truncate" title="${cert.title}">${cert.title}</p>
+              <p class="text-[11px] text-gray-500 truncate" title="${cert.category || 'Документ'}">${cert.category || 'Документ'}</p>
+            </div>
           </div>
-          <div class="flex-grow min-w-0 pr-6">
-            <p class="text-xs font-bold text-gray-800 truncate">${cert.title}</p>
-            <p class="text-[11px] text-gray-500 truncate">${cert.category || 'Документ'}</p>
+          <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+            <button onclick="openEditCertModal(${idx})" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-brand-50 hover:text-brand-700 text-gray-700 text-xs font-bold transition-all flex items-center gap-1">
+              ✏️ Редагувати
+            </button>
+            <button onclick="deleteCert(${idx})" class="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-all flex items-center gap-1" title="Видалити">
+              🗑️
+            </button>
           </div>
-          <button onclick="deleteCert(${idx})" class="absolute top-3 right-3 text-gray-400 hover:text-red-600 p-1 transition-colors" title="Видалити">
-            🗑️
-          </button>
         `;
         container.appendChild(card);
       });
     }
 
-    // Modal Controls
+    // Add Modal Controls
     function openAddCertModal() {
+      document.getElementById('new-cert-title').value = '';
+      document.getElementById('new-cert-category').value = '';
+      document.getElementById('new-cert-file').value = '';
       document.getElementById('add-cert-modal').classList.remove('hidden');
       document.getElementById('add-cert-modal').classList.add('flex');
     }
@@ -856,12 +924,72 @@
           });
           renderAdminCertificates();
           closeAddCertModal();
-          showToast('Сертифікат додано до списку!');
+          showToast('Сертифікат додано до списку! Натисніть «Зберегти всі зміни».', '✅');
         };
         reader.readAsDataURL(file);
       } else {
         alert('Будь ласка, оберіть фото документа');
       }
+    }
+
+    // Edit Modal Controls
+    function openEditCertModal(idx) {
+      const cert = appData.certificates[idx];
+      if (!cert) return;
+      document.getElementById('edit-cert-index').value = idx;
+      document.getElementById('edit-cert-title').value = cert.title || '';
+      document.getElementById('edit-cert-category').value = cert.category || '';
+      document.getElementById('edit-cert-preview').src = cert.image || '';
+      document.getElementById('edit-cert-file').value = '';
+      document.getElementById('edit-cert-modal').classList.remove('hidden');
+      document.getElementById('edit-cert-modal').classList.add('flex');
+    }
+
+    function closeEditCertModal() {
+      document.getElementById('edit-cert-modal').classList.add('hidden');
+      document.getElementById('edit-cert-modal').classList.remove('flex');
+    }
+
+    function confirmSaveEditedCert() {
+      const idx = parseInt(document.getElementById('edit-cert-index').value, 10);
+      if (isNaN(idx) || !appData.certificates[idx]) return;
+
+      const title = document.getElementById('edit-cert-title').value.trim();
+      const category = document.getElementById('edit-cert-category').value.trim();
+      const fileInput = document.getElementById('edit-cert-file');
+
+      if (!title) {
+        alert('Введіть назву сертифіката');
+        return;
+      }
+
+      appData.certificates[idx].title = title;
+      appData.certificates[idx].category = category || 'Документ';
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          appData.certificates[idx].image = e.target.result;
+          renderAdminCertificates();
+          closeEditCertModal();
+          showToast('Зміни сертифіката оновлено! Натисніть «Зберегти всі зміни».', '✏️');
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        renderAdminCertificates();
+        closeEditCertModal();
+        showToast('Зміни сертифіката оновлено! Натисніть «Зберегти всі зміни».', '✏️');
+      }
+    }
+
+    function moveCert(idx, direction) {
+      const newIdx = idx + direction;
+      if (newIdx < 0 || newIdx >= appData.certificates.length) return;
+      const temp = appData.certificates[idx];
+      appData.certificates[idx] = appData.certificates[newIdx];
+      appData.certificates[newIdx] = temp;
+      renderAdminCertificates();
+      showToast('Порядок сертифікатів змінено (натисніть «Зберегти всі зміни»)', '🔄');
     }
 
     async function deleteCert(idx) {
