@@ -497,8 +497,8 @@
             1. Оберіть формат:
           </label>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="book-formats">
-            <button type="button" onclick="selectSlot('format', 'Консультування (до 10 зустрічей)', this)" class="slot-btn format-btn active p-4 rounded-2xl border-2 border-brand-600 bg-brand-50 text-left font-bold text-sm text-brand-900 transition-all flex items-center justify-between">
-              <span>💬 Консультування (1–10 сесій)</span>
+            <button type="button" onclick="selectSlot('format', 'Консультування (1 сесія)', this)" class="slot-btn format-btn active p-4 rounded-2xl border-2 border-brand-600 bg-brand-50 text-left font-bold text-sm text-brand-900 transition-all flex items-center justify-between">
+              <span>💬 Консультування (1 сесія)</span>
               <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-brand-200" data-bind="pricing.firstSessionPrice">1 000 грн</span>
             </button>
             <button type="button" onclick="selectSlot('format', 'Психотерапія (глибинна робота)', this)" class="slot-btn format-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/30 text-left font-bold text-sm text-warm-text transition-all flex items-center justify-between hover:border-brand-400">
@@ -1471,7 +1471,7 @@
 
     // 4. Interactive Live Booking Simulator
     const bookingState = {
-      format: 'Консультування (до 10 зустрічей)',
+      format: 'Консультування (1 сесія)',
       day: 'Будні дні (Пн-Пт)',
       time: 'День (14:00 - 18:00)'
     };
