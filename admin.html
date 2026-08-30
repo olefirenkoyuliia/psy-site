@@ -665,122 +665,123 @@
       reader.readAsDataURL(file);
     }
 
-    // 3. Analytics Dashboard Render
-    function renderAnalytics() {
-      const raw = localStorage.getItem('psy_analytics_stats');
-      const stats = raw ? JSON.parse(raw) : { views: 0, humans: 0, bots: 0, tgClicks: 0, events: [] };
+    // 3. Real-time Cloudflare D1 SQL Analytics Dashboard
+    async function renderAnalytics() {
+      try {
+        const res = await fetch('/api/stats?t=' + Date.now());
+        if (!res.ok) throw new Error('API error');
+        const stats = await res.json();
 
-      const humans = stats.humans || 0;
-      const bots = stats.bots || 0;
-      const tg = stats.tgClicks || 0;
-      const totalVisits = humans + bots;
-      const convRate = humans > 0 ? ((tg / humans) * 100).toFixed(1) : '0';
+        const humans = stats.humans || 0;
+        const bots = stats.bots || 0;
+        const tg = stats.tgClicks || 0;
+        const convRate = stats.conversion || (humans > 0 ? ((tg / humans) * 100).toFixed(1) : '0');
 
-      document.getElementById('stat-humans').textContent = humans;
-      document.getElementById('stat-bots').textContent = bots;
-      document.getElementById('stat-tg').textContent = tg;
-      document.getElementById('stat-conversion').textContent = convRate + '%';
+        document.getElementById('stat-humans').textContent = humans;
+        document.getElementById('stat-bots').textContent = bots;
+        document.getElementById('stat-tg').textContent = tg;
+        document.getElementById('stat-conversion').textContent = convRate + '%';
 
-      // Aggregate Sources
-      const sourcesMap = {};
-      const devicesMap = {};
-      const events = stats.events || [];
+        // Aggregate Sources
+        const sourcesMap = stats.sources || {};
+        const devicesMap = stats.devices || {};
+        const events = stats.events || [];
 
-      events.forEach(ev => {
-        if (ev.type === 'human') {
-          sourcesMap[ev.source] = (sourcesMap[ev.source] || 0) + 1;
-          devicesMap[ev.device] = (devicesMap[ev.device] || 0) + 1;
+        // Render Sources List
+        const sourcesContainer = document.getElementById('stat-sources-list');
+        sourcesContainer.innerHTML = '';
+        const sourceKeys = Object.keys(sourcesMap);
+        if (sourceKeys.length === 0) {
+          sourcesContainer.innerHTML = '<p class="text-xs text-gray-400 py-2">Немає переходів від реальних людей</p>';
+        } else {
+          sourceKeys.sort((a,b) => sourcesMap[b] - sourcesMap[a]).forEach(src => {
+            const count = sourcesMap[src];
+            const pct = Math.round((count / (humans || 1)) * 100);
+            const el = document.createElement('div');
+            el.className = 'space-y-1';
+            el.innerHTML = `
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-medium text-gray-700">${src}</span>
+                <span class="font-bold text-gray-900">${count} (${pct}%)</span>
+              </div>
+              <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-brand-600 h-full rounded-full" style="width: ${pct}%"></div>
+              </div>
+            `;
+            sourcesContainer.appendChild(el);
+          });
         }
-      });
 
-      // Render Sources List
-      const sourcesContainer = document.getElementById('stat-sources-list');
-      sourcesContainer.innerHTML = '';
-      const sourceKeys = Object.keys(sourcesMap);
-      if (sourceKeys.length === 0) {
-        sourcesContainer.innerHTML = '<p class="text-xs text-gray-400 py-2">Немає переходів від реальних людей</p>';
-      } else {
-        sourceKeys.sort((a,b) => sourcesMap[b] - sourcesMap[a]).forEach(src => {
-          const count = sourcesMap[src];
-          const pct = Math.round((count / (humans || 1)) * 100);
-          const el = document.createElement('div');
-          el.className = 'space-y-1';
-          el.innerHTML = `
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-medium text-gray-700">${src}</span>
-              <span class="font-bold text-gray-900">${count} (${pct}%)</span>
-            </div>
-            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-brand-600 h-full rounded-full" style="width: ${pct}%"></div>
-            </div>
-          `;
-          sourcesContainer.appendChild(el);
-        });
-      }
+        // Render Devices List
+        const devicesContainer = document.getElementById('stat-devices-list');
+        devicesContainer.innerHTML = '';
+        const deviceKeys = Object.keys(devicesMap);
+        if (deviceKeys.length === 0) {
+          devicesContainer.innerHTML = '<p class="text-xs text-gray-400 py-2">Немає даних про пристрої</p>';
+        } else {
+          deviceKeys.sort((a,b) => devicesMap[b] - devicesMap[a]).forEach(dev => {
+            const count = devicesMap[dev];
+            const pct = Math.round((count / (humans || 1)) * 100);
+            const el = document.createElement('div');
+            el.className = 'space-y-1';
+            el.innerHTML = `
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-medium text-gray-700">${dev}</span>
+                <span class="font-bold text-gray-900">${count} (${pct}%)</span>
+              </div>
+              <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-purple-600 h-full rounded-full" style="width: ${pct}%"></div>
+              </div>
+            `;
+            devicesContainer.appendChild(el);
+          });
+        }
 
-      // Render Devices List
-      const devicesContainer = document.getElementById('stat-devices-list');
-      devicesContainer.innerHTML = '';
-      const deviceKeys = Object.keys(devicesMap);
-      if (deviceKeys.length === 0) {
-        devicesContainer.innerHTML = '<p class="text-xs text-gray-400 py-2">Немає даних про пристрої</p>';
-      } else {
-        deviceKeys.sort((a,b) => devicesMap[b] - devicesMap[a]).forEach(dev => {
-          const count = devicesMap[dev];
-          const pct = Math.round((count / (humans || 1)) * 100);
-          const el = document.createElement('div');
-          el.className = 'space-y-1';
-          el.innerHTML = `
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-medium text-gray-700">${dev}</span>
-              <span class="font-bold text-gray-900">${count} (${pct}%)</span>
-            </div>
-            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-              <div class="bg-purple-600 h-full rounded-full" style="width: ${pct}%"></div>
-            </div>
-          `;
-          devicesContainer.appendChild(el);
-        });
-      }
-
-      // Render Live Events Table
-      const table = document.getElementById('stat-events-table');
-      table.innerHTML = '';
-      if (events.length === 0) {
-        table.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-gray-400">Поки немає подій у журналі</td></tr>';
-      } else {
-        events.slice(0, 30).forEach(ev => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-gray-50/80 transition-colors';
-          const isBot = ev.type === 'bot';
-          tr.innerHTML = `
-            <td class="py-3 px-4 font-medium text-gray-500">${ev.time || '--:--'}</td>
-            <td class="py-3 px-4">
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${isBot ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
-                ${isBot ? '🤖 Бот / Робот' : '👤 Людина'}
-              </span>
-            </td>
-            <td class="py-3 px-4 font-semibold text-gray-800">${ev.source}</td>
-            <td class="py-3 px-4 text-gray-600">${ev.device}</td>
-            <td class="py-3 px-4 text-right font-bold ${ev.action.includes('Telegram') ? 'text-sky-600' : 'text-gray-700'}">
-              ${ev.action}
-            </td>
-          `;
-          table.appendChild(tr);
-        });
+        // Render Live Events Table
+        const table = document.getElementById('stat-events-table');
+        table.innerHTML = '';
+        if (events.length === 0) {
+          table.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-gray-400">Поки немає подій у базі даних</td></tr>';
+        } else {
+          events.slice(0, 50).forEach(ev => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-gray-50/80 transition-colors';
+            const isBot = ev.type === 'bot';
+            tr.innerHTML = `
+              <td class="py-3 px-4 font-medium text-gray-500">${ev.time || '--:--'}</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${isBot ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                  ${isBot ? '🤖 Бот / Робот' : '👤 Людина'}
+                </span>
+              </td>
+              <td class="py-3 px-4 font-semibold text-gray-800">${ev.source}</td>
+              <td class="py-3 px-4 text-gray-600">${ev.device}</td>
+              <td class="py-3 px-4 text-right font-bold ${ev.action.includes('Telegram') ? 'text-sky-600' : 'text-gray-700'}">
+                ${ev.action}
+              </td>
+            `;
+            table.appendChild(tr);
+          });
+        }
+      } catch(err) {
+        console.error('Analytics load error:', err);
       }
     }
 
-    function refreshAnalytics() {
-      renderAnalytics();
-      showToast('Дані аналітики оновлено!');
+    async function refreshAnalytics() {
+      await renderAnalytics();
+      showToast('Дані аналітики оновлено з бази Cloudflare D1!');
     }
 
-    function clearAnalytics() {
-      if (confirm('Ви дійсно хочете очистити історію відвідувань?')) {
-        localStorage.removeItem('psy_analytics_stats');
-        renderAnalytics();
-        showToast('Історію очищено');
+    async function clearAnalytics() {
+      if (confirm('Ви дійсно хочете очистити всю історію відвідувань у базі даних?')) {
+        try {
+          await fetch('/api/stats/reset', { method: 'POST' });
+          await renderAnalytics();
+          showToast('Історію в базі даних очищено');
+        } catch(e) {
+          showToast('Помилка очищення', '❌');
+        }
       }
     }
 

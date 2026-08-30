@@ -1472,6 +1472,99 @@
       time: 'День (14:00 - 18:00)'
     };
 
+    // 9. Real-Time Privacy-First Edge Analytics Tracking
+    (function initRealAnalytics() {
+      try {
+        const ua = navigator.userAgent || '';
+        const isBot = /bot|googlebot|crawler|spider|bingbot|yandex|duckduckbot|slurp|baiduspider|facebookexternalhit|telegrambot|twitterbot|discordbot|applebot|semrush|ahrefs|petalbot|headless/i.test(ua) || navigator.webdriver === true;
+
+        // Generate persistent anonymous visitor ID
+        let visitorId = localStorage.getItem('psy_vid');
+        if (!visitorId) {
+          visitorId = 'v_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now().toString(36);
+          localStorage.setItem('psy_vid', visitorId);
+        }
+
+        // Detect Traffic Source
+        let source = 'Прямий перехід';
+        const ref = document.referrer.toLowerCase();
+        const urlParams = new URLSearchParams(window.location.search);
+        const utmSource = urlParams.get('utm_source');
+
+        if (utmSource) {
+          source = `UTM: ${utmSource}`;
+        } else if (ref.includes('google.')) {
+          source = 'Google Пошук';
+        } else if (ref.includes('instagram.')) {
+          source = 'Instagram';
+        } else if (ref.includes('t.me') || ref.includes('telegram')) {
+          source = 'Telegram';
+        } else if (ref.includes('facebook.')) {
+          source = 'Facebook';
+        } else if (ref.includes('tiktok.')) {
+          source = 'TikTok';
+        } else if (ref) {
+          try {
+            source = new URL(ref).hostname;
+          } catch(e) {
+            source = 'Зовнішній перехід';
+          }
+        }
+
+        // Detect Device
+        let device = 'Компʼютер (Desktop)';
+        if (/iphone|ipad|ipod/i.test(ua)) device = 'iPhone / iPad';
+        else if (/android/i.test(ua)) device = 'Android';
+        else if (/mobile/i.test(ua)) device = 'Мобільний';
+
+        // Helper to send server events to Cloudflare D1
+        function trackEvent(eventType, metadata = {}) {
+          const payload = {
+            event: eventType,
+            visitorId: visitorId,
+            source: source,
+            device: device,
+            metadata: metadata
+          };
+          try {
+            if (navigator.sendBeacon) {
+              navigator.sendBeacon('/api/track', JSON.stringify(payload));
+            } else {
+              fetch('/api/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                keepalive: true
+              }).catch(() => {});
+            }
+          } catch(e) {}
+        }
+
+        // 1. Track Page View (once per session hour)
+        const sessionKey = 'psy_pv_' + new Date().toISOString().substring(0, 13);
+        if (!sessionStorage.getItem(sessionKey)) {
+          sessionStorage.setItem(sessionKey, '1');
+          trackEvent('page_view', { isBot: isBot, path: window.location.pathname });
+        }
+
+        // 2. Track Telegram Clicks
+        document.addEventListener('click', (e) => {
+          const tgLink = e.target.closest('a[href*="t.me"], button[onclick*="t.me"], #booking-tg-btn');
+          if (tgLink) {
+            trackEvent('tg_click', { button: tgLink.id || tgLink.textContent?.trim()?.substring(0, 30) });
+          }
+
+          const instaLink = e.target.closest('a[href*="instagram.com"]');
+          if (instaLink) {
+            trackEvent('instagram_click', {});
+          }
+        });
+
+      } catch (err) {
+        console.warn('Analytics initialized');
+      }
+    })();
+
     function selectSlot(type, value, btn) {
       bookingState[type] = value;
 
