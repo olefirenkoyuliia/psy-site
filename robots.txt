@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /admin.html
+Disallow: /api/save
 
+# Sitemaps
 Sitemap: https://olefirenko.pp.ua/sitemap.xml
+Host: https://olefirenko.pp.ua
