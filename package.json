@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "puppeteer-core": "^25.9.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.127.1"
+  }
+}

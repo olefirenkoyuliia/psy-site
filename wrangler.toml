@@ -1,0 +1,9 @@
+name = "psy-site"
+compatibility_date = "2026-08-30"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "."
+
+[vars]
+REPO_OWNER = "olefirenkoyuliia"
+REPO_NAME = "psy-site"
+GEMINI_MODEL = "gemini-3.6-flash"

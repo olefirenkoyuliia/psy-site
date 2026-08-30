@@ -864,10 +864,43 @@
       }
     }
 
-    function deleteCert(idx) {
+    async function deleteCert(idx) {
       if (confirm('Видалити цей сертифікат?')) {
         appData.certificates.splice(idx, 1);
         renderAdminCertificates();
+        const token = localStorage.getItem('psy_github_token');
+        let savedViaApi = false;
+        try {
+          const cfSaveRes = await fetch('/api/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: appData, token, audioBase64: pendingAudioBase64 })
+          });
+          if (cfSaveRes.ok) {
+            const saveJson = await cfSaveRes.json();
+            if (saveJson.success) {
+              savedViaApi = true;
+              pendingAudioBase64 = null;
+              showToast('Зміни миттєво збережено на Cloudflare Edge & GitHub!', '⚡', true);
+            }
+          }
+        } catch(e) {}
+
+        if (!savedViaApi) {
+          try {
+            await pushDataToGithub(token, 'data.json', JSON.stringify(appData, null, 2), 'Update website data via admin panel');
+            if (pendingAudioBase64) {
+              const rawBase64 = pendingAudioBase64.includes(',') ? pendingAudioBase64.split(',')[1] : pendingAudioBase64;
+              await pushBinaryToGithub(token, 'audio/greeting.mp3', rawBase64, 'Update greeting.mp3 via admin panel');
+              pendingAudioBase64 = null;
+            }
+            showToast('Зміни успішно збережено та опубліковано на сайті!', '🚀', true);
+          } catch (err) {
+            console.error('GitHub push error:', err);
+            alert('⚠️ Помилка публікації на GitHub: ' + err.message + '\nЗміни збережено в локальному браузері.');
+            showToast('Помилка відправки на GitHub', '❌');
+          }
+        }
         showToast('Сертифікат видалено');
       }
     }
@@ -911,35 +944,63 @@
         localStorage.setItem('psy_site_audio', pendingAudioBase64);
       }
 
-      // Check GitHub token to publish live to server
       const token = localStorage.getItem('psy_github_token') || document.getElementById('github-token-input').value.trim();
-      if (token) {
-        localStorage.setItem('psy_github_token', token);
-        try {
-          // 1. Push data.json to GitHub
-          await pushDataToGithub(token, 'data.json', JSON.stringify(appData, null, 2), 'Update website data via admin panel');
+      let savedViaApi = false;
 
-          // 2. If new audio selected, push audio/greeting.mp3
-          if (pendingAudioBase64) {
-            const rawBase64 = pendingAudioBase64.split(',')[1];
-            await pushBinaryToGithub(token, 'audio/greeting.mp3', rawBase64, 'Update greeting.mp3 via admin panel');
-            const badge = document.getElementById('audio-status-badge');
-            if (badge) {
-              badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
-              badge.textContent = '✅ Аудіо збережено на сервері';
+      // 1. Try Cloudflare Node API first
+      try {
+        const cfSaveRes = await fetch('/api/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: appData, token, audioBase64: pendingAudioBase64 })
+        });
+        if (cfSaveRes.ok) {
+          const saveJson = await cfSaveRes.json();
+          if (saveJson.success) {
+            savedViaApi = true;
+            if (pendingAudioBase64) {
+              const badge = document.getElementById('audio-status-badge');
+              if (badge) {
+                badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
+                badge.textContent = '✅ Аудіо збережено на сервері';
+              }
+              pendingAudioBase64 = null;
             }
-            pendingAudioBase64 = null;
+            showToast('🎉 Зміни збережено на сервері (Cloudflare & GitHub)!', '⚡', true);
           }
-
-          showToast('🎉 Зміни збережено на сервері!', '✅', true);
-        } catch (err) {
-          console.error('GitHub Push failed:', err);
-          alert('⚠️ Помилка публікації на GitHub: ' + err.message + '\nЗміни збережено в локальному браузері.');
-          showToast('Збережено локально. Помилка GitHub: ' + err.message, '⚠️');
         }
-      } else {
-        alert('⚠️ GitHub токен не знайдено! Введіть GitHub токен у верхньому блоці, щоб зміни стали видимі всім відвідувачам сайту.');
-        showToast('Збережено в браузері (для публікації введіть GitHub токен)', '⚠️');
+      } catch(e) {}
+
+      // 2. Direct GitHub Push Fallback
+      if (!savedViaApi) {
+        if (token) {
+          localStorage.setItem('psy_github_token', token);
+          try {
+            // Push data.json to GitHub
+            await pushDataToGithub(token, 'data.json', JSON.stringify(appData, null, 2), 'Update website data via admin panel');
+
+            // If new audio selected, push audio/greeting.mp3
+            if (pendingAudioBase64) {
+              const rawBase64 = pendingAudioBase64.includes(',') ? pendingAudioBase64.split(',')[1] : pendingAudioBase64;
+              await pushBinaryToGithub(token, 'audio/greeting.mp3', rawBase64, 'Update greeting.mp3 via admin panel');
+              const badge = document.getElementById('audio-status-badge');
+              if (badge) {
+                badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
+                badge.textContent = '✅ Аудіо збережено на сервері';
+              }
+              pendingAudioBase64 = null;
+            }
+
+            showToast('🎉 Зміни збережено на сервері!', '✅', true);
+          } catch (err) {
+            console.error('GitHub Push failed:', err);
+            alert('⚠️ Помилка публікації на GitHub: ' + err.message + '\nЗміни збережено в локальному браузері.');
+            showToast('Збережено локально. Помилка GitHub: ' + err.message, '⚠️');
+          }
+        } else {
+          alert('⚠️ GitHub токен не знайдено! Введіть GitHub токен у верхньому блоці, щоб зміни стали видимі всім відвідувачам сайту.');
+          showToast('Збережено в браузері (для публікації введіть GitHub токен)', '⚠️');
+        }
       }
 
       saveBtn.disabled = false;

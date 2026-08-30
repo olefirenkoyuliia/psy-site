@@ -1553,7 +1553,19 @@
         if (local) applyDynamicSiteData(JSON.parse(local));
       } catch (e) {}
 
-      // Step 2: Fetch 0-delay real-time data from GitHub Git DB (Cache-Busted)
+      // Step 2: Fetch 0-delay real-time data from Cloudflare Edge / GitHub Git DB
+      try {
+        const cfRes = await fetch('/api/data', { cache: 'no-store' });
+        if (cfRes.ok) {
+          const freshData = await cfRes.json();
+          if (freshData && freshData.profile) {
+            applyDynamicSiteData(freshData);
+            try { localStorage.setItem('psy_site_data', JSON.stringify(freshData)); } catch(e) {}
+            return;
+          }
+        }
+      } catch(e) {}
+
       try {
         const ghUrl = `https://api.github.com/repos/olefirenkoyuliia/psy-site/contents/data.json?ref=main&t=${Date.now()}`;
         const ghRes = await fetch(ghUrl, { cache: 'no-store' });
