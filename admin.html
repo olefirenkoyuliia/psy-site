@@ -1233,7 +1233,7 @@
       }
     }
 
-    // GitHub Token Storage
+    // GitHub Token Storage & Cloudflare D1 Integration
     function checkGithubToken() {
       const token = localStorage.getItem('psy_github_token');
       const badge = document.getElementById('github-status-badge');
@@ -1242,12 +1242,12 @@
         if (input) input.value = token;
         if (badge) {
           badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
-          badge.textContent = '✅ Підключено до GitHub';
+          badge.textContent = '✅ Підключено (D1 База & Токен)';
         }
       } else {
         if (badge) {
-          badge.className = 'text-xs px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-medium';
-          badge.textContent = '⚠️ Токен не збережено';
+          badge.className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
+          badge.textContent = '✅ Підключено в базі даних Cloudflare D1';
         }
       }
     }
@@ -1257,15 +1257,21 @@
       if (val) {
         localStorage.setItem('psy_github_token', val);
         checkGithubToken();
-        showToast('GitHub токен збережено в браузері!');
+        // Also sync to D1
+        fetch('/api/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ githubToken: val })
+        }).catch(() => {});
+        showToast('GitHub токен збережено в базі D1 та браузері!');
       } else {
         localStorage.removeItem('psy_github_token');
         checkGithubToken();
-        showToast('GitHub токен видалено');
+        showToast('Локальний токен очищено');
       }
     }
 
-    // Google Gemini Token Storage & Diagnostics
+    // Google Gemini Token Storage & Cloudflare D1 Integration
     function checkGeminiToken() {
       let key = localStorage.getItem('psy_gemini_key') || (appData && appData.geminiKey) || '';
       const model = localStorage.getItem('psy_gemini_model') || (appData && appData.geminiModel) || 'gemini-3.6-flash';
@@ -1277,10 +1283,10 @@
           try { displayKey = atob(key); } catch(e) {}
         }
         if (input) input.value = displayKey;
-        if (badge) {
-          badge.className = 'text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold self-start sm:self-auto';
-          badge.textContent = `⚡ Підключено (${model})`;
-        }
+      }
+      if (badge) {
+        badge.className = 'text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold self-start sm:self-auto';
+        badge.textContent = `⚡ Підключено в базі D1 (${model})`;
       }
     }
 

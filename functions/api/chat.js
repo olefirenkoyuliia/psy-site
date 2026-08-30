@@ -4,7 +4,19 @@ export async function onRequestPost(context) {
   try {
     const { messages, userMessage } = await request.json();
 
-    let apiKey = env.GEMINI_API_KEY;
+    // 1. Read API Key securely from D1 SQL database
+    let apiKey = null;
+    if (env.DB) {
+      try {
+        const row = await env.DB.prepare("SELECT data FROM site_data WHERE key = 'gemini_key'").first();
+        if (row && row.data) apiKey = row.data.trim();
+      } catch(e) {}
+    }
+
+    if (!apiKey) {
+      apiKey = env.GEMINI_API_KEY;
+    }
+
     if (!apiKey) {
       // Fallback: read encoded key from local data.json
       try {
@@ -21,7 +33,7 @@ export async function onRequestPost(context) {
     }
 
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'Gemini API key is not configured' }), {
+      return new Response(JSON.stringify({ error: 'Gemini API key is not configured in database' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });

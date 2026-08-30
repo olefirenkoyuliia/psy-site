@@ -3,20 +3,28 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { data, token, audioBase64 } = body;
+    const { data, token, audioBase64, githubToken, geminiKey } = body;
 
-    if (!data) {
-      return new Response(JSON.stringify({ error: 'Missing data payload' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+    // 1. Update secrets in D1 if provided
+    if (githubToken && env.DB) {
+      await env.DB.prepare(
+        "INSERT INTO site_data (key, data, updated_at) VALUES ('github_token', ?, CURRENT_TIMESTAMP) " +
+        "ON CONFLICT(key) DO UPDATE SET data = excluded.data, updated_at = CURRENT_TIMESTAMP"
+      ).bind(githubToken.trim()).run();
     }
 
-    const dataStr = JSON.stringify(data, null, 2);
+    if (geminiKey && env.DB) {
+      const cleanKey = geminiKey.trim().replace(/^['"]|['"]$/g, '');
+      await env.DB.prepare(
+        "INSERT INTO site_data (key, data, updated_at) VALUES ('gemini_key', ?, CURRENT_TIMESTAMP) " +
+        "ON CONFLICT(key) DO UPDATE SET data = excluded.data, updated_at = CURRENT_TIMESTAMP"
+      ).bind(cleanKey).run();
+    }
 
-    // 1. Write directly to Cloudflare D1 SQL Database (0ms instant execution)
+    // 2. Write main website data to Cloudflare D1 SQL Database (0ms)
     let d1Status = 'skipped';
-    if (env.DB) {
+    if (data && env.DB) {
+      const dataStr = JSON.stringify(data, null, 2);
       try {
         await env.DB.prepare(
           "INSERT INTO site_data (key, data, updated_at) VALUES ('main', ?, CURRENT_TIMESTAMP) " +
@@ -29,14 +37,22 @@ export async function onRequestPost(context) {
       }
     }
 
-    // 2. Commit to GitHub repository in background as versioned backup
-    const ghToken = token || env.GITHUB_TOKEN;
+    // 3. Retrieve GitHub token from D1 or env if not passed
+    let ghToken = token || githubToken || env.GITHUB_TOKEN;
+    if (!ghToken && env.DB) {
+      try {
+        const row = await env.DB.prepare("SELECT data FROM site_data WHERE key = 'github_token'").first();
+        if (row && row.data) ghToken = row.data.trim();
+      } catch(e) {}
+    }
+
     const owner = env.REPO_OWNER || 'olefirenkoyuliia';
     const repo = env.REPO_NAME || 'psy-site';
 
     let githubCommitStatus = 'skipped';
-    if (ghToken) {
+    if (ghToken && data) {
       try {
+        const dataStr = JSON.stringify(data, null, 2);
         const utf8Bytes = new TextEncoder().encode(dataStr);
         let bin = '';
         for (let i = 0; i < utf8Bytes.length; i++) bin += String.fromCharCode(utf8Bytes[i]);
