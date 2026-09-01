@@ -2,7 +2,7 @@
 <html lang="uk" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -331,18 +331,20 @@
   <audio id="greeting-audio" src="audio/greeting.mp3" preload="auto" playsinline webkit-playsinline></audio>
 
   <!-- Header / Navigation -->
-  <header class="fixed top-0 left-0 right-0 z-40 glass-nav border-b border-warm-border/60 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-      <a href="#" class="group shrink-0 block">
-        <div class="font-serif-luxury font-bold text-xl sm:text-2xl text-warm-text leading-tight group-hover:text-brand-700 transition-colors" data-bind="profile.name">
+  <header class="fixed top-0 left-0 right-0 z-[100] glass-nav border-b border-warm-border/60 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
+      
+      <!-- Brand Logo / Title -->
+      <a href="#" class="shrink min-w-0 pr-2 block">
+        <div class="font-serif-luxury font-bold text-lg sm:text-2xl text-warm-text leading-tight truncate group-hover:text-brand-700 transition-colors" data-bind="profile.name">
           Юлія Олефіренко
         </div>
-        <div class="text-xs text-warm-muted tracking-wide font-medium" data-bind="profile.role">
+        <div class="text-[11px] sm:text-xs text-warm-muted tracking-wide font-medium truncate" data-bind="profile.role">
           Практикуюча психологиня
         </div>
       </a>
 
-      <!-- Desktop Navigation -->
+      <!-- Desktop Navigation (md and above) -->
       <nav class="hidden md:flex items-center gap-4 lg:gap-5 text-[13px] lg:text-sm font-medium text-warm-muted whitespace-nowrap">
         <a href="#about" class="hover:text-brand-700 transition-colors whitespace-nowrap">Про мене</a>
         <a href="#pricing" class="hover:text-brand-700 transition-colors whitespace-nowrap">Формати</a>
@@ -362,89 +364,87 @@
         </a>
       </nav>
 
-      <!-- Cabinet & CTA & Mobile Toggle Buttons -->
-      <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Right Action Cluster -->
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
         
         <!-- Personal Client Cabinet Link -->
-        <a href="cabinet.html" id="header-cabinet-link" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-warm-card hover:bg-brand-50 text-warm-text hover:text-brand-800 border border-warm-border hover:border-brand-300 text-xs font-semibold shadow-xs transition-all">
-          <img id="nav-user-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23557C56'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="Avatar" class="w-4 h-4 rounded-full object-cover hidden">
-          <span id="nav-user-label" class="flex items-center gap-1">
-            <span>👤</span>
-            <span class="hidden sm:inline">Кабінет</span>
-          </span>
+        <a href="cabinet.html" id="header-cabinet-link" class="inline-flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-full bg-warm-card hover:bg-brand-50 text-warm-text hover:text-brand-800 border border-warm-border hover:border-brand-300 text-xs font-semibold shadow-xs transition-all shrink-0">
+          <span class="text-sm">👤</span>
+          <span id="nav-user-label" class="hidden xs:inline sm:inline">Кабінет</span>
         </a>
 
-        <!-- Telegram CTA -->
-        <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="relative group inline-flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:-translate-y-0.5 overflow-hidden" data-bind-telegram>
+        <!-- Desktop Telegram CTA -->
+        <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="hidden md:inline-flex relative group items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:-translate-y-0.5 overflow-hidden shrink-0" data-bind-telegram>
           <span class="absolute inset-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
             <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/>
           </svg>
-          <span class="hidden sm:inline">Записатися</span>
+          <span>Записатися</span>
         </a>
 
-        <!-- Mobile Menu Hamburger Button -->
-        <button type="button" onclick="toggleMobileMenu()" id="mobile-menu-btn" class="md:hidden p-2 rounded-2xl bg-warm-card hover:bg-brand-50 border border-warm-border text-warm-text hover:text-brand-800 transition-all flex items-center justify-center w-10 h-10 shadow-xs" aria-label="Відкрити меню">
-          <svg id="hamburger-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        <!-- Mobile Menu Toggle Button (Prominent & High Touch Target) -->
+        <button type="button" onclick="toggleMobileMenu()" id="mobile-menu-btn" class="md:hidden px-3.5 py-2 rounded-full bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0" aria-label="Меню">
+          <svg id="hamburger-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
-          <svg id="close-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          <svg id="close-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
           </svg>
+          <span id="menu-btn-text">Меню</span>
         </button>
 
       </div>
     </div>
 
     <!-- Mobile Navigation Drawer -->
-    <div id="mobile-menu-drawer" class="hidden md:hidden fixed top-20 left-0 right-0 bottom-0 bg-warm-bg/95 backdrop-blur-xl z-50 overflow-y-auto border-t border-warm-border shadow-2xl transition-all duration-300">
-      <div class="p-6 space-y-4 max-w-md mx-auto">
+    <div id="mobile-menu-drawer" class="hidden md:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 bg-warm-bg/98 backdrop-blur-2xl z-[9999] overflow-y-auto border-t border-warm-border shadow-2xl transition-all duration-300" style="-webkit-overflow-scrolling: touch;">
+      <div class="p-4 sm:p-6 pb-28 space-y-4 max-w-lg mx-auto">
         
         <!-- Primary Online Question CTA Badge -->
         <a href="#ask-psychologist" onclick="closeMobileMenu()" class="w-full p-4 rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-brand-800 text-white font-bold text-sm shadow-md flex items-center justify-between">
           <span class="flex items-center gap-2.5">
-            <span class="text-lg">💬</span> <span>Запитати психолога онлайн</span>
+            <span class="text-xl">💬</span> <span>Запитати психолога онлайн</span>
           </span>
-          <span class="text-[10px] bg-emerald-400/30 text-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300/40 uppercase font-bold">100% Анонімно</span>
+          <span class="text-[11px] bg-emerald-400/30 text-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300/40 uppercase font-bold">100% Анонімно</span>
         </a>
 
         <!-- Navigation Links Grid -->
-        <nav class="grid grid-cols-1 gap-1 text-sm font-semibold text-warm-text">
-          <a href="#about" onclick="closeMobileMenu()" class="p-3 rounded-xl hover:bg-white border border-transparent hover:border-warm-border flex items-center gap-3 transition-colors">
-            <span class="text-base">🌿</span> <span>Про Юлію Олефіренко</span>
+        <nav class="grid grid-cols-1 gap-1 text-sm font-semibold text-warm-text bg-white p-2 rounded-3xl border border-warm-border shadow-xs">
+          <a href="#about" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+            <span class="text-lg">🌿</span> <span>Про Юлію Олефіренко</span>
           </a>
-          <a href="#pricing" onclick="closeMobileMenu()" class="p-3 rounded-xl hover:bg-white border border-transparent hover:border-warm-border flex items-center gap-3 transition-colors">
-            <span class="text-base">💰</span> <span>Формати та вартість</span>
+          <a href="#pricing" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+            <span class="text-lg">💰</span> <span>Формати та вартість</span>
           </a>
-          <a href="#booking-widget" onclick="closeMobileMenu()" class="p-3 rounded-xl hover:bg-white border border-transparent hover:border-warm-border flex items-center gap-3 transition-colors">
-            <span class="text-base">📅</span> <span>Підбір зручного часу</span>
+          <a href="#booking-widget" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+            <span class="text-lg">📅</span> <span>Підбір зручного часу</span>
           </a>
-          <a href="#topics" onclick="closeMobileMenu()" class="p-3 rounded-xl hover:bg-white border border-transparent hover:border-warm-border flex items-center gap-3 transition-colors">
-            <span class="text-base">🧭</span> <span>Запити, з якими працюю</span>
+          <a href="#topics" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+            <span class="text-lg">🧭</span> <span>Запити, з якими працюю</span>
           </a>
-          <a href="#method" onclick="closeMobileMenu()" class="p-3 rounded-xl hover:bg-white border border-transparent hover:border-warm-border flex items-center gap-3 transition-colors">
-            <span class="text-base">🧠</span> <span>Метод & Символдрама</span>
+          <a href="#method" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+            <span class="text-lg">🧠</span> <span>Метод & Символдрама</span>
           </a>
-          <a href="#diplomas" onclick="closeMobileMenu()" class="p-3 rounded-xl hover:bg-white border border-transparent hover:border-warm-border flex items-center gap-3 transition-colors">
-            <span class="text-base">🎓</span> <span>Освіта та сертифікати</span>
+          <a href="#diplomas" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+            <span class="text-lg">🎓</span> <span>Освіта та сертифікати</span>
           </a>
-          <a href="#faq" onclick="closeMobileMenu()" class="p-3 rounded-xl hover:bg-white border border-transparent hover:border-warm-border flex items-center gap-3 transition-colors">
-            <span class="text-base">❓</span> <span>Часті запитання (FAQ)</span>
+          <a href="#faq" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+            <span class="text-lg">❓</span> <span>Часті запитання (FAQ)</span>
           </a>
-          <a href="https://www.instagram.com/psy_olefirenkoyulia" target="_blank" onclick="closeMobileMenu()" class="p-3 rounded-xl hover:bg-white border border-transparent hover:border-warm-border flex items-center gap-3 transition-colors text-pink-700">
-            <span class="text-base">📸</span> <span>Instagram блог</span>
+          <a href="https://www.instagram.com/psy_olefirenkoyulia" target="_blank" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors text-pink-700">
+            <span class="text-lg">📸</span> <span>Instagram блог</span>
           </a>
-          <a href="/privacy.html" onclick="closeMobileMenu()" class="p-3 rounded-xl hover:bg-white border border-transparent hover:border-warm-border flex items-center gap-3 transition-colors text-warm-muted text-xs">
-            <span class="text-base">🔒</span> <span>Політика конфіденційності</span>
+          <a href="/privacy.html" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors text-warm-muted text-xs">
+            <span class="text-lg">🔒</span> <span>Політика конфіденційності</span>
           </a>
         </nav>
 
         <!-- Mobile Action Buttons -->
-        <div class="pt-4 border-t border-warm-border space-y-2.5">
+        <div class="pt-2 space-y-2.5">
           <a href="cabinet.html" class="w-full py-3.5 px-4 rounded-2xl bg-white border border-warm-border text-warm-text font-bold text-xs flex items-center justify-center gap-2 shadow-xs">
-            <span>👤</span> <span>Особистий кабінет клієнта</span>
+            <span class="text-base">👤</span> <span>Особистий кабінет клієнта</span>
           </a>
-          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="w-full py-3.5 px-4 rounded-2xl bg-brand-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-soft">
+          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="w-full py-3.5 px-4 rounded-2xl bg-brand-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-soft">
             <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/>
             </svg>
@@ -1844,6 +1844,7 @@
       const drawer = document.getElementById('mobile-menu-drawer');
       const hamburgerIcon = document.getElementById('hamburger-icon');
       const closeIcon = document.getElementById('close-icon');
+      const menuBtnText = document.getElementById('menu-btn-text');
       if (!drawer) return;
 
       const isHidden = drawer.classList.contains('hidden');
@@ -1851,11 +1852,13 @@
         drawer.classList.remove('hidden');
         hamburgerIcon?.classList.add('hidden');
         closeIcon?.classList.remove('hidden');
+        if (menuBtnText) menuBtnText.textContent = '✕';
         document.body.style.overflow = 'hidden';
       } else {
         drawer.classList.add('hidden');
         hamburgerIcon?.classList.remove('hidden');
         closeIcon?.classList.add('hidden');
+        if (menuBtnText) menuBtnText.textContent = 'Меню';
         document.body.style.overflow = '';
       }
     }
@@ -1864,10 +1867,12 @@
       const drawer = document.getElementById('mobile-menu-drawer');
       const hamburgerIcon = document.getElementById('hamburger-icon');
       const closeIcon = document.getElementById('close-icon');
+      const menuBtnText = document.getElementById('menu-btn-text');
       if (drawer) {
         drawer.classList.add('hidden');
         hamburgerIcon?.classList.remove('hidden');
         closeIcon?.classList.add('hidden');
+        if (menuBtnText) menuBtnText.textContent = 'Меню';
         document.body.style.overflow = '';
       }
     }
