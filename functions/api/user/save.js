@@ -1,8 +1,20 @@
+export async function onRequestOptions() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
+    }
+  });
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
   try {
-    const data = await request.json();
+    const data = await request.json().catch(() => ({}));
     const email = (data.email || '').toLowerCase().trim();
     const googleId = data.google_id || data.googleId || '';
 

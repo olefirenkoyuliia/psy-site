@@ -158,22 +158,27 @@
           <div class="flex-grow border-t border-warm-border"></div>
         </div>
 
-        <!-- Quick One-Click Logins for Testing Roles -->
+        <!-- Quick Registration & Roles -->
         <div class="space-y-2">
-          <!-- Owner Login -->
-          <button onclick="loginAsOwnerYulia()" class="w-full py-3 px-4 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm">
-            <span>👑 Вхід як Юлія Олефіренко (Овнер практики)</span>
+          <!-- Direct Register Button -->
+          <button onclick="openRegisterModal()" class="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <span>✍️ Зареєструвати новий акаунт (Email / Google)</span>
           </button>
 
-          <!-- Client Login -->
-          <button onclick="quickTestGoogleLogin()" class="w-full py-2.5 px-4 rounded-xl bg-warm-card hover:bg-brand-50 text-warm-text hover:text-brand-900 border border-warm-border hover:border-brand-300 text-xs font-semibold transition-colors flex items-center justify-center gap-2">
-            <span>👤 Вхід як Клієнт (Олександр Петренко)</span>
-          </button>
+          <!-- Quick Test Roles -->
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="loginAsOwnerYulia()" class="py-2.5 px-3 rounded-xl bg-brand-900 hover:bg-black text-white font-bold text-[11px] transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+              <span>👑 Юлія (Овнер)</span>
+            </button>
+            <button onclick="quickTestGoogleLogin()" class="py-2.5 px-3 rounded-xl bg-warm-card hover:bg-brand-50 text-warm-text border border-warm-border hover:border-brand-300 text-[11px] font-semibold transition-colors flex items-center justify-center gap-1.5">
+              <span>👤 Клієнт (Демо)</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <div class="pt-4 border-t border-warm-border/60 text-[11px] text-warm-muted leading-relaxed">
-        🔒 Безпечна авторизація через Google SSO.
+        🔒 Безпечна авторизація без паролів через Google SSO або пряму реєстрацію.
       </div>
     </div>
 
@@ -522,6 +527,51 @@
 
       </form>
     </div>
+  <!-- Modal: Direct User Registration / Sign-In -->
+  <div id="register-client-modal" onclick="if(event.target === this) closeRegisterModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-warm-border shadow-2xl space-y-5 relative my-auto">
+      
+      <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">✍️</span>
+          <div>
+            <h3 class="font-bold text-warm-text text-base">Реєстрація / Вхід</h3>
+            <p class="text-xs text-warm-muted">Створення клієнтського кабінету</p>
+          </div>
+        </div>
+        <button onclick="closeRegisterModal()" class="w-8 h-8 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center font-bold text-xs">
+          ✕
+        </button>
+      </div>
+
+      <form id="direct-register-form" onsubmit="submitRegisterModal(event)" class="space-y-4">
+        
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-warm-text">Ваше ім'я та прізвище:</label>
+          <input type="text" id="reg-name" required placeholder="Наприклад: Олена Мельник" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-warm-text">Ваш Email (Google / робочий):</label>
+          <input type="email" id="reg-email" required placeholder="name@gmail.com" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-warm-text">Телефон (опціонально):</label>
+          <input type="tel" id="reg-phone" placeholder="+380..." class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs outline-none focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeRegisterModal()" class="px-4 py-2.5 rounded-xl border border-warm-border text-warm-text font-semibold text-xs">
+            Скасувати
+          </button>
+          <button type="submit" id="reg-submit-btn" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5">
+            <span>✨ Зареєструватися та увійти</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
   </div>
 
   <!-- Modal: Edit Client Details & Therapist Notes (For Owner Julia) -->
@@ -664,15 +714,90 @@
       }
     }
 
-    function triggerGoogleLogin() {
-      if (window.google && window.google.accounts) {
-        google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-            quickTestGoogleLogin();
-          }
+    function openRegisterModal() {
+      document.getElementById('register-client-modal').classList.remove('hidden');
+    }
+
+    function closeRegisterModal() {
+      document.getElementById('register-client-modal').classList.add('hidden');
+    }
+
+    async function submitRegisterModal(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const phone = document.getElementById('reg-phone').value.trim();
+
+      if (!name || !email) {
+        alert('Будь ласка, заповніть ім\'я та email');
+        return;
+      }
+
+      const regBtn = document.getElementById('reg-submit-btn');
+      const origText = regBtn.innerHTML;
+      regBtn.innerHTML = '<span>⏳ Реєстрація...</span>';
+      regBtn.disabled = true;
+
+      const parts = name.split(' ');
+      const firstName = parts[0] || name;
+      const lastName = parts.slice(1).join(' ') || '';
+
+      const profilePayload = {
+        name: name,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        phone: phone,
+        google_id: `usr_${Date.now()}`,
+        preferred_format: 'Платформа (Відеокімната)'
+      };
+
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile: profilePayload })
         });
+
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data.user;
+        } else {
+          currentUser = {
+            ...profilePayload,
+            id: Date.now(),
+            role: isOwnerUser(profilePayload) ? 'owner' : 'client'
+          };
+        }
+      } catch(err) {
+        currentUser = {
+          ...profilePayload,
+          id: Date.now(),
+          role: isOwnerUser(profilePayload) ? 'owner' : 'client'
+        };
+      }
+
+      localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
+      regBtn.innerHTML = origText;
+      regBtn.disabled = false;
+      closeRegisterModal();
+      renderDashboard(currentUser);
+      showToast('Акаунт успішно зареєстровано!');
+    }
+
+    function triggerGoogleLogin() {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        try {
+          google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+              openRegisterModal();
+            }
+          });
+        } catch(e) {
+          openRegisterModal();
+        }
       } else {
-        quickTestGoogleLogin();
+        openRegisterModal();
       }
     }
 
