@@ -193,28 +193,32 @@
         </div>
       </div>
 
-      <!-- CLIENT'S UPCOMING SESSION NOTIFICATION CARD (If scheduled) -->
-      <div id="client-upcoming-session-card" class="hidden p-6 sm:p-7 rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-900 text-white shadow-card border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-        <div class="space-y-2">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-xs font-bold">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Ваша запланована консультація онлайн</span>
+      <!-- CLIENT'S UPCOMING SESSIONS LIST & CALENDAR SYNC HUB -->
+      <div id="client-upcoming-sessions-container" class="hidden space-y-4">
+        <div class="p-6 rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-900 text-white shadow-card border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-xs font-bold mb-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Ваш розклад онлайн-консультацій</span>
+            </div>
+            <h2 class="font-serif-luxury font-bold text-xl text-white">
+              Заплановані консультації (<span id="client-sessions-count">0</span>)
+            </h2>
+            <p class="text-xs text-emerald-200">Психотерапія з Юлією Олефіренко • Google Meet</p>
           </div>
-          <h2 class="font-serif-luxury font-bold text-xl sm:text-2xl text-white">
-            Сесія: <span id="client-session-datetime">--</span>
-          </h2>
-          <p class="text-xs text-emerald-200">
-            Психологиня: Юлія Олефіренко • Тривалість: 50 хвилин • Формат: Відеокімната на платформі
-          </p>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="downloadClientIcsFile()" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-bold transition-all flex items-center gap-1.5">
+              <span>📥 Завантажити .ics</span>
+            </button>
+            <button onclick="openClientSyncModal()" class="px-4 py-2.5 rounded-xl bg-white text-brand-900 hover:bg-emerald-50 text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+              <span>🔗 Автосинхронізація</span>
+            </button>
+          </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3 shrink-0">
-          <a id="client-join-meet-btn" href="meet.html" class="px-6 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 text-brand-900 font-bold text-xs sm:text-sm shadow-hover transition-all flex items-center gap-2">
-            <span>📹 Приєднатися до відеосесії</span>
-          </a>
-          <a id="client-gcal-btn" href="#" target="_blank" class="px-4 py-3 rounded-2xl bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold text-xs transition-all flex items-center gap-1.5">
-            <span>📅 Додати в Google Calendar</span>
-          </a>
+        <div id="client-sessions-cards-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated dynamically with each scheduled session -->
         </div>
       </div>
 
@@ -260,6 +264,9 @@
               </button>
             </div>
 
+            <button onclick="openCalendarSyncModal()" class="px-3.5 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs">
+              <span>🗓️ Синхронізація з Google</span>
+            </button>
             <button onclick="openScheduleModal()" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
               <span>➕ Призначити сесії</span>
             </button>
@@ -818,6 +825,74 @@
         </div>
 
       </form>
+    </div>
+  </div>
+
+  <!-- Modal: Google Calendar Sync & Multi-Session Links Hub -->
+  <div id="calendar-sync-modal" onclick="if(event.target === this) closeModal('calendar-sync-modal')" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full border border-warm-border shadow-2xl space-y-5 relative my-auto">
+      
+      <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🗓️</span>
+          <div>
+            <h3 class="font-bold text-warm-text text-base" id="sync-modal-title">Синхронізація з Google Календарем</h3>
+            <p class="text-xs text-warm-muted">Додавання сесій у Google Календар та підключення живої автосинхронізації</p>
+          </div>
+        </div>
+        <button onclick="closeModal('calendar-sync-modal')" class="w-8 h-8 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center font-bold text-xs">
+          ✕
+        </button>
+      </div>
+
+      <!-- Option 1: Live Automatic Sync Feed URL -->
+      <div class="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5">
+            <span class="text-emerald-800 text-sm">⚡</span>
+            <span class="font-bold text-emerald-950 text-xs">Постійна автосинхронізація (Рекомендовано):</span>
+          </div>
+          <span class="text-[10px] text-emerald-800 bg-emerald-100 font-bold px-2 py-0.5 rounded-full">1 раз підключити</span>
+        </div>
+        <p class="text-[11px] text-emerald-900 leading-relaxed">
+          Додайте це посилання один раз у свій Google Календар (пункт <strong>«Інші календарі» ➔ «Додати за URL»</strong>). Усі нові, перенесені та створені зустрічі будуть <strong>автоматично з'являтися у вашому календарі на телефоні та ноутбуці</strong>!
+        </p>
+        <div class="flex items-center gap-2 pt-1">
+          <input type="text" id="sync-modal-feed-url" readonly value="https://dev.psy-site.pages.dev/api/calendar/feed?role=owner" class="w-full px-3 py-2 rounded-xl border border-emerald-300 text-[11px] font-mono bg-white text-emerald-950">
+          <button type="button" onclick="copyFeedUrlFromInput()" id="sync-modal-copy-btn" class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shrink-0 transition-colors shadow-xs">
+            Скопіювати
+          </button>
+        </div>
+      </div>
+
+      <!-- Option 2: 1-Click .ICS File Download for All Sessions -->
+      <div class="p-4 rounded-2xl bg-warm-bg border border-warm-border space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-warm-text text-xs">📥 Завантажити всі сесії одним файлом:</span>
+          <span class="text-[10px] text-warm-muted">Google / Apple / Outlook</span>
+        </div>
+        <button type="button" onclick="downloadAllSessionsIcs()" class="w-full py-2.5 rounded-xl bg-white hover:bg-brand-50 border border-warm-border text-brand-900 font-bold text-xs transition-colors flex items-center justify-center gap-2">
+          <span>📥 Завантажити .ics файл (усі сесії)</span>
+        </button>
+      </div>
+
+      <!-- Option 3: Individual Session 1-Click Google Calendar Links List -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs font-bold text-warm-text">
+          <span>📅 Прямі посилання для додавання кожної сесії в Google Calendar:</span>
+          <span class="text-[10px] text-warm-muted font-bold" id="sync-modal-sessions-count">0 зустрічей</span>
+        </div>
+        <div id="sync-modal-sessions-list" class="max-h-48 overflow-y-auto space-y-1.5 p-2 rounded-2xl bg-gray-50 border border-warm-border text-xs">
+          <!-- Dynamically populated links -->
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-warm-border/60">
+        <button type="button" onclick="closeModal('calendar-sync-modal')" class="px-6 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs transition-all shadow-sm">
+          Зрозуміло
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -2019,39 +2094,173 @@
       showToast(`Обрані ${ids.length} зустрічей успішно перенесено на +${daysToAdd} днів!`);
     }
 
+    let clientCurrentSessions = [];
+
     async function loadClientUpcomingSession(email) {
       if (!email) return;
-      const card = document.getElementById('client-upcoming-session-card');
+      const container = document.getElementById('client-upcoming-sessions-container');
+      const countEl = document.getElementById('client-sessions-count');
+      const cardsList = document.getElementById('client-sessions-cards-list');
+      if (!container || !cardsList) return;
+
       try {
         const res = await fetch(`/api/appointments?email=${encodeURIComponent(email)}`);
         if (res.ok) {
           const data = await res.json();
-          const upcoming = (data.appointments || []).find(a => a.status === 'scheduled');
-          if (upcoming) {
-            const gmeetLink = upcoming.google_meet_url || (upcoming.meet_url?.includes('meet.google.com') ? upcoming.meet_url : 'https://meet.google.com/new');
+          clientCurrentSessions = (data.appointments || []).filter(a => a.status === 'scheduled');
+          
+          if (clientCurrentSessions.length > 0) {
+            countEl.textContent = clientCurrentSessions.length;
+            container.classList.remove('hidden');
 
-            document.getElementById('client-session-datetime').textContent = `${upcoming.session_date} о ${upcoming.session_time}`;
-            
-            const joinBtn = document.getElementById('client-join-meet-btn');
-            joinBtn.href = gmeetLink;
-            joinBtn.target = '_blank';
-            joinBtn.innerHTML = '<span>🌐 Увійти в Google Meet</span>';
-            
-            const gcalUrl = buildGoogleCalendarLink(
-              `Консультація психотерапії з Юлією Олефіренко`,
-              `Індивідуальна сесія (${upcoming.duration_minutes || 50} хв).\nПряме посилання на Google Meet: ${gmeetLink}`,
-              gmeetLink,
-              upcoming.session_date,
-              upcoming.session_time,
-              upcoming.duration_minutes
-            );
-            document.getElementById('client-gcal-btn').href = gcalUrl;
-            card.classList.remove('hidden');
+            cardsList.innerHTML = clientCurrentSessions.map((app, idx) => {
+              const gmeetLink = app.google_meet_url || (app.meet_url?.includes('meet.google.com') ? app.meet_url : 'https://meet.google.com/new');
+              const gcalUrl = buildGoogleCalendarLink(
+                `Консультація психотерапії: Юлія Олефіренко`,
+                `Індивідуальна сесія (${app.duration_minutes || 50} хв).\nПряме посилання Google Meet: ${gmeetLink}`,
+                gmeetLink,
+                app.session_date,
+                app.session_time,
+                app.duration_minutes || 50,
+                app.client_email
+              );
+
+              return `
+                <div class="p-5 rounded-2xl bg-white border border-warm-border shadow-soft flex flex-col justify-between space-y-4 hover:border-brand-300 transition-all">
+                  <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-bold">
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px]">Сесія ${idx + 1}/${clientCurrentSessions.length}</span>
+                      <span class="text-warm-muted font-mono">${app.duration_minutes || 50} хв</span>
+                    </div>
+                    <div class="text-base font-bold text-warm-text">
+                      ${app.session_date} о ${app.session_time}
+                    </div>
+                    <p class="text-xs text-warm-muted leading-relaxed">
+                      ${app.therapist_notes || 'Індивідуальна онлайн-сесія психотерапії'}
+                    </p>
+                  </div>
+
+                  <div class="space-y-2 pt-1 border-t border-warm-border/50">
+                    <a href="${gmeetLink}" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5">
+                      <span>📹 Увійти в Google Meet</span>
+                    </a>
+                    <div class="flex items-center gap-1.5">
+                      <a href="${gcalUrl}" target="_blank" class="flex-1 py-2 px-2 rounded-xl bg-warm-bg hover:bg-emerald-50 text-emerald-950 font-semibold text-[11px] border border-warm-border text-center transition-all flex items-center justify-center gap-1">
+                        <span>📅 Google Календар</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('');
           } else {
-            card.classList.add('hidden');
+            container.classList.add('hidden');
           }
         }
-      } catch(e) {}
+      } catch(e) {
+        container.classList.add('hidden');
+      }
+    }
+
+    function openCalendarSyncModal(customTitle, specificSessions) {
+      const modal = document.getElementById('calendar-sync-modal');
+      const titleEl = document.getElementById('sync-modal-title');
+      const feedInput = document.getElementById('sync-modal-feed-url');
+      const countEl = document.getElementById('sync-modal-sessions-count');
+      const listEl = document.getElementById('sync-modal-sessions-list');
+
+      if (!modal) return;
+
+      if (customTitle && titleEl) titleEl.textContent = customTitle;
+
+      const sessions = specificSessions || cachedAppointments.filter(a => a.status === 'scheduled');
+      if (countEl) countEl.textContent = `${sessions.length} зустрічей`;
+
+      // Feed URL
+      const host = window.location.origin && window.location.origin.startsWith('http') 
+        ? window.location.origin 
+        : 'https://olefirenko.pp.ua';
+      const feedUrl = `${host}/api/calendar/feed?role=owner`;
+      if (feedInput) feedInput.value = feedUrl;
+
+      // Render individual links
+      if (listEl) {
+        if (sessions.length === 0) {
+          listEl.innerHTML = '<div class="text-warm-muted text-center p-3 text-xs">Немає запланованих зустрічей для синхронізації.</div>';
+        } else {
+          listEl.innerHTML = sessions.map((app, idx) => {
+            const gmeetLink = app.google_meet_url || (app.meet_url?.includes('meet.google.com') ? app.meet_url : 'https://meet.google.com/new');
+            const gcalUrl = buildGoogleCalendarLink(
+              `Психотерапія: ${app.client_name || 'Клієнт'}`,
+              `Онлайн-сесія психотерапії (${app.duration_minutes || 50} хв).\nПряме посилання Google Meet: ${gmeetLink}`,
+              gmeetLink,
+              app.session_date,
+              app.session_time,
+              app.duration_minutes || 50,
+              app.client_email || ''
+            );
+
+            return `
+              <div class="flex items-center justify-between p-2 rounded-xl bg-white border border-warm-border hover:border-emerald-400 transition-colors">
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold flex items-center justify-center">${idx + 1}</span>
+                  <div>
+                    <span class="font-bold text-warm-text">${app.session_date} о ${app.session_time}</span>
+                    <span class="text-warm-muted text-[11px] pl-1 font-medium">(${escapeHtml(app.client_name || '')})</span>
+                  </div>
+                </div>
+                <a href="${gcalUrl}" target="_blank" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors flex items-center gap-1 shadow-xs">
+                  <span>➕ Додати в Google</span>
+                </a>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      openModal('calendar-sync-modal');
+    }
+
+    function openClientSyncModal() {
+      const email = currentUser?.email || '';
+      const host = window.location.origin && window.location.origin.startsWith('http') 
+        ? window.location.origin 
+        : 'https://olefirenko.pp.ua';
+      const feedUrl = `${host}/api/calendar/feed?email=${encodeURIComponent(email)}`;
+      
+      const feedInput = document.getElementById('sync-modal-feed-url');
+      const titleEl = document.getElementById('sync-modal-title');
+      if (feedInput) feedInput.value = feedUrl;
+      if (titleEl) titleEl.textContent = 'Синхронізація розкладу з вашим календарем';
+
+      openCalendarSyncModal('Синхронізація ваших консультацій з Google Календарем', clientCurrentSessions);
+    }
+
+    function copyFeedUrlFromInput() {
+      const input = document.getElementById('sync-modal-feed-url');
+      if (input) {
+        input.select();
+        navigator.clipboard.writeText(input.value);
+        showToast('🔗 Посилання автосинхронізації скопійовано в буфер обміну!');
+      }
+    }
+
+    function downloadAllSessionsIcs() {
+      const role = currentUser?.role === 'owner' ? 'owner' : '';
+      const email = currentUser?.email || '';
+      const url = role === 'owner' ? '/api/calendar/feed?role=owner' : `/api/calendar/feed?email=${encodeURIComponent(email)}`;
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `therapy_sessions_${Date.now()}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('📥 Файл календаря .ics завантажено!');
+    }
+
+    function downloadClientIcsFile() {
+      downloadAllSessionsIcs();
     }
 
     let currentScheduleMode = 'single';
@@ -2574,23 +2783,8 @@
         renderCalendarGridView();
         closeScheduleModal();
         
-        const firstSession = coursePlannedSessions[0] || { dateStr: startDate, timeStr: startTime };
-        const fullGcalUrl = buildGoogleCalendarLink(
-          count > 1 ? `Курс психотерапії: ${client.name} & Юлія Олефіренко` : `Сесія психотерапії: ${client.name} & Юлія Олефіренко`,
-          count > 1 ? `Індивідуальний курс психотерапії (${count} сесій по ${durationMinutes} хв).\nПряме посилання Google Meet: ${customGmeetUrl}` : `Консультація психотерапії (${durationMinutes} хв).\nПряме посилання Google Meet: ${customGmeetUrl}`,
-          customGmeetUrl,
-          firstSession.dateStr,
-          firstSession.timeStr,
-          durationMinutes,
-          client.email,
-          count > 1 ? count : 0
-        );
-
         showToast(`🎉 Успішно призначено ${count} зустрічей для клієнта!`);
-        
-        if (confirm(`Успішно призначено ${count} зустрічей для клієнта "${client.name}"!\n\nБажаєте відкрити Google Календар, щоб зберегти приватну подію / серію в один клік?`)) {
-          window.open(fullGcalUrl, '_blank');
-        }
+        openCalendarSyncModal(`🎉 Успішно призначено ${count} зустрічей для ${client.name}!`, appointmentsPayload);
 
       } else {
         // Single session creation
@@ -2635,8 +2829,10 @@
         }
 
         renderAppointmentsList(cachedAppointments);
+        renderCalendarGridView();
         closeScheduleModal();
         showToast('Зустріч успішно призначено!');
+        openCalendarSyncModal(`🎉 Зустріч для ${client.name} успішно призначено!`, [payload]);
       }
     }
 
