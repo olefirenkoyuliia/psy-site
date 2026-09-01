@@ -2282,7 +2282,10 @@
               session.client_email ? { email: session.client_email, displayName: session.client_name } : null,
               { email: 'olefirenkou@gmail.com', displayName: 'Юлія Олефіренко' }
             ].filter(Boolean),
-            visibility: 'private'
+            visibility: 'private',
+            transparency: 'opaque',
+            guestsCanSeeOtherGuests: false,
+            anyoneCanAddSelf: false
           };
 
           const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=all', {
