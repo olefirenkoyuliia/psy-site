@@ -2014,10 +2014,43 @@
           ...payload
         };
 
-        // Sync date/time change to Google Calendar if connected: Delete old event + Re-create on new date
+        // Sync date/time change to Google Calendar: Try atomic PATCH first, fallback to delete+create
         if (googleCalendarToken || localStorage.getItem('psy_google_cal_token')) {
-          await deleteGoogleCalendarEvent(oldApp, oldApp.session_date);
-          await syncSessionsToGoogleCalendarDirectly([cachedAppointments[idx]]);
+          if (!googleCalendarToken) googleCalendarToken = localStorage.getItem('psy_google_cal_token');
+          let updatedViaPatch = false;
+
+          if (oldApp.google_event_id) {
+            try {
+              const startDateTime = `${newDate}T${newTime}:00`;
+              const startDate = new Date(startDateTime);
+              const endDate = new Date(startDate.getTime() + duration * 60000);
+              const pad = (n) => String(n).padStart(2, '0');
+              const formatRfc3339 = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}+03:00`;
+
+              const patchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${oldApp.google_event_id}?sendUpdates=all`, {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': `Bearer ${googleCalendarToken}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  start: { dateTime: formatRfc3339(startDate), timeZone: 'Europe/Kyiv' },
+                  end: { dateTime: formatRfc3339(endDate), timeZone: 'Europe/Kyiv' }
+                })
+              });
+              if (patchRes.ok) {
+                updatedViaPatch = true;
+                console.log(`Successfully patched Google Calendar event ${oldApp.google_event_id} to ${newDate} ${newTime}`);
+              }
+            } catch(e) {
+              console.warn('Google Calendar PATCH error:', e);
+            }
+          }
+
+          if (!updatedViaPatch) {
+            await deleteGoogleCalendarEvent(oldApp, oldApp.session_date);
+            await syncSessionsToGoogleCalendarDirectly([cachedAppointments[idx]]);
+          }
         }
       }
 
@@ -2040,34 +2073,41 @@
           eventIdsToDelete.add(app.google_event_id);
         }
 
-        // Search primary calendar by client name and client email
-        const searchTerms = [app.client_name, app.client_email].filter(Boolean);
-        for (const term of searchTerms) {
-          try {
-            const query = encodeURIComponent(term.trim());
-            if (!query) continue;
-            const searchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?q=${query}&maxResults=50`, {
-              headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
-            });
-            if (searchRes.ok) {
-              const data = await searchRes.json();
-              const items = data.items || [];
-              const targetDate = specificDate || app.session_date;
+        // 1. Scan live calendar events list (not relying on search index latency)
+        try {
+          const listRes = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?singleEvents=true&maxResults=250&timeMin=' + new Date(Date.now() - 30 * 86400000).toISOString(), {
+            headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
+          });
+          if (listRes.ok) {
+            const listData = await listRes.json();
+            const items = listData.items || [];
+            const clientNameLow = (app.client_name || '').toLowerCase().trim();
+            const clientEmailLow = (app.client_email || '').toLowerCase().trim();
+            const targetDate = specificDate || app.session_date;
 
-              items.forEach(item => {
-                const itemStart = item.start?.dateTime || item.start?.date || '';
-                if (targetDate) {
-                  if (itemStart.includes(targetDate)) {
-                    eventIdsToDelete.add(item.id);
-                  }
-                } else {
+            items.forEach(item => {
+              const itemSummary = (item.summary || '').toLowerCase();
+              const itemDesc = (item.description || '').toLowerCase();
+              const itemStart = item.start?.dateTime || item.start?.date || '';
+
+              const isDateMatch = targetDate ? itemStart.includes(targetDate) : false;
+              const isNameMatch = clientNameLow && (itemSummary.includes(clientNameLow) || itemDesc.includes(clientNameLow));
+              const isEmailMatch = clientEmailLow && (itemDesc.includes(clientEmailLow) || (item.attendees && item.attendees.some(a => (a.email || '').toLowerCase() === clientEmailLow)));
+
+              if (item.id === app.google_event_id) {
+                eventIdsToDelete.add(item.id);
+              } else if (isDateMatch && (isNameMatch || isEmailMatch || itemSummary.includes('психотерап'))) {
+                eventIdsToDelete.add(item.id);
+              } else if (isNameMatch && (itemSummary.includes('психотерап') || itemDesc.includes('психотерап'))) {
+                if (!targetDate || isDateMatch) {
                   eventIdsToDelete.add(item.id);
                 }
-              });
-            }
-          } catch(e) {}
-        }
+              }
+            });
+          }
+        } catch(e) {}
 
+        // 2. Perform direct DELETE calls for all identified event IDs
         for (const eventId of eventIdsToDelete) {
           try {
             const delRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}?sendUpdates=all`, {
