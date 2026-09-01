@@ -307,30 +307,56 @@
       initAutoHideControls();
     });
 
-    let lastWakeTime = Date.now();
+    let lastMouseX = 0, lastMouseY = 0;
 
     function initAutoHideControls() {
-      // Activity listeners to show controls and reset timer
-      const events = ['mousemove', 'mousedown', 'touchstart', 'touchmove', 'pointerdown', 'keydown'];
-      events.forEach(evt => {
-        window.addEventListener(evt, () => {
-          showControls();
-        }, { passive: true });
-      });
+      // Mouse movement on desktop (only on real cursor motion > 8px)
+      window.addEventListener('mousemove', (e) => {
+        if (Math.abs(e.clientX - lastMouseX) > 8 || Math.abs(e.clientY - lastMouseY) > 8) {
+          lastMouseX = e.clientX;
+          lastMouseY = e.clientY;
+          if (!areControlsVisible) {
+            showControls();
+          } else {
+            resetControlsTimer();
+          }
+        }
+      }, { passive: true });
 
-      // Tap on the video background toggles controls only if already awake for a moment
-      document.getElementById('video-stage').addEventListener('click', (e) => {
-        if (e.target.closest('button') || e.target.closest('#local-video-container') || e.target.closest('#session-notes-sidebar')) return;
-        
-        if (Date.now() - lastWakeTime < 400) {
-          // Just awakened by touchstart, keep visible
-          showControls();
-        } else if (areControlsVisible) {
+      window.addEventListener('keydown', () => {
+        showControls();
+      }, { passive: true });
+
+      // Tap/click on video screen toggles controls: 1st tap shows, 2nd tap collapses
+      document.body.addEventListener('click', (e) => {
+        // Ignore if clicked on interactive elements
+        if (e.target.closest('button') || e.target.closest('a') || e.target.closest('textarea') || e.target.closest('input') || e.target.closest('#local-video-container') || e.target.closest('#session-notes-sidebar') || e.target.closest('#bottom-floating-dock') || e.target.closest('#top-floating-header')) {
+          return;
+        }
+
+        if (areControlsVisible) {
           hideControls();
         } else {
           showControls();
         }
       });
+
+      // Keep awake when interacting with dock or header buttons
+      const dock = document.getElementById('bottom-floating-dock');
+      if (dock) {
+        dock.addEventListener('pointerdown', (e) => {
+          e.stopPropagation();
+          resetControlsTimer();
+        });
+      }
+
+      const header = document.getElementById('top-floating-header');
+      if (header) {
+        header.addEventListener('pointerdown', (e) => {
+          e.stopPropagation();
+          resetControlsTimer();
+        });
+      }
 
       // Start initial timer
       resetControlsTimer();
