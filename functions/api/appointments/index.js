@@ -157,10 +157,10 @@ export async function onRequestPut(context) {
 
   try {
     const data = await request.json();
-    const id = data.id;
+    const ids = Array.isArray(data.ids) ? data.ids : (data.id ? [data.id] : []);
 
-    if (!id) {
-      return new Response(JSON.stringify({ error: 'Appointment ID is required' }), {
+    if (ids.length === 0) {
+      return new Response(JSON.stringify({ error: 'Appointment ID or IDs array is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
@@ -172,16 +172,29 @@ export async function onRequestPut(context) {
       });
     }
 
-    const status = data.status || 'scheduled';
-    const therapistNotes = data.therapist_notes || '';
-
-    await env.DB.prepare(
-      "UPDATE appointments SET status = ?, therapist_notes = COALESCE(NULLIF(?, ''), therapist_notes), updated_at = CURRENT_TIMESTAMP WHERE id = ?"
-    ).bind(status, therapistNotes, id).run();
+    for (const id of ids) {
+      await env.DB.prepare(
+        "UPDATE appointments SET " +
+        "session_date = COALESCE(NULLIF(?, ''), session_date), " +
+        "session_time = COALESCE(NULLIF(?, ''), session_time), " +
+        "duration_minutes = COALESCE(NULLIF(?, 0), duration_minutes), " +
+        "status = COALESCE(NULLIF(?, ''), status), " +
+        "therapist_notes = COALESCE(NULLIF(?, ''), therapist_notes), " +
+        "updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+      ).bind(
+        data.session_date || '',
+        data.session_time || '',
+        data.duration_minutes || 0,
+        data.status || '',
+        data.therapist_notes || '',
+        id
+      ).run();
+    }
 
     return new Response(JSON.stringify({
       success: true,
-      message: 'Статус зустрічі оновлено'
+      updatedCount: ids.length,
+      message: ids.length > 1 ? `Оновлено ${ids.length} сесій` : 'Сесію успішно оновлено'
     }), {
       headers: {
         'Content-Type': 'application/json',
@@ -201,22 +214,33 @@ export async function onRequestPut(context) {
 export async function onRequestDelete(context) {
   const { request, env } = context;
   const url = new URL(request.url);
-  const id = url.searchParams.get('id');
+  const idParam = url.searchParams.get('id');
+  const idsParam = url.searchParams.get('ids');
 
-  if (!id) {
-    return new Response(JSON.stringify({ error: 'Appointment ID is required' }), {
+  let ids = [];
+  if (idsParam) {
+    ids = idsParam.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+  } else if (idParam) {
+    ids = [parseInt(idParam)].filter(n => !isNaN(n));
+  }
+
+  if (ids.length === 0) {
+    return new Response(JSON.stringify({ error: 'Appointment ID or IDs are required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }
 
   if (env.DB) {
-    await env.DB.prepare("DELETE FROM appointments WHERE id = ?").bind(id).run();
+    for (const id of ids) {
+      await env.DB.prepare("DELETE FROM appointments WHERE id = ?").bind(id).run();
+    }
   }
 
   return new Response(JSON.stringify({
     success: true,
-    message: 'Зустріч скасовано'
+    deletedCount: ids.length,
+    message: ids.length > 1 ? `Скасовано ${ids.length} зустрічей` : 'Зустріч скасовано'
   }), {
     headers: {
       'Content-Type': 'application/json',
