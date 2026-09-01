@@ -134,47 +134,57 @@
           </div>
         </div>
 
-        <!-- 4 KPI Metrics Grid -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- 5 KPI Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
           
           <!-- Metric 1: Real Humans -->
-          <div class="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-1">
+          <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-1">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-emerald-800">Люди (Сьогодні)</span>
-              <span class="text-base">👤</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800">Відвідувачі</span>
+              <span class="text-sm">👤</span>
             </div>
-            <div class="text-3xl font-extrabold text-emerald-900" id="stat-humans">0</div>
-            <p class="text-[11px] text-emerald-700 font-medium">Реальні відвідувачі</p>
+            <div class="text-2xl sm:text-3xl font-extrabold text-emerald-900" id="stat-humans">0</div>
+            <p class="text-[10px] text-emerald-700 font-medium">Реальні люди</p>
           </div>
 
-          <!-- Metric 2: Search Bots -->
-          <div class="p-5 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-1">
+          <!-- Metric 2: Telegram Leads -->
+          <div class="p-4 rounded-2xl bg-sky-50/60 border border-sky-200/80 space-y-1">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-amber-800">Боти & Сканери</span>
-              <span class="text-base">🤖</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-sky-800">Telegram</span>
+              <span class="text-sm">💬</span>
             </div>
-            <div class="text-3xl font-extrabold text-amber-900" id="stat-bots">0</div>
-            <p class="text-[11px] text-amber-700 font-medium">Googlebot, роботи тощо</p>
+            <div class="text-2xl sm:text-3xl font-extrabold text-sky-900" id="stat-tg">0</div>
+            <p class="text-[10px] text-sky-700 font-medium">Кліки на запис</p>
           </div>
 
-          <!-- Metric 3: Telegram Leads -->
-          <div class="p-5 rounded-2xl bg-sky-50/60 border border-sky-200/80 space-y-1">
+          <!-- Metric 3: Online Inquiries -->
+          <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-1">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-sky-800">Кліки в Telegram</span>
-              <span class="text-base">💬</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800">Запитання</span>
+              <span class="text-sm">✉️</span>
             </div>
-            <div class="text-3xl font-extrabold text-sky-900" id="stat-tg">0</div>
-            <p class="text-[11px] text-sky-700 font-medium">Переходи на запис</p>
+            <div class="text-2xl sm:text-3xl font-extrabold text-amber-900" id="stat-inquiries">0</div>
+            <p class="text-[10px] text-amber-700 font-medium">Звернення з сайту</p>
           </div>
 
-          <!-- Metric 4: Conversion Rate -->
-          <div class="p-5 rounded-2xl bg-purple-50/60 border border-purple-200/80 space-y-1">
+          <!-- Metric 4: Registered Clients -->
+          <div class="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-200/80 space-y-1">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-purple-800">Конверсія сайту</span>
-              <span class="text-base">🎯</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-800">Кабінети</span>
+              <span class="text-sm">👥</span>
             </div>
-            <div class="text-3xl font-extrabold text-purple-900" id="stat-conversion">0%</div>
-            <p class="text-[11px] text-purple-700 font-medium">Кліки / Відвідувачі</p>
+            <div class="text-2xl sm:text-3xl font-extrabold text-indigo-900" id="stat-clients">0</div>
+            <p class="text-[10px] text-indigo-700 font-medium">Клієнти в базі</p>
+          </div>
+
+          <!-- Metric 5: Total Conversion Rate -->
+          <div class="p-4 rounded-2xl bg-purple-50/60 border border-purple-200/80 space-y-1 col-span-2 sm:col-span-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-purple-800">Конверсія</span>
+              <span class="text-sm">🎯</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-purple-900" id="stat-conversion">0%</div>
+            <p class="text-[10px] text-purple-700 font-medium">Ліди / Відвідувачі</p>
           </div>
 
         </div>
@@ -767,16 +777,19 @@
       try {
         const res = await fetch('/api/stats?t=' + Date.now());
         if (!res.ok) throw new Error('API error');
-        const stats = await res.json();
-
         const humans = stats.humans || 0;
         const bots = stats.bots || 0;
         const tg = stats.tgClicks || 0;
-        const convRate = stats.conversion || (humans > 0 ? ((tg / humans) * 100).toFixed(1) : '0');
+        const inquiries = stats.inquiriesCount || 0;
+        const clients = stats.totalClients || 0;
+        const totalLeads = stats.totalLeads || (tg + inquiries + clients);
+        const convRate = stats.conversion || (humans > 0 ? Math.min(100, ((totalLeads / humans) * 100)).toFixed(1) : '0');
 
         document.getElementById('stat-humans').textContent = humans;
-        document.getElementById('stat-bots').textContent = bots;
+        if (document.getElementById('stat-bots')) document.getElementById('stat-bots').textContent = bots;
         document.getElementById('stat-tg').textContent = tg;
+        if (document.getElementById('stat-inquiries')) document.getElementById('stat-inquiries').textContent = inquiries;
+        if (document.getElementById('stat-clients')) document.getElementById('stat-clients').textContent = clients;
         document.getElementById('stat-conversion').textContent = convRate + '%';
 
         // Aggregate Sources

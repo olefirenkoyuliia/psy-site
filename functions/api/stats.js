@@ -84,7 +84,9 @@ export async function onRequestGet(context) {
       let actionTitle = 'Перегляд сайту';
       if (row.event_type === 'tg_click') actionTitle = 'Клік у Telegram 💬';
       if (row.event_type === 'booking_click') actionTitle = 'Запис на час 📅';
-      if (row.event_type === 'quiz_completed') actionTitle = 'Пройдено опитування стану 🧭';
+      if (row.event_type === 'inquiry_submit') actionTitle = 'Запитання психологу ✉️';
+      if (row.event_type === 'user_login') actionTitle = 'Вхід в кабінет 👤';
+      if (row.event_type === 'quiz_completed') actionTitle = 'Пройдено опитування 🧭';
       if (row.event_type === 'instagram_click') actionTitle = 'Перехід в Instagram 📸';
       if (row.event_type === 'audio_play') actionTitle = 'Прослуховування аудіо 🎙️';
       if (row.event_type === 'chat_open') actionTitle = 'Чат з AI-асистентом 🤖';
@@ -171,8 +173,15 @@ export async function onRequestGet(context) {
       registeredClients = usersQuery.results || [];
     } catch(e) {}
 
+    let totalInquiries = 0;
+    try {
+      const inqRes = await env.DB.prepare("SELECT COUNT(*) as cnt FROM client_inquiries").first();
+      totalInquiries = inqRes?.cnt || 0;
+    } catch(e) {}
+
     const humanCount = Math.max(humans, countedVisitors.size);
-    const convRate = humanCount > 0 ? ((tgClicks / humanCount) * 100).toFixed(1) : '0';
+    const totalLeads = tgClicks + totalInquiries + (registeredClients.length || 0);
+    const convRate = humanCount > 0 ? Math.min(100, ((totalLeads / humanCount) * 100)).toFixed(1) : '0';
 
     return new Response(JSON.stringify({
       success: true,
@@ -180,6 +189,9 @@ export async function onRequestGet(context) {
       bots: bots,
       views: pageViews || humanCount,
       tgClicks: tgClicks,
+      inquiriesCount: totalInquiries,
+      totalClients: registeredClients.length,
+      totalLeads: totalLeads,
       conversion: convRate,
       sources: sourcesMap,
       devices: devicesMap,
@@ -189,8 +201,7 @@ export async function onRequestGet(context) {
       topicAnalytics: topicAnalytics,
       registeredClients: registeredClients,
       totalChats: chatInquiries.length,
-      totalQuizzes: quizSubmissions.length,
-      totalClients: registeredClients.length
+      totalQuizzes: quizSubmissions.length
     }), {
       headers: {
         'Content-Type': 'application/json',

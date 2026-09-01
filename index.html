@@ -1788,6 +1788,19 @@
         localStorage.setItem('psy_client_email', clientEmail);
         localStorage.setItem('psy_client_name', clientName);
 
+        // Track conversion event in real-time analytics
+        try {
+          fetch('/api/track', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event: 'inquiry_submit',
+              visitorId: localStorage.getItem('psy_vid') || 'anon',
+              metadata: { topic: selectedInquiryTopicVal, name: clientName, email: clientEmail }
+            })
+          }).catch(() => {});
+        } catch(e) {}
+
         if (questionEl) questionEl.value = '';
         
         alert(`🌿 Дякуємо, ${clientName}!\n\nВаше запитання успішно передано Юлії. Відповідь з'явиться у вашому Особистому кабінеті.\n\nНатисніть «ОК», щоб відкрити кабінет.`);
