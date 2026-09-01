@@ -241,44 +241,130 @@
       <div id="owner-schedule-view" class="hidden space-y-6">
         
         <!-- Schedule Header -->
-        <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <h2 class="font-bold text-warm-text text-lg flex items-center gap-2">
-              <span>📅</span> <span>Календар та онлайн-сесії</span>
+              <span>📅</span> <span>Календар зайнятості та онлайн-сесії</span>
             </h2>
-            <p class="text-xs text-warm-muted">Призначення зустрічей, перенесення, відміна та приватний Google Calendar</p>
+            <p class="text-xs text-warm-muted">Перегляд зайнятих та вільних слотів у реальному часі, захист від накладок та призначення від 1 до 100+ сесій</p>
           </div>
 
-          <div class="flex items-center gap-3">
-            <button onclick="openScheduleModal()" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-2">
-              <span>➕ Призначити зустріч / курс</span>
+          <div class="flex flex-wrap items-center gap-2.5">
+            <!-- View Mode Switcher -->
+            <div class="inline-flex p-1 bg-warm-bg rounded-2xl border border-warm-border text-xs font-bold">
+              <button type="button" onclick="setScheduleDisplayMode('calendar')" id="btn-display-calendar" class="px-3.5 py-1.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-1.5">
+                <span>📅 Календар слотів</span>
+              </button>
+              <button type="button" onclick="setScheduleDisplayMode('cards')" id="btn-display-cards" class="px-3.5 py-1.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-1.5">
+                <span>📋 Список карток</span>
+              </button>
+            </div>
+
+            <button onclick="openScheduleModal()" class="px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+              <span>➕ Призначити сесії</span>
             </button>
-            <button onclick="loadAppointmentsList()" class="px-3.5 py-2.5 rounded-xl bg-warm-card hover:bg-brand-50 text-brand-800 border border-warm-border text-xs font-bold transition-colors">
+            <button onclick="loadAppointmentsList()" class="px-3 py-2.5 rounded-xl bg-warm-card hover:bg-brand-50 text-brand-800 border border-warm-border text-xs font-bold transition-colors">
               🔄 Оновити
             </button>
           </div>
         </div>
 
-        <!-- Filter and Multi-selection Bar -->
-        <div class="flex flex-wrap items-center justify-between gap-3 px-1 text-xs">
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
-            <button onclick="filterAppointmentsStatus('all')" id="sched-filter-all" class="px-3 py-1.5 rounded-xl bg-brand-700 text-white font-bold transition-all">Усі (<span id="count-filter-all">0</span>)</button>
-            <button onclick="filterAppointmentsStatus('scheduled')" id="sched-filter-scheduled" class="px-3 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">Заплановані (<span id="count-filter-scheduled">0</span>)</button>
-            <button onclick="filterAppointmentsStatus('completed')" id="sched-filter-completed" class="px-3 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">Завершені (<span id="count-filter-completed">0</span>)</button>
-            <button onclick="filterAppointmentsStatus('cancelled')" id="sched-filter-cancelled" class="px-3 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">Скасовані (<span id="count-filter-cancelled">0</span>)</button>
+        <!-- ======================================================== -->
+        <!-- SUB-VIEW A: VISUAL CALENDAR SLOTS GRID (Real-Time Free/Busy) -->
+        <!-- ======================================================== -->
+        <div id="owner-calendar-grid-view" class="space-y-4">
+          
+          <!-- Calendar Week Navigator Bar -->
+          <div class="p-4 rounded-2xl bg-white border border-warm-border shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="changeCalendarWeek(-1)" class="px-3 py-1.5 rounded-xl bg-warm-bg hover:bg-gray-200 text-warm-text font-bold transition-colors">
+                ◀ Попередній
+              </button>
+              <button type="button" onclick="setCalendarToday()" class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 font-bold border border-emerald-200 transition-colors">
+                Сьогодні
+              </button>
+              <button type="button" onclick="changeCalendarWeek(1)" class="px-3 py-1.5 rounded-xl bg-warm-bg hover:bg-gray-200 text-warm-text font-bold transition-colors">
+                Наступний ▶
+              </button>
+              <span id="cal-grid-range-title" class="font-bold text-warm-text text-sm pl-2">Тиждень</span>
+            </div>
+
+            <!-- Legend -->
+            <div class="flex flex-wrap items-center gap-3 text-[11px] font-semibold text-warm-text">
+              <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-md bg-emerald-100 border border-emerald-400"></span>
+                <span>🟢 Вільний слот (клікніть для вибору)</span>
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-md bg-amber-200 border border-amber-400"></span>
+                <span>🔒 Зайнято (Захист від накладок)</span>
+              </span>
+              <span class="flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-md bg-brand-700"></span>
+                <span>🔵 Обрано</span>
+              </span>
+            </div>
           </div>
 
-          <div class="flex items-center gap-2">
-            <button type="button" onclick="toggleSelectAllAppointments()" id="btn-select-all-appts" class="px-3 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all flex items-center gap-1.5 text-xs">
-              <span>☑️</span> <span>Обрати всі</span>
-            </button>
+          <!-- Calendar Grid Table -->
+          <div class="bg-white rounded-3xl border border-warm-border shadow-soft overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[760px] border-collapse text-xs">
+                <thead>
+                  <tr id="cal-grid-header-row" class="bg-warm-bg/60 border-b border-warm-border text-warm-text text-center font-bold">
+                    <!-- Populated dynamically with 7 weekdays & dates -->
+                  </tr>
+                </thead>
+                <tbody id="cal-grid-body-rows" class="divide-y divide-warm-border/50">
+                  <!-- Populated dynamically with time rows and slots -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- SUB-VIEW B: CARDS LIST VIEW (With status filters)        -->
+        <!-- ======================================================== -->
+        <div id="owner-cards-list-view" class="hidden space-y-4">
+          <!-- Filter and Multi-selection Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-3 px-1 text-xs">
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+              <button onclick="filterAppointmentsStatus('all')" id="sched-filter-all" class="px-3 py-1.5 rounded-xl bg-brand-700 text-white font-bold transition-all">Усі (<span id="count-filter-all">0</span>)</button>
+              <button onclick="filterAppointmentsStatus('scheduled')" id="sched-filter-scheduled" class="px-3 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">Заплановані (<span id="count-filter-scheduled">0</span>)</button>
+              <button onclick="filterAppointmentsStatus('completed')" id="sched-filter-completed" class="px-3 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">Завершені (<span id="count-filter-completed">0</span>)</button>
+              <button onclick="filterAppointmentsStatus('cancelled')" id="sched-filter-cancelled" class="px-3 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">Скасовані (<span id="count-filter-cancelled">0</span>)</button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="toggleSelectAllAppointments()" id="btn-select-all-appts" class="px-3 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all flex items-center gap-1.5 text-xs">
+                <span>☑️</span> <span>Обрати всі</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Appointments Cards Grid -->
+          <div id="owner-appointments-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="col-span-full p-12 text-center bg-white rounded-3xl border border-warm-border text-warm-muted text-xs">
+              Завантаження розкладу зустрічей...
+            </div>
           </div>
         </div>
 
-        <!-- Appointments List -->
-        <div id="owner-appointments-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="col-span-full p-12 text-center bg-white rounded-3xl border border-warm-border text-warm-muted text-xs">
-            Завантаження розкладу зустрічей...
+        <!-- Floating Bottom Dock: Booking Multi-Selected Calendar Slots -->
+        <div id="calendar-booking-dock" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 hidden max-w-xl w-[94%] bg-brand-900/95 backdrop-blur-xl text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-emerald-500/40 flex flex-wrap items-center justify-between gap-3 animate-fade-in">
+          <div class="flex items-center gap-2 text-xs font-bold">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Обрано для запису: <strong id="cal-selected-slots-count" class="text-emerald-300">0</strong> вільних слотів</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openBookingForSelectedCalendarSlots()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
+              <span>✨ Призначити сесії клієнту</span>
+            </button>
+            <button onclick="clearCalendarSlotSelection()" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs flex items-center justify-center">
+              ✕
+            </button>
           </div>
         </div>
 
@@ -1370,7 +1456,229 @@
       const badge = document.getElementById('owner-appointments-badge');
       if (badge) badge.textContent = cachedAppointments.filter(a => a.status === 'scheduled').length;
 
+      if (currentScheduleDisplayMode === 'calendar') {
+        renderCalendarGridView();
+      }
       renderAppointmentsList(cachedAppointments);
+    }
+
+    let currentScheduleDisplayMode = 'calendar';
+    let calendarCurrentStartDate = getMondayDate(new Date());
+    let selectedCalendarBookingSlots = new Set(); // 'YYYY-MM-DD|HH:MM'
+
+    function getMondayDate(d) {
+      const date = new Date(d);
+      const day = date.getDay();
+      const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+      const mon = new Date(date.setDate(diff));
+      mon.setHours(0, 0, 0, 0);
+      return mon;
+    }
+
+    function setScheduleDisplayMode(mode) {
+      currentScheduleDisplayMode = mode;
+      const btnCal = document.getElementById('btn-display-calendar');
+      const btnCards = document.getElementById('btn-display-cards');
+      const viewCal = document.getElementById('owner-calendar-grid-view');
+      const viewCards = document.getElementById('owner-cards-list-view');
+
+      if (mode === 'calendar') {
+        btnCal.className = 'px-3.5 py-1.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-1.5';
+        btnCards.className = 'px-3.5 py-1.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-1.5';
+        viewCal.classList.remove('hidden');
+        viewCards.classList.add('hidden');
+        renderCalendarGridView();
+      } else {
+        btnCal.className = 'px-3.5 py-1.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-1.5';
+        btnCards.className = 'px-3.5 py-1.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-1.5';
+        viewCal.classList.add('hidden');
+        viewCards.classList.remove('hidden');
+        renderAppointmentsList(cachedAppointments);
+      }
+    }
+
+    function changeCalendarWeek(offset) {
+      calendarCurrentStartDate.setDate(calendarCurrentStartDate.getDate() + offset * 7);
+      renderCalendarGridView();
+    }
+
+    function setCalendarToday() {
+      calendarCurrentStartDate = getMondayDate(new Date());
+      renderCalendarGridView();
+    }
+
+    function toggleCalendarSlotSelection(dateStr, timeStr) {
+      const key = `${dateStr}|${timeStr}`;
+      if (selectedCalendarBookingSlots.has(key)) {
+        selectedCalendarBookingSlots.delete(key);
+      } else {
+        selectedCalendarBookingSlots.add(key);
+      }
+      updateCalendarBookingDock();
+      renderCalendarGridView();
+    }
+
+    function clearCalendarSlotSelection() {
+      selectedCalendarBookingSlots.clear();
+      updateCalendarBookingDock();
+      renderCalendarGridView();
+    }
+
+    function updateCalendarBookingDock() {
+      const dock = document.getElementById('calendar-booking-dock');
+      const countEl = document.getElementById('cal-selected-slots-count');
+      const count = selectedCalendarBookingSlots.size;
+      if (dock && countEl) {
+        countEl.textContent = count;
+        dock.classList.toggle('hidden', count === 0);
+      }
+    }
+
+    function openBookingForSelectedCalendarSlots() {
+      if (selectedCalendarBookingSlots.size === 0) return;
+      const sortedKeys = Array.from(selectedCalendarBookingSlots).sort();
+      
+      const sessions = sortedKeys.map(k => {
+        const [dateStr, timeStr] = k.split('|');
+        const [y, m, d] = dateStr.split('-');
+        const dateObj = new Date(Number(y), Number(m) - 1, Number(d));
+        return {
+          dateStr: dateStr,
+          timeStr: timeStr,
+          dayOfWeekName: UKRAINIAN_DAYS[dateObj.getDay()]
+        };
+      });
+
+      openScheduleModal();
+      setScheduleMode('course');
+      
+      coursePlannedSessions = sessions;
+      if (sessions.length > 0) {
+        document.getElementById('schedule-date').value = sessions[0].dateStr;
+        document.getElementById('schedule-time').value = sessions[0].timeStr;
+      }
+      renderCourseSchedulePreviewList();
+      
+      clearCalendarSlotSelection();
+    }
+
+    const STANDARD_CALENDAR_HOURS = [
+      '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'
+    ];
+
+    const UKRAINIAN_MONTHS = [
+      'січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'
+    ];
+
+    function renderCalendarGridView() {
+      const headerRow = document.getElementById('cal-grid-header-row');
+      const bodyRows = document.getElementById('cal-grid-body-rows');
+      const rangeTitle = document.getElementById('cal-grid-range-title');
+      if (!headerRow || !bodyRows) return;
+
+      const todayStr = new Date().toISOString().substring(0, 10);
+
+      // Compute the 7 dates of current week
+      const weekDates = [];
+      const monday = new Date(calendarCurrentStartDate);
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dayNum = String(d.getDate()).padStart(2, '0');
+        const dateStr = `${y}-${m}-${dayNum}`;
+        const dayOfWeekIndex = d.getDay();
+
+        weekDates.push({
+          dateStr: dateStr,
+          dayNum: dayNum,
+          monthName: UKRAINIAN_MONTHS[d.getMonth()],
+          year: y,
+          dayOfWeekName: UKRAINIAN_DAYS[dayOfWeekIndex],
+          isToday: dateStr === todayStr
+        });
+      }
+
+      // Title
+      const firstD = weekDates[0];
+      const lastD = weekDates[6];
+      if (rangeTitle) {
+        rangeTitle.textContent = `${firstD.dayNum} ${firstD.monthName} — ${lastD.dayNum} ${lastD.monthName} ${lastD.year}`;
+      }
+
+      // Render Header Row
+      headerRow.innerHTML = `
+        <th class="p-3 w-20 bg-warm-bg/90 border-r border-warm-border text-warm-muted text-[11px] font-mono">Час</th>
+        ${weekDates.map(wd => `
+          <th class="p-2.5 border-r last:border-r-0 border-warm-border ${wd.isToday ? 'bg-emerald-50 text-emerald-950 font-black' : ''}">
+            <div class="flex flex-col items-center">
+              <span class="text-xs ${wd.isToday ? 'text-emerald-800' : 'text-warm-muted'}">${wd.dayOfWeekName}</span>
+              <span class="text-sm font-bold ${wd.isToday ? 'text-emerald-900 bg-emerald-200/70 px-2 py-0.5 rounded-full' : 'text-warm-text'}">${wd.dayNum}.${wd.dateStr.split('-')[1]}</span>
+            </div>
+          </th>
+        `).join('')}
+      `;
+
+      // Active appointments lookup
+      const activeApps = cachedAppointments.filter(a => a.status !== 'cancelled');
+
+      // Render Time Rows
+      bodyRows.innerHTML = STANDARD_CALENDAR_HOURS.map(hour => `
+        <tr class="hover:bg-gray-50/50 transition-colors">
+          <td class="p-2 w-20 text-center font-mono font-bold text-xs text-warm-muted bg-warm-bg/40 border-r border-warm-border">
+            ${hour}
+          </td>
+          ${weekDates.map(wd => {
+            const slotKey = `${wd.dateStr}|${hour}`;
+            const bookedApp = activeApps.find(a => a.session_date === wd.dateStr && (a.session_time === hour || a.session_time?.startsWith(hour.substring(0, 2))));
+            const isSelected = selectedCalendarBookingSlots.has(slotKey);
+
+            if (bookedApp) {
+              return `
+                <td class="p-1.5 border-r last:border-r-0 border-warm-border/60 align-top">
+                  <div onclick="openRescheduleModal(${bookedApp.id})" class="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-950 shadow-xs cursor-pointer transition-all space-y-0.5">
+                    <div class="flex items-center justify-between text-[10px] font-bold text-amber-900">
+                      <span>🔒 Зайнято</span>
+                      <span>${bookedApp.session_time}</span>
+                    </div>
+                    <div class="font-bold truncate text-[11px]">${escapeHtml(bookedApp.client_name)}</div>
+                    <div class="text-[9px] text-amber-800/80 flex items-center justify-between">
+                      <span>50 хв</span>
+                      <span class="text-[10px]">🌐 Meet</span>
+                    </div>
+                  </div>
+                </td>
+              `;
+            }
+
+            if (isSelected) {
+              return `
+                <td class="p-1.5 border-r last:border-r-0 border-warm-border/60 align-top">
+                  <div onclick="toggleCalendarSlotSelection('${wd.dateStr}', '${hour}')" class="p-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white shadow-md cursor-pointer transition-all space-y-0.5 animate-fade-in">
+                    <div class="flex items-center justify-between text-[10px] font-bold text-emerald-200">
+                      <span>✓ Обрано</span>
+                      <span>${hour}</span>
+                    </div>
+                    <div class="text-[10px] font-semibold truncate">Готово до запису</div>
+                    <div class="text-[9px] text-emerald-200">Клікніть щоб зняти</div>
+                  </div>
+                </td>
+              `;
+            }
+
+            return `
+              <td class="p-1.5 border-r last:border-r-0 border-warm-border/60 align-top">
+                <button type="button" onclick="toggleCalendarSlotSelection('${wd.dateStr}', '${hour}')" class="w-full h-full min-h-[52px] p-2 rounded-xl border border-dashed border-warm-border/80 hover:border-emerald-500 hover:bg-emerald-50/70 transition-all text-left flex flex-col justify-between group bg-white/40">
+                  <span class="text-[10px] text-warm-muted group-hover:text-emerald-800 font-mono font-bold">${hour}</span>
+                  <span class="text-[9px] text-emerald-700 opacity-0 group-hover:opacity-100 font-bold transition-opacity">+ Обрати</span>
+                </button>
+              </td>
+            `;
+          }).join('')}
+        </tr>
+      `).join('');
     }
 
     let selectedAppointmentIds = new Set();
@@ -2124,6 +2432,29 @@
       const notes = document.getElementById('schedule-notes').value.trim();
       const startDate = document.getElementById('schedule-date').value;
       const startTime = document.getElementById('schedule-time').value;
+
+      // Real-time conflict validation against existing active appointments
+      const activeAppointments = cachedAppointments.filter(a => a.status !== 'cancelled');
+      const conflicts = [];
+
+      if (currentScheduleMode === 'course') {
+        coursePlannedSessions.forEach((s, idx) => {
+          const conflict = activeAppointments.find(a => a.session_date === s.dateStr && (a.session_time === s.timeStr || a.session_time?.startsWith(s.timeStr.substring(0, 2))));
+          if (conflict) {
+            conflicts.push(`• Сесія ${idx + 1} (${s.dateStr} о ${s.timeStr}) — вже зайнято зустріччю з "${conflict.client_name}"`);
+          }
+        });
+      } else {
+        const conflict = activeAppointments.find(a => a.session_date === startDate && (a.session_time === startTime || a.session_time?.startsWith(startTime.substring(0, 2))));
+        if (conflict) {
+          conflicts.push(`• Обраний час (${startDate} о ${startTime}) — вже зайнято зустріччю з "${conflict.client_name}"`);
+        }
+      }
+
+      if (conflicts.length > 0) {
+        alert(`⚠️ УВАГА! Виявлено накладку в розкладі:\n\n${conflicts.join('\n')}\n\nБудь ласка, оберіть інший вільний час, щоб уникнути подвійного бронювання.`);
+        return;
+      }
 
       if (currentScheduleMode === 'course') {
         if (coursePlannedSessions.length === 0) {

@@ -81,6 +81,24 @@ export async function onRequestPost(context) {
 
       if (!clientName || !sessionDate || !sessionTime) continue;
 
+      if (env.DB && !data.allow_conflict) {
+        // Anti-double-booking check: ensure no active appointment exists on same date and time
+        const existing = await env.DB.prepare(
+          "SELECT id, client_name, session_date, session_time FROM appointments WHERE session_date = ? AND session_time = ? AND status = 'scheduled'"
+        ).bind(sessionDate, sessionTime).first();
+
+        if (existing) {
+          return new Response(JSON.stringify({
+            conflict: true,
+            error: `Слот ${sessionDate} о ${sessionTime} вже зайнятий (клієнт: ${existing.client_name}). Оберіть інший час.`,
+            conflictingAppointment: existing
+          }), {
+            status: 409,
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+          });
+        }
+      }
+
       if (!env.DB) {
         createdList.push({
           id: Date.now() + Math.floor(Math.random() * 1000),
