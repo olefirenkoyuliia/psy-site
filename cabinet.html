@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="uk" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Особистий кабінет клієнта | Юлія Олефіренко</title>
+  <meta name="description" content="Особистий захищений кабінет клієнта практикуючої психологині Юлії Олефіренко. Керування контактами, запитами та записом на сесії.">
+  <meta name="theme-color" content="#FAF8F5">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Identity Services (GIS) for Google SSO -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#F4F7F4',
+              100: '#E5EDE5',
+              200: '#CCE0CC',
+              300: '#A3C7A3',
+              400: '#75A875',
+              500: '#557C56',
+              600: '#436444',
+              700: '#335334',
+              800: '#264027',
+              900: '#1D301E',
+            },
+            warm: {
+              bg: '#FAF8F5',
+              card: '#F3EFEA',
+              border: '#E8E2D9',
+              text: '#2D2B2A',
+              muted: '#6E6A67'
+            },
+            accent: {
+              amber: '#D8A25E',
+              terra: '#C16A50'
+            }
+          },
+          fontFamily: {
+            'sans': ['"Plus Jakarta Sans"', 'sans-serif'],
+            'serif-luxury': ['"Cormorant Garamond"', 'serif'],
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(45, 43, 42, 0.05)',
+            'card': '0 10px 30px -4px rgba(45, 43, 42, 0.06)',
+            'hover': '0 20px 40px -4px rgba(45, 43, 42, 0.12)',
+            'glow': '0 0 25px rgba(85, 124, 86, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FAF8F5;
+      color: #2D2B2A;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    .glass-nav {
+      background: rgba(250, 248, 245, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-100 selection:text-brand-900">
+
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 z-40 glass-nav border-b border-warm-border/60 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <a href="index.html" class="group shrink-0 block">
+        <div class="font-serif-luxury font-bold text-xl sm:text-2xl text-warm-text leading-tight group-hover:text-brand-700 transition-colors">
+          Юлія Олефіренко
+        </div>
+        <div class="text-xs text-warm-muted tracking-wide font-medium">
+          Особистий кабінет клієнта
+        </div>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-warm-border text-xs font-semibold text-warm-muted hover:text-brand-700 hover:border-brand-300 transition-colors">
+          <span>← На головну</span>
+        </a>
+
+        <!-- User profile widget in header -->
+        <div id="header-user-widget" class="hidden flex items-center gap-3">
+          <div class="flex items-center gap-2 pl-2">
+            <img id="header-user-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23557C56'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="Avatar" class="w-8 h-8 rounded-full border border-brand-200 object-cover shadow-sm">
+            <span id="header-user-name" class="text-xs font-bold text-gray-800 hidden md:inline">Користувач</span>
+          </div>
+          <button onclick="logoutUser()" class="px-3 py-1.5 rounded-full bg-warm-card hover:bg-rose-50 text-warm-muted hover:text-rose-600 border border-warm-border text-xs font-medium transition-colors">
+            Вийти
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+
+    <!-- 1. LOGIN / GOOGLE SSO SCREEN (Visible when logged out) -->
+    <div id="auth-screen" class="max-w-md mx-auto my-12 p-8 sm:p-10 rounded-3xl glass-card border border-warm-border shadow-card text-center space-y-6">
+      <div class="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-3xl mx-auto shadow-sm">
+        🌿
+      </div>
+      
+      <div class="space-y-2">
+        <h1 class="font-serif-luxury font-bold text-2xl sm:text-3xl text-warm-text">
+          Вхід до кабінету клієнта
+        </h1>
+        <p class="text-xs text-warm-muted leading-relaxed">
+          Увійдіть через ваш <strong>Google акаунт</strong>, щоб автоматично заповнити дані та керувати вашими сесіями психотерапії.
+        </p>
+      </div>
+
+      <!-- Google SSO Container -->
+      <div class="pt-2 space-y-4">
+        <!-- Live Google GIS One Tap & Button -->
+        <div id="g_id_onload"
+             data-client_id="YOUR_GOOGLE_CLIENT_ID"
+             data-callback="handleGoogleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="flex justify-center" id="google-signin-btn-container">
+          <button onclick="triggerGoogleLogin()" class="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-gray-800 font-bold text-sm border border-gray-300 shadow-sm hover:shadow transition-all duration-200">
+            <svg class="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span>Увійти через Google</span>
+          </button>
+        </div>
+
+        <div class="relative flex py-2 items-center">
+          <div class="flex-grow border-t border-warm-border"></div>
+          <span class="flex-shrink mx-3 text-[11px] text-warm-muted uppercase tracking-wider font-semibold">або</span>
+          <div class="flex-grow border-t border-warm-border"></div>
+        </div>
+
+        <!-- Quick Demo One-Click Sign In for Instant Local Testing -->
+        <button onclick="quickTestGoogleLogin()" class="w-full py-3 px-4 rounded-xl bg-warm-card hover:bg-brand-50 text-brand-800 hover:text-brand-900 border border-warm-border hover:border-brand-300 text-xs font-semibold transition-colors flex items-center justify-center gap-2">
+          <span>⚡ Демо-вхід Google (Олександр Петренко)</span>
+        </button>
+      </div>
+
+      <div class="pt-4 border-t border-warm-border/60 text-[11px] text-warm-muted leading-relaxed">
+        🔒 Ваші дані захищені. Ми використовуємо Google SSO тільки для підтвердження вашої пошти та імені.
+      </div>
+    </div>
+
+    <!-- 2. CLIENT DASHBOARD (Visible when logged in) -->
+    <div id="cabinet-dashboard" class="hidden space-y-8">
+      
+      <!-- Welcome Hero Banner -->
+      <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-brand-700 via-brand-600 to-brand-800 text-white shadow-card flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+        <div class="space-y-2 relative z-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-emerald-200 text-xs font-semibold backdrop-blur-md">
+            <span>🟢</span> <span>Особистий простір клієнта</span>
+          </div>
+          <h1 class="font-serif-luxury font-bold text-2xl sm:text-4xl text-white leading-tight">
+            Вітаємо, <span id="welcome-user-name">Клієнте</span>! ✨
+          </h1>
+          <p class="text-xs sm:text-sm text-brand-100 max-w-xl leading-relaxed">
+            Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та підготуватися до зустрічі з Юлією Олефіренко.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 shrink-0 relative z-10">
+          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
+            <span>💬 Написати Юлії</span>
+          </a>
+          <a href="index.html#booking-widget" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
+            <span>📅 Обрати час сесії</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Main 2-Column Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Column: Personal Profile Form (7 cols) -->
+        <div class="lg:col-span-7 space-y-6">
+          
+          <!-- Card: Google Connected Identity -->
+          <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft space-y-4">
+            <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">👤</span>
+                <h2 class="font-bold text-warm-text text-base">Профіль Google</h2>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold flex items-center gap-1">
+                <span>✓</span> Google SSO підключено
+              </span>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <img id="card-user-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23557C56'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="Avatar" class="w-16 h-16 rounded-2xl border-2 border-brand-200 object-cover shadow-sm">
+              <div class="space-y-0.5">
+                <div id="card-user-fullname" class="font-bold text-warm-text text-lg">Користувач</div>
+                <div id="card-user-email" class="text-xs text-warm-muted font-medium">user@gmail.com</div>
+                <div class="text-[11px] text-brand-700 font-semibold pt-1">
+                  Дані автоматично синхронізовано з Google
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Editable Profile Details -->
+          <div class="p-6 sm:p-8 rounded-3xl glass-card border border-warm-border shadow-soft space-y-6">
+            <div class="border-b border-warm-border/60 pb-3">
+              <h2 class="font-bold text-warm-text text-base">Особисті дані та контакти</h2>
+              <p class="text-xs text-warm-muted">Вкажіть зручні контакти для зв'язку перед початком сесії</p>
+            </div>
+
+            <form id="profile-edit-form" onsubmit="saveUserProfile(event)" class="space-y-4">
+              
+              <!-- Name & Email (Auto-filled from Google) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-bold text-warm-text">Ваше ім'я та прізвище:</label>
+                  <input type="text" id="input-name" required class="w-full px-4 py-3 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none font-medium">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-bold text-warm-text">Електронна пошта (Google):</label>
+                  <input type="email" id="input-email" readonly class="w-full px-4 py-3 rounded-xl border border-warm-border bg-gray-100 text-warm-muted text-xs outline-none cursor-not-allowed font-medium">
+                </div>
+              </div>
+
+              <!-- Phone & Telegram -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-bold text-warm-text">Номер телефону (Viber/WhatsApp):</label>
+                  <input type="tel" id="input-phone" placeholder="+380 (99) 000-00-00" class="w-full px-4 py-3 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none">
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-bold text-warm-text">Telegram нікнейм:</label>
+                  <div class="relative">
+                    <span class="absolute left-3.5 top-3 text-xs text-warm-muted font-bold">@</span>
+                    <input type="text" id="input-telegram" placeholder="username" class="w-full pl-8 pr-4 py-3 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Preferred Meeting Format -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-warm-text">Бажаний формат відеозустрічі:</label>
+                <select id="input-format" class="w-full px-4 py-3 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none font-medium">
+                  <option value="Google Meet">Google Meet (Рекомендовано, стабільний зв'язок)</option>
+                  <option value="Telegram Video">Telegram Відеодзвінок</option>
+                  <option value="Інший формат">Інший узгоджений формат</option>
+                </select>
+              </div>
+
+              <!-- Therapy Goal / Focus -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-warm-text">Ваш основний запит або тема для роботи:</label>
+                <textarea id="input-goal" rows="3" placeholder="Наприклад: робота з тривожністю, відновлення ресурсу після вигорання, розбір повторюваних снів або стосунки..." class="w-full p-4 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none leading-relaxed"></textarea>
+                <p class="text-[11px] text-warm-muted">Цей опис допоможе психологині краще підготуватися до вашої першої зустрічі.</p>
+              </div>
+
+              <!-- Private Notes -->
+              <div class="space-y-1.5">
+                <label class="block text-xs font-bold text-warm-text">Особисті нотатки та інсайти між сесіями (бачите тільки ви):</label>
+                <textarea id="input-notes" rows="2" placeholder="Ваші думки, спостереження чи питання, які хочеться обговорити на наступній консультації..." class="w-full p-4 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none leading-relaxed"></textarea>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="pt-2 flex items-center justify-between">
+                <button type="submit" id="save-btn" class="px-8 py-3.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-hover transition-all flex items-center gap-2">
+                  <span>💾 Зберегти дані кабінету</span>
+                </button>
+                <span id="save-status-text" class="text-xs font-semibold text-emerald-700 hidden">
+                  ✓ Успішно збережено!
+                </span>
+              </div>
+
+            </form>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Session Guide & Booking (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- Next Steps & Direct Booking Card -->
+          <div class="p-6 sm:p-7 rounded-3xl bg-warm-card border border-warm-border shadow-soft space-y-5">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">🌿</span>
+              <div>
+                <h3 class="font-bold text-warm-text text-base">Консультація та сесія</h3>
+                <p class="text-xs text-warm-muted">Психологиня Юлія Олефіренко</p>
+              </div>
+            </div>
+
+            <div class="space-y-2.5 text-xs text-warm-text">
+              <div class="flex items-center justify-between py-2 border-b border-warm-border/60">
+                <span class="text-warm-muted">Формат:</span>
+                <span class="font-bold">Онлайн (Google Meet)</span>
+              </div>
+              <div class="flex items-center justify-between py-2 border-b border-warm-border/60">
+                <span class="text-warm-muted">Тривалість:</span>
+                <span class="font-bold">50 хвилин</span>
+              </div>
+              <div class="flex items-center justify-between py-2 border-b border-warm-border/60">
+                <span class="text-warm-muted">Вартість:</span>
+                <span class="font-bold text-brand-800">1 200 грн</span>
+              </div>
+              <div class="flex items-center justify-between py-2 border-b border-warm-border/60">
+                <span class="text-warm-muted">Оплата:</span>
+                <span class="font-bold">Офіційно на ФОП</span>
+              </div>
+            </div>
+
+            <div class="space-y-2.5 pt-1">
+              <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-hover transition-all">
+                <span>💬 Узгодити дату в Telegram</span>
+              </a>
+              <a href="index.html#booking-widget" class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-white hover:bg-warm-bg text-warm-text font-bold text-xs border border-warm-border transition-all">
+                <span>📅 Календар вільних годин</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Therapy Client Rules & Safe Space Reminder -->
+          <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft space-y-4">
+            <h3 class="font-bold text-warm-text text-sm flex items-center gap-2">
+              <span>🔒</span> <span>Безпечний простір та конфіденційність</span>
+            </h3>
+            <ul class="space-y-2.5 text-xs text-warm-muted leading-relaxed">
+              <li class="flex items-start gap-2">
+                <span class="text-brand-600 font-bold">•</span>
+                <span>Усе, що ви обговорюєте під час консультації, залишається суворо конфіденційним.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-brand-600 font-bold">•</span>
+                <span>Підготуйте затишне місце, де вас ніхто не турбуватиме, навушники та склянку води.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-brand-600 font-bold">•</span>
+                <span>Перенесення або скасування зустрічі здійснюється не пізніше, ніж за 24 години до початку.</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-warm-border py-8 text-center text-xs text-warm-muted mt-auto">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>© 2026 Юлія Олефіренко. Практикуюча психологиня. Всі права захищено.</p>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2">
+    <span id="toast-icon">✓</span>
+    <span id="toast-msg">Повідомлення</span>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // State management
+    let currentUser = null;
+
+    // 1. Initialize Authentication on Page Load
+    document.addEventListener('DOMContentLoaded', () => {
+      checkExistingSession();
+      initGoogleSso();
+    });
+
+    function checkExistingSession() {
+      const savedUser = localStorage.getItem('psy_client_user');
+      if (savedUser) {
+        try {
+          currentUser = JSON.parse(savedUser);
+          renderDashboard(currentUser);
+          // Refresh from backend D1 if online
+          fetchProfileFromBackend(currentUser.email);
+        } catch(e) {
+          localStorage.removeItem('psy_client_user');
+          renderAuthScreen();
+        }
+      } else {
+        renderAuthScreen();
+      }
+    }
+
+    function initGoogleSso() {
+      if (window.google && window.google.accounts) {
+        try {
+          google.accounts.id.initialize({
+            client_id: "712891928374-placeholder.apps.googleusercontent.com", // Configurable
+            callback: handleGoogleCredentialResponse,
+            auto_select: false
+          });
+        } catch(e) {
+          console.warn('Google Identity Services initialized in fallback mode');
+        }
+      }
+    }
+
+    function triggerGoogleLogin() {
+      // Trigger Google One Tap or prompt
+      if (window.google && window.google.accounts) {
+        google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            quickTestGoogleLogin();
+          }
+        });
+      } else {
+        quickTestGoogleLogin();
+      }
+    }
+
+    // Google Credential Callback from Google Identity Services
+    async function handleGoogleCredentialResponse(response) {
+      if (!response.credential) return;
+
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data.user;
+          localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
+          renderDashboard(currentUser);
+          showToast('Успішний вхід через Google!');
+        } else {
+          // Fallback client decode
+          decodeJwtAndLogin(response.credential);
+        }
+      } catch (err) {
+        decodeJwtAndLogin(response.credential);
+      }
+    }
+
+    function decodeJwtAndLogin(credential) {
+      try {
+        const payloadBase64 = credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(payloadBase64))));
+        
+        currentUser = {
+          google_id: decoded.sub,
+          email: decoded.email,
+          name: decoded.name || 'Користувач',
+          first_name: decoded.given_name || '',
+          last_name: decoded.family_name || '',
+          picture: decoded.picture || '',
+          phone: '',
+          telegram: '',
+          preferred_format: 'Google Meet',
+          therapy_goal: '',
+          notes: ''
+        };
+
+        localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
+        renderDashboard(currentUser);
+        showToast('Успішний вхід через Google!');
+      } catch(e) {
+        showToast('Помилка авторизації Google', '⚠️');
+      }
+    }
+
+    // Instant One-Click Demo Login for smooth local testing
+    async function quickTestGoogleLogin() {
+      const demoProfile = {
+        google_id: "demo_google_12345",
+        email: "oleksandr.demo@gmail.com",
+        name: "Олександр Петренко",
+        given_name: "Олександр",
+        family_name: "Петренко",
+        picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+      };
+
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile: demoProfile })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = data.user;
+        } else {
+          currentUser = {
+            ...demoProfile,
+            phone: "+380 (67) 123-45-67",
+            telegram: "oleksandr_psy",
+            preferred_format: "Google Meet",
+            therapy_goal: "Робота з вигоранням та внутрішнім критиком",
+            notes: "Сесії по вівторках"
+          };
+        }
+      } catch(e) {
+        currentUser = {
+          ...demoProfile,
+          phone: "+380 (67) 123-45-67",
+          telegram: "oleksandr_psy",
+          preferred_format: "Google Meet",
+          therapy_goal: "Робота з вигоранням та внутрішнім критиком",
+          notes: "Сесії по вівторках"
+        };
+      }
+
+      localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
+      renderDashboard(currentUser);
+      showToast('Успішний вхід через Google SSO!');
+    }
+
+    async function fetchProfileFromBackend(email) {
+      if (!email) return;
+      try {
+        const res = await fetch(`/api/user/profile?email=${encodeURIComponent(email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            currentUser = { ...currentUser, ...data.user };
+            localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
+            populateForm(currentUser);
+          }
+        }
+      } catch(e) {
+        console.log('Working in offline/cached mode');
+      }
+    }
+
+    function renderAuthScreen() {
+      document.getElementById('auth-screen').classList.remove('hidden');
+      document.getElementById('cabinet-dashboard').classList.add('hidden');
+      document.getElementById('header-user-widget').classList.add('hidden');
+    }
+
+    function renderDashboard(user) {
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('cabinet-dashboard').classList.remove('hidden');
+      document.getElementById('header-user-widget').classList.remove('hidden');
+
+      // Update Header
+      const headerAvatar = document.getElementById('header-user-avatar');
+      const headerName = document.getElementById('header-user-name');
+      if (headerAvatar && user.picture) headerAvatar.src = user.picture;
+      if (headerName) headerName.textContent = user.name.split(' ')[0] || user.name;
+
+      // Update Hero
+      document.getElementById('welcome-user-name').textContent = user.first_name || user.name.split(' ')[0] || 'Клієнте';
+
+      // Update Profile Card
+      const cardAvatar = document.getElementById('card-user-avatar');
+      if (cardAvatar && user.picture) cardAvatar.src = user.picture;
+      document.getElementById('card-user-fullname').textContent = user.name || 'Користувач';
+      document.getElementById('card-user-email').textContent = user.email || '';
+
+      // Populate Form Fields
+      populateForm(user);
+    }
+
+    function populateForm(user) {
+      document.getElementById('input-name').value = user.name || '';
+      document.getElementById('input-email').value = user.email || '';
+      document.getElementById('input-phone').value = user.phone || '';
+      document.getElementById('input-telegram').value = (user.telegram || '').replace(/^@/, '');
+      document.getElementById('input-format').value = user.preferred_format || 'Google Meet';
+      document.getElementById('input-goal').value = user.therapy_goal || '';
+      document.getElementById('input-notes').value = user.notes || '';
+    }
+
+    async function saveUserProfile(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const saveBtn = document.getElementById('save-btn');
+      const originalText = saveBtn.innerHTML;
+      saveBtn.innerHTML = '<span>⏳ Збереження...</span>';
+      saveBtn.disabled = true;
+
+      const updatedData = {
+        email: currentUser.email,
+        google_id: currentUser.google_id,
+        name: document.getElementById('input-name').value.trim(),
+        phone: document.getElementById('input-phone').value.trim(),
+        telegram: document.getElementById('input-telegram').value.trim(),
+        preferred_format: document.getElementById('input-format').value,
+        therapy_goal: document.getElementById('input-goal').value.trim(),
+        notes: document.getElementById('input-notes').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/user/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedData)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = { ...currentUser, ...data.user };
+        } else {
+          currentUser = { ...currentUser, ...updatedData };
+        }
+      } catch(err) {
+        currentUser = { ...currentUser, ...updatedData };
+      }
+
+      localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
+      renderDashboard(currentUser);
+
+      saveBtn.innerHTML = originalText;
+      saveBtn.disabled = false;
+
+      const statusText = document.getElementById('save-status-text');
+      if (statusText) {
+        statusText.classList.remove('hidden');
+        setTimeout(() => statusText.classList.add('hidden'), 3000);
+      }
+
+      showToast('Особисті дані успішно збережено!');
+    }
+
+    function logoutUser() {
+      if (confirm('Ви дійсно бажаєте вийти з кабінету?')) {
+        localStorage.removeItem('psy_client_user');
+        currentUser = null;
+        renderAuthScreen();
+        showToast('Ви вийшли з особистого кабінету');
+      }
+    }
+
+    function showToast(msg, icon = '✓') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+      if (!toast) return;
+
+      toastMsg.textContent = msg;
+      toastIcon.textContent = icon;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

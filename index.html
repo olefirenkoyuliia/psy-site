@@ -359,9 +359,20 @@
         </a>
       </nav>
 
-      <!-- CTA Button -->
-      <div class="flex items-center gap-3">
-        <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="relative group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:-translate-y-0.5 overflow-hidden" data-bind-telegram>
+      <!-- Cabinet & CTA Buttons -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        
+        <!-- Personal Client Cabinet Link -->
+        <a href="cabinet.html" id="header-cabinet-link" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-warm-card hover:bg-brand-50 text-warm-text hover:text-brand-800 border border-warm-border hover:border-brand-300 text-xs font-semibold shadow-xs transition-all">
+          <img id="nav-user-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23557C56'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E" alt="Avatar" class="w-4 h-4 rounded-full object-cover hidden">
+          <span id="nav-user-label" class="flex items-center gap-1">
+            <span>👤</span>
+            <span class="hidden sm:inline">Кабінет</span>
+          </span>
+        </a>
+
+        <!-- Telegram CTA -->
+        <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="relative group inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-semibold shadow-soft hover:shadow-glow transition-all duration-300 transform hover:-translate-y-0.5 overflow-hidden" data-bind-telegram>
           <span class="absolute inset-0 w-full h-full bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
             <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/>
@@ -2514,7 +2525,28 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
           openOnlineModal(e);
         }, { passive: false });
       }
+
+      initHeaderCabinetWidget();
     });
+
+    function initHeaderCabinetWidget() {
+      const savedUser = localStorage.getItem('psy_client_user');
+      if (savedUser) {
+        try {
+          const u = JSON.parse(savedUser);
+          const avatar = document.getElementById('nav-user-avatar');
+          const label = document.getElementById('nav-user-label');
+          if (avatar && u.picture) {
+            avatar.src = u.picture;
+            avatar.classList.remove('hidden');
+          }
+          if (label) {
+            const firstName = u.first_name || (u.name ? u.name.split(' ')[0] : 'Кабінет');
+            label.innerHTML = `<span>${firstName}</span>`;
+          }
+        } catch(e) {}
+      }
+    }
   </script>
 
   <!-- Modal: Live Online Status & Exclusive Quick Diagnostic Hub -->

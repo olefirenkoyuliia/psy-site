@@ -162,6 +162,15 @@ export async function onRequestGet(context) {
       percentage: totalTopicQueries > 0 ? Math.round((topicCounts[t] / totalTopicQueries) * 100) : 0
     })).sort((a, b) => b.count - a.count);
 
+    let registeredClients = [];
+    try {
+      const usersQuery = await env.DB.prepare(
+        "SELECT id, name, email, picture, phone, telegram, preferred_format, therapy_goal, created_at, updated_at " +
+        "FROM users ORDER BY id DESC LIMIT 100"
+      ).all();
+      registeredClients = usersQuery.results || [];
+    } catch(e) {}
+
     const humanCount = Math.max(humans, countedVisitors.size);
     const convRate = humanCount > 0 ? ((tgClicks / humanCount) * 100).toFixed(1) : '0';
 
@@ -178,8 +187,10 @@ export async function onRequestGet(context) {
       chatInquiries: chatInquiries,
       quizSubmissions: quizSubmissions,
       topicAnalytics: topicAnalytics,
+      registeredClients: registeredClients,
       totalChats: chatInquiries.length,
-      totalQuizzes: quizSubmissions.length
+      totalQuizzes: quizSubmissions.length,
+      totalClients: registeredClients.length
     }), {
       headers: {
         'Content-Type': 'application/json',
