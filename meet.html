@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Відеосесія онлайн | Юлія Олефіренко</title>
   <meta name="description" content="Захищена відеокімната для індивідуальної онлайн-сесії психотерапії з Юлією Олефіренко.">
-  <meta name="theme-color" content="#101214">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
 
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,9 +32,9 @@
               900: '#1D301E',
             },
             meet: {
-              dark: '#101214',
-              card: '#181B1F',
-              border: '#2A2E35'
+              dark: '#0B0C0E',
+              card: '#141619',
+              border: '#24272D'
             }
           },
           fontFamily: {
@@ -45,199 +48,207 @@
 
   <style>
     :root {
-      --sat: env(safe-area-inset-top);
-      --sab: env(safe-area-inset-bottom);
-      --sal: env(safe-area-inset-left);
-      --sar: env(safe-area-inset-right);
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+      --sar: env(safe-area-inset-right, 0px);
     }
     html, body {
       height: 100%;
       height: 100dvh;
-      background-color: #101214;
+      width: 100%;
+      width: 100vw;
+      background-color: #000000;
       color: #F3EFEA;
       font-family: 'Plus Jakarta Sans', sans-serif;
       overflow: hidden;
+      margin: 0;
+      padding: 0;
     }
     .video-mirror {
       transform: scaleX(-1);
     }
-    .safe-bottom {
-      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    .safe-top-p {
+      padding-top: max(0.75rem, env(safe-area-inset-top));
     }
-    .safe-top {
-      padding-top: max(0.5rem, env(safe-area-inset-top));
+    .safe-bottom-p {
+      padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    }
+    .safe-top-m {
+      top: max(0.75rem, env(safe-area-inset-top));
+    }
+    .safe-bottom-m {
+      bottom: max(1.25rem, env(safe-area-inset-bottom));
     }
   </style>
 </head>
-<body class="h-full h-[100dvh] flex flex-col antialiased select-none">
+<body class="h-full h-[100dvh] w-full w-[100vw] relative bg-black antialiased select-none overflow-hidden">
 
-  <!-- Top Header Bar -->
-  <header class="h-14 sm:h-16 border-b border-meet-border bg-meet-card/95 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shrink-0 z-30 safe-top">
+  <!-- ======================================================== -->
+  <!-- 1. FULLSCREEN EDGE-TO-EDGE VIDEO CONTAINER               -->
+  <!-- ======================================================== -->
+  <div id="video-stage" class="absolute inset-0 w-full h-full bg-black flex items-center justify-center overflow-hidden">
     
-    <!-- Brand / Title -->
-    <div class="flex items-center gap-2 sm:gap-3">
+    <!-- Remote Video (Fills the entire screen edge-to-edge) -->
+    <video id="remote-video" autoplay playsinline webkit-playsinline class="w-full h-full object-cover sm:object-contain bg-black hidden"></video>
+
+    <!-- Waiting / Reconnecting Placeholder Screen -->
+    <div id="remote-placeholder" class="text-center space-y-4 p-6 max-w-sm sm:max-w-md z-10">
+      <div class="w-20 h-20 rounded-3xl bg-brand-900/80 border border-emerald-500/40 flex items-center justify-center text-4xl mx-auto shadow-2xl animate-pulse">
+        🌱
+      </div>
+      <div class="space-y-1.5">
+        <h2 class="text-lg sm:text-2xl font-bold text-white font-serif-luxury tracking-wide" id="waiting-title">Очікування підключення...</h2>
+        <p class="text-xs text-gray-400 leading-relaxed" id="waiting-desc">
+          Ви в захищеній відеокімнаті. Зв'язок почнеться автоматично, щойно співрозмовник увійде.
+        </p>
+      </div>
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-emerald-300 text-xs font-mono shadow-md">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span id="room-status-badge">Кімната: <strong id="room-code-badge">psy-room</strong></span>
+      </div>
+    </div>
+
+    <!-- Local Self-View PIP (Floating in top-right or bottom-right) -->
+    <div id="local-video-container" class="absolute top-16 sm:top-20 right-3 sm:right-6 w-24 sm:w-44 h-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-emerald-500/70 shadow-2xl bg-gray-900 z-30 transition-all cursor-pointer">
+      <video id="local-video" autoplay playsinline webkit-playsinline muted class="w-full h-full object-cover video-mirror"></video>
+      <div class="absolute bottom-1 left-2 text-[9px] sm:text-[10px] bg-black/70 px-1.5 py-0.5 rounded text-white font-bold" id="local-user-label">
+        Ви
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 2. OVERLAID FLOATING TOP HEADER BAR                      -->
+  <!-- ======================================================== -->
+  <header class="absolute top-0 left-0 right-0 z-40 safe-top-p px-3 sm:px-6 flex items-center justify-between pointer-events-none">
+    
+    <!-- Left: Brand / Psychologist Tag -->
+    <div class="pointer-events-auto flex items-center gap-2 bg-black/60 backdrop-blur-xl border border-white/10 px-3 py-1.5 rounded-full shadow-lg">
       <a href="cabinet.html" class="flex items-center gap-2 group">
-        <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-brand-800 border border-brand-600/50 flex items-center justify-center text-emerald-200 text-xs sm:text-sm font-bold shadow-sm">
+        <span class="w-6 h-6 rounded-full bg-brand-700 flex items-center justify-center text-xs text-white">
           🌿
         </span>
-        <div class="truncate max-w-[120px] sm:max-w-none">
-          <div class="font-serif-luxury font-bold text-sm sm:text-base text-white leading-none truncate">
+        <div class="leading-none">
+          <div class="font-serif-luxury font-bold text-xs sm:text-sm text-white truncate max-w-[110px] sm:max-w-none">
             Юлія Олефіренко
           </div>
-          <div class="text-[9px] sm:text-[10px] text-emerald-400 font-medium pt-0.5 truncate">
+          <div class="text-[8px] sm:text-[9px] text-emerald-400 font-medium">
             Онлайн-сесія
           </div>
         </div>
       </a>
-      <span class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 text-[10px] font-bold">
-        <span>🔒</span> <span>Конфіденційно • Безлімітна сесія</span>
-      </span>
     </div>
 
     <!-- Center: Live Session Timer -->
-    <div class="flex items-center gap-1.5 sm:gap-2 bg-black/50 border border-meet-border px-2.5 sm:px-3.5 py-1 rounded-full text-xs">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="timer-dot"></span>
-      <span class="text-[10px] sm:text-xs text-gray-400 font-medium hidden sm:inline">Час:</span>
+    <div class="pointer-events-auto flex items-center gap-1.5 bg-black/60 backdrop-blur-xl border border-white/10 px-3 py-1.5 rounded-full text-xs shadow-lg">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
       <span id="session-countdown" class="text-xs sm:text-sm font-bold text-white font-mono tracking-wider">50:00</span>
     </div>
 
-    <!-- Right: Header Controls -->
-    <div class="flex items-center gap-1.5 sm:gap-2.5">
-      <button onclick="toggleNotesPanel()" id="notes-header-btn" class="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-meet-border hover:bg-gray-700 text-gray-200 text-xs font-bold transition-colors flex items-center gap-1.5" title="Терапевтичні нотатки">
-        <span>📝</span> <span class="hidden md:inline">Нотатки</span>
+    <!-- Right: Quick Tools (Notes & Fullscreen) -->
+    <div class="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
+      <!-- Fullscreen toggle -->
+      <button onclick="toggleFullscreen()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-xl border border-white/10 text-white flex items-center justify-center text-xs shadow-lg transition-all" title="На весь екран">
+        <span id="fs-icon">⛶</span>
       </button>
 
-      <button onclick="hangUpCall()" class="px-3 sm:px-4 py-1.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1">
-        <span>✕</span> <span class="hidden sm:inline">Завершити</span>
+      <!-- Notes toggle -->
+      <button onclick="toggleNotesPanel()" id="notes-header-btn" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-xl border border-white/10 text-white flex items-center justify-center text-xs shadow-lg transition-all" title="Терапевтичні нотатки">
+        <span>📝</span>
       </button>
     </div>
   </header>
 
-  <!-- Main Video Area -->
-  <main class="flex-grow flex relative overflow-hidden p-1.5 sm:p-4 gap-3">
-    
-    <!-- Video Stage -->
-    <div class="flex-grow flex flex-col h-full rounded-2xl sm:rounded-3xl overflow-hidden bg-meet-card border border-meet-border relative shadow-2xl justify-between">
+  <!-- ======================================================== -->
+  <!-- 3. OVERLAID FLOATING BOTTOM CONTROLS DOCK                -->
+  <!-- ======================================================== -->
+  <div class="absolute bottom-0 left-0 right-0 z-40 safe-bottom-p px-3 flex justify-center pointer-events-none">
+    <div class="pointer-events-auto w-[94%] max-w-sm sm:max-w-md bg-black/75 backdrop-blur-2xl border border-white/15 px-3 sm:px-6 py-2.5 sm:py-3.5 rounded-3xl sm:rounded-full shadow-2xl flex items-center justify-around sm:justify-center sm:gap-4">
       
-      <!-- Video Screen Area -->
-      <div class="relative w-full h-full flex items-center justify-center bg-black overflow-hidden">
-        
-        <!-- Remote Video (HD Stream from partner - uncropped full field of view) -->
-        <video id="remote-video" autoplay playsinline webkit-playsinline class="w-full h-full object-contain bg-black hidden"></video>
-
-        <!-- Waiting / Reconnecting Placeholder (Shown when alone or reconnecting) -->
-        <div id="remote-placeholder" class="text-center space-y-3 sm:space-y-4 p-6 sm:p-8 max-w-sm sm:max-w-md my-auto">
-          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-brand-900/70 border border-emerald-500/40 flex items-center justify-center text-3xl sm:text-4xl mx-auto shadow-lg animate-pulse" id="placeholder-icon-box">
-            🌱
-          </div>
-          <div class="space-y-1">
-            <h2 class="text-base sm:text-xl font-bold text-white" id="waiting-title">Очікування підключення...</h2>
-            <p class="text-[11px] sm:text-xs text-gray-400 leading-relaxed" id="waiting-desc">
-              Ви в захищеній відеокімнаті. Відеозв'язок розпочнеться автоматично, щойно співрозмовник увійде.
-            </p>
-          </div>
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-800/50 text-emerald-300 text-[11px] font-mono">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping" id="status-ping-dot"></span>
-            <span id="room-status-badge">Кімната: <strong id="room-code-badge">psy-room</strong></span>
-          </div>
+      <!-- Mic Toggle -->
+      <button onclick="toggleAudio()" id="btn-mic" class="flex flex-col items-center gap-1 group focus:outline-none">
+        <div id="btn-mic-icon-box" class="w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95">
+          <span id="mic-icon">🎤</span>
         </div>
+        <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="mic-label">Мікр</span>
+      </button>
 
-        <!-- Local Video PIP (Corner Preview) -->
-        <div id="local-video-container" class="absolute top-3 right-3 sm:top-auto sm:bottom-28 sm:right-6 w-24 sm:w-44 h-32 sm:h-32 rounded-xl sm:rounded-2xl overflow-hidden border-2 border-emerald-500/60 shadow-2xl bg-gray-900 z-20 transition-all cursor-pointer">
-          <video id="local-video" autoplay playsinline webkit-playsinline muted class="w-full h-full object-cover video-mirror"></video>
-          <div class="absolute bottom-1 left-1.5 text-[9px] sm:text-[10px] bg-black/70 px-1.5 py-0.5 rounded text-white font-bold" id="local-user-label">
-            Ви
-          </div>
+      <!-- Camera Toggle -->
+      <button onclick="toggleVideo()" id="btn-cam" class="flex flex-col items-center gap-1 group focus:outline-none">
+        <div id="btn-cam-icon-box" class="w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95">
+          <span id="cam-icon">📹</span>
         </div>
+        <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="cam-label">Камера</span>
+      </button>
 
-      </div>
-
-      <!-- Bottom Floating Controls Toolbar (Ultra-responsive on Mobile & Desktop) -->
-      <div class="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-40 w-[94%] max-w-md sm:max-w-lg bg-black/85 backdrop-blur-2xl border border-white/15 px-3 sm:px-6 py-2.5 sm:py-3.5 rounded-2xl sm:rounded-full shadow-2xl safe-bottom">
-        <div class="flex items-center justify-around sm:justify-center sm:gap-4">
-          
-          <!-- Mic Toggle -->
-          <button onclick="toggleAudio()" id="btn-mic" class="flex flex-col items-center gap-1 group focus:outline-none">
-            <div id="btn-mic-icon-box" class="w-12 h-12 sm:w-12 sm:h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95">
-              <span id="mic-icon">🎤</span>
-            </div>
-            <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="mic-label">Мікр</span>
-          </button>
-
-          <!-- Camera Toggle -->
-          <button onclick="toggleVideo()" id="btn-cam" class="flex flex-col items-center gap-1 group focus:outline-none">
-            <div id="btn-cam-icon-box" class="w-12 h-12 sm:w-12 sm:h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95">
-              <span id="cam-icon">📹</span>
-            </div>
-            <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="cam-label">Камера</span>
-          </button>
-
-          <!-- Flip Camera (Mobile) / Screen Share (Desktop) -->
-          <button onclick="handleFlipOrScreen()" id="btn-flip-or-screen" class="flex flex-col items-center gap-1 group focus:outline-none">
-            <div class="w-12 h-12 sm:w-12 sm:h-12 rounded-2xl sm:rounded-full bg-gray-800 hover:bg-gray-700 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95 border border-white/10">
-              <span id="flip-icon">🔄</span>
-            </div>
-            <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="flip-label">Камера</span>
-          </button>
-
-          <!-- Notes Toggle (Mobile Quick Access) -->
-          <button onclick="toggleNotesPanel()" class="flex flex-col items-center gap-1 group focus:outline-none sm:hidden">
-            <div class="w-12 h-12 rounded-2xl bg-gray-800 hover:bg-gray-700 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95 border border-white/10">
-              <span>📝</span>
-            </div>
-            <span class="text-[9px] font-semibold text-gray-300">Нотатки</span>
-          </button>
-
-          <div class="hidden sm:block h-8 w-px bg-white/20 mx-1"></div>
-
-          <!-- Hangup / End Call Button -->
-          <button onclick="hangUpCall()" class="flex flex-col items-center gap-1 group focus:outline-none">
-            <div class="w-12 h-12 sm:w-auto sm:px-5 sm:h-12 rounded-2xl sm:rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-1.5 text-lg sm:text-xs font-bold transition-all shadow-lg active:scale-95">
-              <span>✕</span> <span class="hidden sm:inline">Завершити</span>
-            </div>
-            <span class="text-[9px] sm:hidden font-semibold text-rose-400">Вийти</span>
-          </button>
-
+      <!-- Flip Camera (Mobile) / Screen Share (Desktop) -->
+      <button onclick="handleFlipOrScreen()" id="btn-flip-or-screen" class="flex flex-col items-center gap-1 group focus:outline-none">
+        <div class="w-12 h-12 rounded-2xl sm:rounded-full bg-gray-800 hover:bg-gray-700 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95 border border-white/10">
+          <span id="flip-icon">🔄</span>
         </div>
-      </div>
+        <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="flip-label">Камера</span>
+      </button>
+
+      <!-- Fit / Fill Toggle (Aspect Switcher) -->
+      <button onclick="toggleVideoFit()" id="btn-fit-toggle" class="flex flex-col items-center gap-1 group focus:outline-none">
+        <div class="w-12 h-12 rounded-2xl sm:rounded-full bg-gray-800 hover:bg-gray-700 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95 border border-white/10">
+          <span id="fit-icon">↔️</span>
+        </div>
+        <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="fit-label">Масштаб</span>
+      </button>
+
+      <div class="h-8 w-px bg-white/20 mx-1"></div>
+
+      <!-- Hangup / End Call Button -->
+      <button onclick="hangUpCall()" class="flex flex-col items-center gap-1 group focus:outline-none">
+        <div class="w-12 h-12 rounded-2xl sm:rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center text-xl transition-all shadow-lg active:scale-95">
+          <span>✕</span>
+        </div>
+        <span class="text-[9px] sm:text-[10px] font-semibold text-rose-400">Вийти</span>
+      </button>
 
     </div>
+  </div>
 
-    <!-- Slide-over / Modal Side Panel: In-Session Notes -->
-    <div id="session-notes-sidebar" class="fixed sm:relative inset-x-2 bottom-2 top-16 sm:inset-auto sm:top-auto sm:bottom-auto hidden w-auto sm:w-80 lg:w-96 bg-meet-card border border-meet-border rounded-3xl p-4 sm:p-5 flex flex-col justify-between shrink-0 shadow-2xl z-50 space-y-4">
-      <div class="space-y-3 flex-grow flex flex-col">
-        <div class="flex items-center justify-between border-b border-meet-border pb-2.5">
-          <div class="flex items-center gap-2">
-            <span class="text-lg">📝</span>
-            <h3 class="font-bold text-sm text-white">Терапевтичний блокнот</h3>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] text-emerald-400 font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60">
-              🔒 Приватно
-            </span>
-            <button onclick="toggleNotesPanel()" class="sm:hidden text-gray-400 hover:text-white p-1">✕</button>
-          </div>
+  <!-- ======================================================== -->
+  <!-- 4. MODAL / DRAWER: PRIVATE THERAPY NOTEPAD               -->
+  <!-- ======================================================== -->
+  <div id="session-notes-sidebar" class="fixed inset-x-3 bottom-24 sm:bottom-auto sm:right-6 sm:left-auto sm:top-20 sm:w-96 bg-meet-card/95 backdrop-blur-2xl border border-meet-border rounded-3xl p-5 hidden flex-col justify-between shadow-2xl z-50 space-y-4 max-h-[75vh]">
+    <div class="space-y-3 flex-grow flex flex-col">
+      <div class="flex items-center justify-between border-b border-meet-border pb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">📝</span>
+          <h3 class="font-bold text-sm text-white">Терапевтичний блокнот</h3>
         </div>
-
-        <p class="text-[11px] text-gray-400">
-          Фіксуйте ключові інсайти, метафори, образи символдрами та думки під час сесії. Нотатки зберігаються автоматично.
-        </p>
-
-        <textarea id="in-session-notes" oninput="autoSaveNotes()" placeholder="Запишіть спостереження, хід зустрічі або домашнє завдання..." class="flex-grow w-full p-3 rounded-2xl bg-black/50 border border-meet-border text-xs text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none leading-relaxed min-h-[140px]"></textarea>
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] text-emerald-400 font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60">
+            🔒 Приватно
+          </span>
+          <button onclick="toggleNotesPanel()" class="text-gray-400 hover:text-white p-1">✕</button>
+        </div>
       </div>
 
-      <div class="pt-2 flex items-center justify-between border-t border-meet-border text-xs">
-        <span class="text-[10px] text-gray-400" id="notes-status-text">Збережено автоматично ✓</span>
-        <button onclick="saveInSessionNotes()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center gap-1">
-          <span>💾 Зберегти</span>
-        </button>
-      </div>
+      <p class="text-[11px] text-gray-400 leading-relaxed">
+        Фіксуйте ключові інсайти, метафори, образи символдрами та думки під час сесії. Нотатки зберігаються автоматично.
+      </p>
+
+      <textarea id="in-session-notes" oninput="autoSaveNotes()" placeholder="Запишіть спостереження, хід зустрічі або домашнє завдання..." class="flex-grow w-full p-3.5 rounded-2xl bg-black/60 border border-meet-border text-xs text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none leading-relaxed min-h-[160px]"></textarea>
     </div>
 
-  </main>
+    <div class="pt-2 flex items-center justify-between border-t border-meet-border text-xs">
+      <span class="text-[10px] text-gray-400" id="notes-status-text">Збережено автоматично ✓</span>
+      <button onclick="saveInSessionNotes()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center gap-1">
+        <span>💾 Зберегти</span>
+      </button>
+    </div>
+  </div>
 
-  <!-- Modal: Session Ended Screen (Appears ONLY on explicit button click) -->
-  <div id="session-ended-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl hidden flex items-center justify-center p-4">
+  <!-- ======================================================== -->
+  <!-- 5. MODAL: SESSION ENDED CONFIRMATION SCREEN              -->
+  <!-- ======================================================== -->
+  <div id="session-ended-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl hidden flex items-center justify-center p-4">
     <div class="bg-meet-card border border-meet-border rounded-3xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
       <div class="w-16 h-16 rounded-2xl bg-brand-900 border border-emerald-500/40 flex items-center justify-center text-3xl mx-auto shadow-md">
         🌿
@@ -266,6 +277,7 @@
     let isScreenSharing = false;
     let isSessionExplicitlyEnded = false;
     let isConnectedWithPeer = false;
+    let isCoverMode = true; // Full screen cover mode by default on mobile
     let autoReconnectInterval = null;
     let currentFacingMode = 'user'; // 'user' or 'environment'
     let timerInterval = null;
@@ -290,6 +302,45 @@
       startSessionTimer();
       loadExistingNotes();
     });
+
+    // Auto-fullscreen on first user tap if supported
+    document.addEventListener('click', () => {
+      if (isMobileDevice && !document.fullscreenElement && !document.webkitFullscreenElement) {
+        tryRequestFullscreen();
+      }
+    }, { once: true });
+
+    function tryRequestFullscreen() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(() => {});
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen().catch(() => {});
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        tryRequestFullscreen();
+        document.getElementById('fs-icon').textContent = '🗗';
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        document.getElementById('fs-icon').textContent = '⛶';
+      }
+    }
+
+    function toggleVideoFit() {
+      const vid = document.getElementById('remote-video');
+      isCoverMode = !isCoverMode;
+      if (isCoverMode) {
+        vid.className = 'w-full h-full object-cover bg-black';
+        document.getElementById('fit-label').textContent = 'Повний';
+      } else {
+        vid.className = 'w-full h-full object-contain bg-black';
+        document.getElementById('fit-label').textContent = 'Вмістити';
+      }
+    }
 
     async function initWebRTC() {
       await startCameraStream(currentFacingMode);
@@ -334,7 +385,6 @@
           localVid.classList.remove('video-mirror');
         }
 
-        // If in active call, replace video track for remote partner
         if (currentCall && currentCall.peerConnection) {
           const videoTrack = localStream.getVideoTracks()[0];
           const sender = currentCall.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
@@ -348,7 +398,6 @@
     }
 
     function setupPeerConnection() {
-      // Deterministic Host ID for therapist, client ID for client
       const peerId = isOwnerRole ? `${roomParam}-host` : `${roomParam}-client-${Math.floor(Math.random()*1000)}`;
       
       peer = new Peer(peerId, {
@@ -363,30 +412,26 @@
 
       peer.on('open', (id) => {
         console.log('Peer connected with ID:', id);
-
         if (!isOwnerRole) {
           connectToHost();
           startAutoReconnectHeartbeat();
         }
       });
 
-      // Handle Incoming Call
       peer.on('call', (call) => {
-        console.log('Incoming call received, answering with stream');
+        console.log('Incoming call received, answering');
         currentCall = call;
         call.answer(localStream);
         handleStream(call);
       });
 
-      // Handle Data Channel for explicit session termination
       peer.on('connection', (conn) => {
         setupDataChannel(conn);
       });
 
       peer.on('error', (err) => {
-        console.log('Peer connection status:', err.type);
+        console.log('Peer status:', err.type);
         if (err.type === 'peer-unavailable' && !isOwnerRole) {
-          // If therapist refreshed or not in room yet, keep waiting and retry
           showWaitingOrReconnectingState(false);
         }
       });
@@ -404,17 +449,15 @@
 
     function connectToHost() {
       if (!peer || peer.destroyed || isSessionExplicitlyEnded) return;
-      if (isConnectedWithPeer) return; // Already connected
+      if (isConnectedWithPeer) return;
 
       const hostPeerId = `${roomParam}-host`;
       
-      // Connect Data Channel
       try {
         const conn = peer.connect(hostPeerId);
         if (conn) setupDataChannel(conn);
       } catch(e) {}
 
-      // Call Host
       if (localStream) {
         const call = peer.call(hostPeerId, localStream);
         if (call) {
@@ -435,7 +478,7 @@
 
     function handleStream(call) {
       call.on('stream', (remoteStream) => {
-        console.log('Remote video stream attached!');
+        console.log('Remote stream received');
         isConnectedWithPeer = true;
 
         const remoteVideo = document.getElementById('remote-video');
@@ -451,7 +494,6 @@
         isConnectedWithPeer = false;
 
         if (!isSessionExplicitlyEnded) {
-          // Network glitch or page reload: show friendly reconnecting state
           showWaitingOrReconnectingState(true);
           if (!isOwnerRole) {
             connectToHost();
@@ -472,11 +514,11 @@
 
       if (isReconnect) {
         title.textContent = "📡 Відновлення зв'язку...";
-        desc.textContent = "Тимчасове перепідключення або оновлення сторінки співрозмовником. Сесія автоматично продовжиться.";
+        desc.textContent = "Тимчасове перепідключення або оновлення сторінки співрозмовником. Зв'язок автоматично відновиться.";
         badge.innerHTML = `<span class="text-amber-300">Перепідключення...</span>`;
       } else {
         title.textContent = "Очікування співрозмовника...";
-        desc.textContent = "Ви в захищеній відеокімнаті. Відеозв'язок розпочнеться автоматично, щойно співрозмовник увійде.";
+        desc.textContent = "Ви в захищеній відеокімнаті. Зв'язок розпочнеться автоматично, щойно співрозмовник увійде.";
         badge.innerHTML = `Кімната: <strong id="room-code-badge">${roomParam}</strong>`;
       }
     }
@@ -491,12 +533,12 @@
       const label = document.getElementById('mic-label');
 
       if (isAudioMuted) {
-        iconBox.className = 'w-12 h-12 sm:w-12 sm:h-12 rounded-2xl sm:rounded-full bg-rose-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95';
+        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-rose-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95';
         icon.textContent = '🔇';
         label.textContent = 'Вимкнено';
         label.className = 'text-[9px] sm:text-[10px] font-semibold text-rose-400';
       } else {
-        iconBox.className = 'w-12 h-12 sm:w-12 sm:h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95';
+        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95';
         icon.textContent = '🎤';
         label.textContent = 'Мікр';
         label.className = 'text-[9px] sm:text-[10px] font-semibold text-gray-300';
@@ -513,12 +555,12 @@
       const label = document.getElementById('cam-label');
 
       if (isVideoMuted) {
-        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-rose-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95';
+        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-rose-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95';
         icon.textContent = '🚫';
         label.textContent = 'Вимкнено';
         label.className = 'text-[9px] sm:text-[10px] font-semibold text-rose-400';
       } else {
-        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95';
+        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95';
         icon.textContent = '📹';
         label.textContent = 'Камера';
         label.className = 'text-[9px] sm:text-[10px] font-semibold text-gray-300';
@@ -595,9 +637,11 @@
       const btn = document.getElementById('notes-header-btn');
       if (sidebar.classList.contains('hidden')) {
         sidebar.classList.remove('hidden');
+        sidebar.classList.add('flex');
         if (btn) btn.classList.add('bg-brand-600', 'text-white');
       } else {
         sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex');
         if (btn) btn.classList.remove('bg-brand-600', 'text-white');
       }
     }
@@ -632,7 +676,6 @@
         isSessionExplicitlyEnded = true;
         clearInterval(autoReconnectInterval);
 
-        // Notify partner via data channel
         if (dataConnection && dataConnection.open) {
           try {
             dataConnection.send({
@@ -674,10 +717,6 @@
       if (peer) {
         try { peer.destroy(); } catch(e) {}
       }
-    }
-
-    function confirmExit() {
-      return confirm('Ви дійсно бажаєте вийти з відеосесії та повернутися в кабінет?');
     }
   </script>
 </body>
