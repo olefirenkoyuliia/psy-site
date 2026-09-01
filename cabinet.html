@@ -135,13 +135,9 @@
 
       <!-- Google SSO Container -->
       <div class="pt-2 space-y-4">
-        <div id="g_id_onload"
-             data-client_id="YOUR_GOOGLE_CLIENT_ID"
-             data-callback="handleGoogleCredentialResponse"
-             data-auto_prompt="false">
-        </div>
-        <div class="flex justify-center" id="google-signin-btn-container">
-          <button onclick="triggerGoogleLogin()" class="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-gray-800 font-bold text-sm border border-gray-300 shadow-sm hover:shadow transition-all duration-200">
+        <!-- Official Google GIS Button Mount -->
+        <div class="flex justify-center min-h-[46px] w-full" id="google-signin-btn-container">
+          <button onclick="triggerGoogleLogin()" id="fallback-google-btn" class="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-gray-800 font-bold text-sm border border-gray-300 shadow-sm hover:shadow transition-all duration-200">
             <svg class="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -150,6 +146,23 @@
             </svg>
             <span>Увійти через Google</span>
           </button>
+        </div>
+
+        <!-- Google Client ID Setup Notice (Visible if not configured) -->
+        <div id="google-config-box" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-left space-y-2 text-xs">
+          <div class="flex items-center justify-between text-amber-900 font-bold text-[11px]">
+            <span>⚙️ Налаштування Google SSO Client ID</span>
+            <button onclick="toggleGoogleConfigBox()" class="text-amber-700 hover:underline">✕</button>
+          </div>
+          <p class="text-[11px] text-amber-800 leading-relaxed">
+            Вставте ваш <strong>Client ID</strong> з Google Cloud Console для автоматичного виклику вікна вибору акаунта:
+          </p>
+          <div class="flex gap-2">
+            <input type="text" id="input-google-client-id" placeholder="123456...apps.googleusercontent.com" class="flex-grow px-3 py-1.5 rounded-xl border border-amber-300 text-[11px] bg-white">
+            <button onclick="saveGoogleClientId()" class="px-3 py-1.5 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold text-[11px] shrink-0">
+              Зберегти
+            </button>
+          </div>
         </div>
 
         <div class="relative flex py-2 items-center">
@@ -704,16 +717,81 @@
       }
     }
 
-    function initGoogleSso() {
-      if (window.google && window.google.accounts) {
+    let activeGoogleClientId = '';
+
+    async function initGoogleSso() {
+      try {
+        const res = await fetch('/api/auth/config');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.clientId) {
+            activeGoogleClientId = data.clientId;
+          }
+        }
+      } catch(e) {}
+
+      if (!activeGoogleClientId) {
+        activeGoogleClientId = localStorage.getItem('psy_google_client_id') || '';
+      }
+
+      const input = document.getElementById('input-google-client-id');
+      if (input && activeGoogleClientId) input.value = activeGoogleClientId;
+
+      if (activeGoogleClientId && window.google && window.google.accounts && window.google.accounts.id) {
         try {
           google.accounts.id.initialize({
-            client_id: "712891928374-placeholder.apps.googleusercontent.com",
+            client_id: activeGoogleClientId,
             callback: handleGoogleCredentialResponse,
-            auto_select: false
+            auto_select: false,
+            cancel_on_tap_outside: true
           });
-        } catch(e) {}
+
+          const container = document.getElementById('google-signin-btn-container');
+          if (container) {
+            container.innerHTML = '';
+            google.accounts.id.renderButton(container, {
+              theme: 'outline',
+              size: 'large',
+              type: 'standard',
+              shape: 'pill',
+              text: 'continue_with',
+              logo_alignment: 'left',
+              width: 320
+            });
+          }
+        } catch(e) {
+          console.warn('GIS init:', e);
+        }
       }
+    }
+
+    function toggleGoogleConfigBox() {
+      const box = document.getElementById('google-config-box');
+      if (box) box.classList.toggle('hidden');
+    }
+
+    async function saveGoogleClientId() {
+      const input = document.getElementById('input-google-client-id');
+      const val = (input?.value || '').trim();
+      if (!val) {
+        alert('Будь ласка, введіть Client ID');
+        return;
+      }
+
+      activeGoogleClientId = val;
+      localStorage.setItem('psy_google_client_id', val);
+
+      try {
+        await fetch('/api/auth/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId: val })
+        });
+      } catch(e) {}
+
+      toggleGoogleConfigBox();
+      showToast('Google Client ID збережено!');
+      initGoogleSso();
     }
 
     function openModal(id) {
