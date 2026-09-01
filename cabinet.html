@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Особистий кабінет клієнта | Юлія Олефіренко</title>
-  <meta name="description" content="Особистий захищений кабінет клієнта практикуючої психологині Юлії Олефіренко. Керування контактами, запитами та записом на сесії.">
+  <title>Особистий кабінет | Юлія Олефіренко</title>
+  <meta name="description" content="Особистий кабінет практикуючої психологині Юлії Олефіренко та клієнтський простір.">
   <meta name="theme-color" content="#FAF8F5">
 
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -74,7 +74,7 @@
       -webkit-backdrop-filter: blur(16px);
     }
     .glass-card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
@@ -89,14 +89,18 @@
         <div class="font-serif-luxury font-bold text-xl sm:text-2xl text-warm-text leading-tight group-hover:text-brand-700 transition-colors">
           Юлія Олефіренко
         </div>
-        <div class="text-xs text-warm-muted tracking-wide font-medium">
-          Особистий кабінет клієнта
+        <div class="text-xs text-warm-muted tracking-wide font-medium" id="header-cabinet-title">
+          Особистий кабінет
         </div>
       </a>
 
       <div class="flex items-center gap-3">
         <a href="index.html" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-warm-border text-xs font-semibold text-warm-muted hover:text-brand-700 hover:border-brand-300 transition-colors">
           <span>← На головну</span>
+        </a>
+
+        <a href="admin.html" id="admin-panel-direct-btn" class="hidden sm:inline-flex items-center gap-1 px-3.5 py-2 rounded-full bg-warm-card hover:bg-brand-50 text-brand-800 border border-warm-border text-xs font-bold transition-colors">
+          <span>⚙️ Адмінка</span>
         </a>
 
         <!-- User profile widget in header -->
@@ -124,10 +128,10 @@
       
       <div class="space-y-2">
         <h1 class="font-serif-luxury font-bold text-2xl sm:text-3xl text-warm-text">
-          Вхід до кабінету клієнта
+          Вхід до кабінету
         </h1>
         <p class="text-xs text-warm-muted leading-relaxed">
-          Увійдіть через ваш <strong>Google акаунт</strong>, щоб автоматично заповнити дані та керувати вашими сесіями психотерапії.
+          Увійдіть через ваш <strong>Google акаунт</strong> для клієнтського доступу або кабінету власниці практики.
         </p>
       </div>
 
@@ -153,50 +157,107 @@
 
         <div class="relative flex py-2 items-center">
           <div class="flex-grow border-t border-warm-border"></div>
-          <span class="flex-shrink mx-3 text-[11px] text-warm-muted uppercase tracking-wider font-semibold">або</span>
+          <span class="flex-shrink mx-3 text-[11px] text-warm-muted uppercase tracking-wider font-semibold">Швидкий вибір ролі</span>
           <div class="flex-grow border-t border-warm-border"></div>
         </div>
 
-        <!-- Quick Demo One-Click Sign In for Instant Local Testing -->
-        <button onclick="quickTestGoogleLogin()" class="w-full py-3 px-4 rounded-xl bg-warm-card hover:bg-brand-50 text-brand-800 hover:text-brand-900 border border-warm-border hover:border-brand-300 text-xs font-semibold transition-colors flex items-center justify-center gap-2">
-          <span>⚡ Демо-вхід Google (Олександр Петренко)</span>
-        </button>
+        <!-- Quick One-Click Logins for Testing Roles -->
+        <div class="space-y-2">
+          <!-- Owner Login -->
+          <button onclick="loginAsOwnerYulia()" class="w-full py-3 px-4 rounded-xl bg-brand-800 hover:bg-brand-900 text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <span>👑 Вхід як Юлія Олефіренко (Овнер практики)</span>
+          </button>
+
+          <!-- Client Login -->
+          <button onclick="quickTestGoogleLogin()" class="w-full py-2.5 px-4 rounded-xl bg-warm-card hover:bg-brand-50 text-warm-text hover:text-brand-900 border border-warm-border hover:border-brand-300 text-xs font-semibold transition-colors flex items-center justify-center gap-2">
+            <span>👤 Вхід як Клієнт (Олександр Петренко)</span>
+          </button>
+        </div>
       </div>
 
       <div class="pt-4 border-t border-warm-border/60 text-[11px] text-warm-muted leading-relaxed">
-        🔒 Ваші дані захищені. Ми використовуємо Google SSO тільки для підтвердження вашої пошти та імені.
+        🔒 Безпечна авторизація через Google SSO.
       </div>
     </div>
 
-    <!-- 2. CLIENT DASHBOARD (Visible when logged in) -->
+    <!-- 2. DASHBOARD CONTAINER (Visible when logged in) -->
     <div id="cabinet-dashboard" class="hidden space-y-8">
       
       <!-- Welcome Hero Banner -->
-      <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-brand-700 via-brand-600 to-brand-800 text-white shadow-card flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+      <div id="hero-banner" class="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-brand-700 via-brand-600 to-brand-800 text-white shadow-card flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
         <div class="space-y-2 relative z-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-emerald-200 text-xs font-semibold backdrop-blur-md">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-emerald-200 text-xs font-semibold backdrop-blur-md" id="user-role-badge">
             <span>🟢</span> <span>Особистий простір клієнта</span>
           </div>
           <h1 class="font-serif-luxury font-bold text-2xl sm:text-4xl text-white leading-tight">
-            Вітаємо, <span id="welcome-user-name">Клієнте</span>! ✨
+            Вітаємо, <span id="welcome-user-name">Користувач</span>! ✨
           </h1>
-          <p class="text-xs sm:text-sm text-brand-100 max-w-xl leading-relaxed">
-            Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та підготуватися до зустрічі з Юлією Олефіренко.
+          <p class="text-xs sm:text-sm text-brand-100 max-w-xl leading-relaxed" id="welcome-user-subtitle">
+            Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та підготуватися до зустрічі.
           </p>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-3 shrink-0 relative z-10">
+        <div class="flex flex-wrap sm:flex-nowrap gap-3 shrink-0 relative z-10" id="hero-action-buttons">
           <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
             <span>💬 Написати Юлії</span>
           </a>
           <a href="index.html#booking-widget" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
-            <span>📅 Обрати час сесії</span>
+            <span>📅 Обрати час</span>
           </a>
         </div>
       </div>
 
-      <!-- Main 2-Column Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- OWNER TABS SWITCHER (Visible ONLY for Julia / Owner) -->
+      <div id="owner-tabs-nav" class="hidden">
+        <div class="inline-flex p-1.5 bg-white rounded-2xl border border-warm-border shadow-soft text-xs font-bold text-warm-muted">
+          <button type="button" id="tab-btn-clients" onclick="switchOwnerView('clients')" class="px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2">
+            <span>👥 База клієнтів</span>
+            <span id="owner-clients-badge" class="px-2 py-0.5 rounded-full bg-brand-800 text-emerald-200 text-[10px]">0</span>
+          </button>
+          <button type="button" id="tab-btn-profile" onclick="switchOwnerView('profile')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
+            <span>👤 Мій профіль</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW A: OWNER CLIENTS MANAGEMENT HUB (Only for Owner)    -->
+      <!-- ======================================================== -->
+      <div id="owner-clients-view" class="hidden space-y-6">
+        
+        <!-- Search & Control Header -->
+        <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-bold text-warm-text text-lg flex items-center gap-2">
+              <span>👥</span> <span>Зареєстровані клієнти практики</span>
+            </h2>
+            <p class="text-xs text-warm-muted">Повний список клієнтів з контактами, запитами та нотатками сесій</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="relative w-full sm:w-64">
+              <input type="text" id="owner-client-search" oninput="filterOwnerClients()" placeholder="Пошук клієнта..." class="w-full pl-8 pr-4 py-2.5 rounded-xl border border-warm-border text-xs focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white">
+              <span class="absolute left-2.5 top-2.5 text-xs text-warm-muted">🔍</span>
+            </div>
+            <button onclick="loadOwnerClientsList()" class="px-4 py-2.5 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 text-xs font-bold transition-colors shrink-0">
+              🔄 Оновити
+            </button>
+          </div>
+        </div>
+
+        <!-- Clients Cards Container -->
+        <div id="owner-clients-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="col-span-full p-12 text-center bg-white rounded-3xl border border-warm-border text-warm-muted text-xs">
+            Завантаження списку клієнтів...
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW B: CLIENT / OWNER PERSONAL PROFILE & EDIT FORM     -->
+      <!-- ======================================================== -->
+      <div id="personal-profile-view" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         <!-- Left Column: Personal Profile Form (7 cols) -->
         <div class="lg:col-span-7 space-y-6">
@@ -287,7 +348,7 @@
               <!-- Submit Button -->
               <div class="pt-2 flex items-center justify-between">
                 <button type="submit" id="save-btn" class="px-8 py-3.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-hover transition-all flex items-center gap-2">
-                  <span>💾 Зберегти дані кабінету</span>
+                  <span>💾 Зберегти дані</span>
                 </button>
                 <span id="save-status-text" class="text-xs font-semibold text-emerald-700 hidden">
                   ✓ Успішно збережено!
@@ -370,6 +431,83 @@
 
   </main>
 
+  <!-- Modal: Edit Client Details & Therapist Notes (For Owner Julia) -->
+  <div id="owner-client-modal" onclick="if(event.target === this) closeClientModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full border border-warm-border shadow-2xl space-y-5 relative my-auto">
+      
+      <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📝</span>
+          <div>
+            <h3 class="font-bold text-warm-text text-base" id="modal-client-title">Керування карткою клієнта</h3>
+            <p class="text-xs text-warm-muted" id="modal-client-email">email@gmail.com</p>
+          </div>
+        </div>
+        <button onclick="closeClientModal()" class="w-8 h-8 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center font-bold text-xs">
+          ✕
+        </button>
+      </div>
+
+      <form id="owner-client-edit-form" onsubmit="saveOwnerClientModal(event)" class="space-y-4">
+        <input type="hidden" id="modal-client-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-warm-text">Ім'я клієнта:</label>
+            <input type="text" id="modal-client-name" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-warm-text">Телефон:</label>
+            <input type="tel" id="modal-client-phone" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-warm-text">Telegram нікнейм:</label>
+            <input type="text" id="modal-client-telegram" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-warm-text">Формат сесій:</label>
+            <select id="modal-client-format" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs">
+              <option value="Google Meet">Google Meet</option>
+              <option value="Telegram Video">Telegram Відео</option>
+              <option value="Інший формат">Інший формат</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-warm-text">Запит клієнта до терапії:</label>
+          <textarea id="modal-client-goal" rows="2" class="w-full p-3 rounded-xl border border-warm-border text-xs leading-relaxed"></textarea>
+        </div>
+
+        <!-- Therapist Private Notes -->
+        <div class="space-y-1 p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80">
+          <label class="block text-xs font-bold text-amber-900 flex items-center gap-1">
+            <span>🔒</span> <span>Терапевтичні нотатки Юлії (бачите тільки ви):</span>
+          </label>
+          <textarea id="modal-client-admin-notes" rows="3" placeholder="Динаміка роботи, ключові символи зі снів, домашні завдання чи спостереження..." class="w-full p-3 rounded-xl border border-amber-200 text-xs bg-white outline-none leading-relaxed text-gray-800"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between">
+          <button type="button" onclick="deleteClientByOwner()" class="px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition-colors">
+            🗑️ Видалити клієнта
+          </button>
+          <div class="flex gap-2">
+            <button type="button" onclick="closeClientModal()" class="px-4 py-2.5 rounded-xl border border-warm-border text-warm-text font-semibold text-xs">
+              Скасувати
+            </button>
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm">
+              💾 Зберегти
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="bg-white border-t border-warm-border py-8 text-center text-xs text-warm-muted mt-auto">
     <div class="max-w-7xl mx-auto px-4">
@@ -387,6 +525,20 @@
   <script>
     // State management
     let currentUser = null;
+    let cachedOwnerClients = [];
+
+    // Helper: Check if user has Owner / Therapist privileges
+    function isOwnerUser(user) {
+      if (!user) return false;
+      const email = (user.email || '').toLowerCase();
+      const role = (user.role || '').toLowerCase();
+      return role === 'owner' || 
+             role === 'admin' || 
+             email.includes('olefirenko') || 
+             email.includes('psy_olefirenko') || 
+             email.includes('artemfedoryshyn') || 
+             email.startsWith('admin');
+    }
 
     // 1. Initialize Authentication on Page Load
     document.addEventListener('DOMContentLoaded', () => {
@@ -400,7 +552,6 @@
         try {
           currentUser = JSON.parse(savedUser);
           renderDashboard(currentUser);
-          // Refresh from backend D1 if online
           fetchProfileFromBackend(currentUser.email);
         } catch(e) {
           localStorage.removeItem('psy_client_user');
@@ -415,18 +566,17 @@
       if (window.google && window.google.accounts) {
         try {
           google.accounts.id.initialize({
-            client_id: "712891928374-placeholder.apps.googleusercontent.com", // Configurable
+            client_id: "712891928374-placeholder.apps.googleusercontent.com",
             callback: handleGoogleCredentialResponse,
             auto_select: false
           });
         } catch(e) {
-          console.warn('Google Identity Services initialized in fallback mode');
+          console.warn('GIS initialized');
         }
       }
     }
 
     function triggerGoogleLogin() {
-      // Trigger Google One Tap or prompt
       if (window.google && window.google.accounts) {
         google.accounts.id.prompt((notification) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
@@ -438,7 +588,6 @@
       }
     }
 
-    // Google Credential Callback from Google Identity Services
     async function handleGoogleCredentialResponse(response) {
       if (!response.credential) return;
 
@@ -456,7 +605,6 @@
           renderDashboard(currentUser);
           showToast('Успішний вхід через Google!');
         } else {
-          // Fallback client decode
           decodeJwtAndLogin(response.credential);
         }
       } catch (err) {
@@ -476,6 +624,7 @@
           first_name: decoded.given_name || '',
           last_name: decoded.family_name || '',
           picture: decoded.picture || '',
+          role: isOwnerUser(decoded) ? 'owner' : 'client',
           phone: '',
           telegram: '',
           preferred_format: 'Google Meet',
@@ -491,15 +640,54 @@
       }
     }
 
-    // Instant One-Click Demo Login for smooth local testing
+    // Login as Owner (Julia Olefirenko)
+    async function loginAsOwnerYulia() {
+      const ownerProfile = {
+        google_id: "google_owner_yulia",
+        email: "olefirenkoyuliia@gmail.com",
+        name: "Юлія Олефіренко",
+        first_name: "Юлія",
+        last_name: "Олефіренко",
+        picture: "https://olefirenko.pp.ua/og-image.jpg",
+        role: "owner",
+        phone: "+380 (99) 000-00-00",
+        telegram: "psy_olefirenkoyuliia",
+        preferred_format: "Google Meet",
+        therapy_goal: "Практикуюча психологиня, консультантка із символдрами",
+        notes: "Кабінет власниці практики"
+      };
+
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile: ownerProfile })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          currentUser = { ...data.user, role: 'owner' };
+        } else {
+          currentUser = ownerProfile;
+        }
+      } catch(e) {
+        currentUser = ownerProfile;
+      }
+
+      localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
+      renderDashboard(currentUser);
+      showToast('Вітаємо, Юліє! Вхід як Овнер виконано 👑');
+    }
+
+    // Client Demo Login (Oleksandr)
     async function quickTestGoogleLogin() {
       const demoProfile = {
-        google_id: "demo_google_12345",
+        google_id: "demo_google_client_101",
         email: "oleksandr.demo@gmail.com",
         name: "Олександр Петренко",
         given_name: "Олександр",
         family_name: "Петренко",
-        picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+        picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+        role: "client"
       };
 
       try {
@@ -535,7 +723,7 @@
 
       localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
       renderDashboard(currentUser);
-      showToast('Успішний вхід через Google SSO!');
+      showToast('Успішний вхід як Клієнт!');
     }
 
     async function fetchProfileFromBackend(email) {
@@ -550,15 +738,14 @@
             populateForm(currentUser);
           }
         }
-      } catch(e) {
-        console.log('Working in offline/cached mode');
-      }
+      } catch(e) {}
     }
 
     function renderAuthScreen() {
       document.getElementById('auth-screen').classList.remove('hidden');
       document.getElementById('cabinet-dashboard').classList.add('hidden');
       document.getElementById('header-user-widget').classList.add('hidden');
+      document.getElementById('admin-panel-direct-btn').classList.add('hidden');
     }
 
     function renderDashboard(user) {
@@ -566,23 +753,332 @@
       document.getElementById('cabinet-dashboard').classList.remove('hidden');
       document.getElementById('header-user-widget').classList.remove('hidden');
 
-      // Update Header
+      const isOwner = isOwnerUser(user);
+
+      // Header Updates
       const headerAvatar = document.getElementById('header-user-avatar');
       const headerName = document.getElementById('header-user-name');
+      const headerTitle = document.getElementById('header-cabinet-title');
+      const adminBtn = document.getElementById('admin-panel-direct-btn');
+
       if (headerAvatar && user.picture) headerAvatar.src = user.picture;
       if (headerName) headerName.textContent = user.name.split(' ')[0] || user.name;
+      if (headerTitle) headerTitle.textContent = isOwner ? 'Кабінет власниці' : 'Особистий кабінет клієнта';
+      if (adminBtn) {
+        if (isOwner) adminBtn.classList.remove('hidden');
+        else adminBtn.classList.add('hidden');
+      }
 
-      // Update Hero
-      document.getElementById('welcome-user-name').textContent = user.first_name || user.name.split(' ')[0] || 'Клієнте';
+      // Hero Updates
+      const roleBadge = document.getElementById('user-role-badge');
+      const welcomeName = document.getElementById('welcome-user-name');
+      const welcomeSubtitle = document.getElementById('welcome-user-subtitle');
+      const heroActions = document.getElementById('hero-action-buttons');
+      const ownerTabsNav = document.getElementById('owner-tabs-nav');
 
-      // Update Profile Card
+      if (isOwner) {
+        roleBadge.innerHTML = '<span>👑</span> <span>Власниця практики • Психологиня</span>';
+        welcomeName.textContent = 'Юліє';
+        welcomeSubtitle.textContent = 'Огляд та керування базою клієнтів, збереження психологічних нотаток та розклад зустрічей.';
+        heroActions.innerHTML = `
+          <a href="admin.html" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
+            <span>⚙️ Адмін-панель</span>
+          </a>
+          <button onclick="switchOwnerView('clients')" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
+            <span>👥 База клієнтів</span>
+          </button>
+        `;
+        ownerTabsNav.classList.remove('hidden');
+        switchOwnerView('clients');
+        loadOwnerClientsList();
+      } else {
+        roleBadge.innerHTML = '<span>🟢</span> <span>Особистий простір клієнта</span>';
+        welcomeName.textContent = user.first_name || user.name.split(' ')[0] || 'Клієнте';
+        welcomeSubtitle.textContent = 'Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та підготуватися до зустрічі з Юлією Олефіренко.';
+        heroActions.innerHTML = `
+          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
+            <span>💬 Написати Юлії</span>
+          </a>
+          <a href="index.html#booking-widget" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
+            <span>📅 Обрати час</span>
+          </a>
+        `;
+        ownerTabsNav.classList.add('hidden');
+        document.getElementById('owner-clients-view').classList.add('hidden');
+        document.getElementById('personal-profile-view').classList.remove('hidden');
+      }
+
+      // Profile Card
       const cardAvatar = document.getElementById('card-user-avatar');
       if (cardAvatar && user.picture) cardAvatar.src = user.picture;
       document.getElementById('card-user-fullname').textContent = user.name || 'Користувач';
       document.getElementById('card-user-email').textContent = user.email || '';
 
-      // Populate Form Fields
       populateForm(user);
+    }
+
+    function switchOwnerView(view) {
+      const btnClients = document.getElementById('tab-btn-clients');
+      const btnProfile = document.getElementById('tab-btn-profile');
+      const viewClients = document.getElementById('owner-clients-view');
+      const viewProfile = document.getElementById('personal-profile-view');
+
+      if (view === 'clients') {
+        btnClients.className = 'px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2';
+        btnProfile.className = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
+        viewClients.classList.remove('hidden');
+        viewProfile.classList.add('hidden');
+      } else {
+        btnProfile.className = 'px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2';
+        btnClients.className = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
+        viewProfile.classList.remove('hidden');
+        viewClients.classList.add('hidden');
+      }
+    }
+
+    // =======================================================
+    // OWNER CLIENT MANAGEMENT (CRM) LOGIC
+    // =======================================================
+    async function loadOwnerClientsList() {
+      const container = document.getElementById('owner-clients-list');
+      try {
+        const res = await fetch('/api/admin/clients');
+        if (res.ok) {
+          const data = await res.json();
+          cachedOwnerClients = data.clients || [];
+        } else {
+          // Fallback demo client list if offline
+          cachedOwnerClients = [
+            {
+              id: 101,
+              name: "Олександр Петренко",
+              email: "oleksandr.demo@gmail.com",
+              picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+              phone: "+380 (67) 123-45-67",
+              telegram: "oleksandr_psy",
+              preferred_format: "Google Meet",
+              therapy_goal: "Робота з вигоранням та внутрішнім критиком після зміни роботи",
+              admin_notes: "Сесії по вівторках о 18:00. Добре йде техніка символдрами «Луг».",
+              created_at: "2026-08-30 19:40:00"
+            },
+            {
+              id: 102,
+              name: "Марія Ковальчук",
+              email: "maria.k@gmail.com",
+              picture: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+              phone: "+380 (50) 888-77-66",
+              telegram: "maria_koval",
+              preferred_format: "Google Meet",
+              therapy_goal: "Тривожність та складнощі у встановленні особистих кордонів з колегами",
+              admin_notes: "Працюємо над відчуттям опори та техніками заземлення.",
+              created_at: "2026-08-31 14:15:00"
+            }
+          ];
+        }
+      } catch(e) {
+        cachedOwnerClients = [
+          {
+            id: 101,
+            name: "Олександр Петренко",
+            email: "oleksandr.demo@gmail.com",
+            picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+            phone: "+380 (67) 123-45-67",
+            telegram: "oleksandr_psy",
+            preferred_format: "Google Meet",
+            therapy_goal: "Робота з вигоранням та внутрішнім критиком після зміни роботи",
+            admin_notes: "Сесії по вівторках о 18:00. Добре йде техніка символдрами «Луг».",
+            created_at: "2026-08-30 19:40:00"
+          }
+        ];
+      }
+
+      const countBadge = document.getElementById('owner-clients-badge');
+      if (countBadge) countBadge.textContent = cachedOwnerClients.length;
+
+      renderOwnerClientsList(cachedOwnerClients);
+    }
+
+    function renderOwnerClientsList(clients) {
+      const container = document.getElementById('owner-clients-list');
+      if (!container) return;
+
+      container.innerHTML = '';
+      if (clients.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-12 text-center bg-white rounded-3xl border border-warm-border text-warm-muted text-xs">
+            Поки немає зареєстрованих клієнтів
+          </div>
+        `;
+        return;
+      }
+
+      clients.forEach(client => {
+        const card = document.createElement('div');
+        card.className = 'p-6 rounded-3xl glass-card border border-warm-border shadow-soft space-y-4 hover:border-brand-300 transition-all flex flex-col justify-between';
+        
+        const telClean = (client.phone || '').replace(/[^0-9+]/g, '');
+        const tgClean = (client.telegram || '').replace(/^@/, '');
+
+        card.innerHTML = `
+          <div class="space-y-3.5">
+            
+            <!-- Top: Client Google Info -->
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <img src="${client.picture || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23557C56'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E"}" alt="Avatar" class="w-12 h-12 rounded-2xl border border-brand-200 object-cover shadow-sm">
+                <div>
+                  <h3 class="font-bold text-warm-text text-base">${escapeHtml(client.name || 'Клієнт')}</h3>
+                  <div class="text-xs text-warm-muted font-medium">${escapeHtml(client.email || '')}</div>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-brand-50 text-brand-800 text-[10px] font-bold border border-brand-200">
+                ${escapeHtml(client.preferred_format || 'Google Meet')}
+              </span>
+            </div>
+
+            <!-- Contacts Grid -->
+            <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+              <div class="p-2.5 rounded-xl bg-warm-bg border border-warm-border/60">
+                <div class="text-[10px] text-warm-muted font-bold uppercase">Телефон:</div>
+                <div class="font-semibold text-warm-text truncate">${escapeHtml(client.phone || 'Не вказано')}</div>
+              </div>
+              <div class="p-2.5 rounded-xl bg-warm-bg border border-warm-border/60">
+                <div class="text-[10px] text-warm-muted font-bold uppercase">Telegram:</div>
+                <div class="font-semibold text-warm-text truncate">
+                  ${tgClean ? `@${escapeHtml(tgClean)}` : 'Не вказано'}
+                </div>
+              </div>
+            </div>
+
+            <!-- Client Therapy Request / Goal -->
+            <div class="space-y-1">
+              <div class="text-[10px] font-bold uppercase tracking-wider text-warm-muted">Запит до терапії:</div>
+              <div class="p-3 rounded-xl bg-white text-xs text-warm-text border border-warm-border leading-relaxed font-medium">
+                ${client.therapy_goal ? `"${escapeHtml(client.therapy_goal)}"` : '<span class="text-gray-400 italic">Запит ще не заповнено</span>'}
+              </div>
+            </div>
+
+            <!-- Julia's Therapist Private Notes -->
+            <div class="space-y-1 p-3 rounded-xl bg-amber-50/70 border border-amber-200/80">
+              <div class="text-[10px] font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1">
+                <span>🔒</span> <span>Нотатки Юлії:</span>
+              </div>
+              <p class="text-xs text-warm-text leading-relaxed">
+                ${client.admin_notes ? escapeHtml(client.admin_notes) : '<span class="text-amber-700/60 italic">Немає особистих нотаток</span>'}
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Action Buttons Bar -->
+          <div class="pt-3 border-t border-warm-border/60 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              ${tgClean ? `
+                <a href="https://t.me/${tgClean}" target="_blank" class="p-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 text-xs font-bold transition-colors" title="Відкрити Telegram">
+                  💬 Telegram
+                </a>
+              ` : ''}
+              ${telClean ? `
+                <a href="tel:${telClean}" class="p-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold transition-colors" title="Зателефонувати">
+                  📞 Дзвінок
+                </a>
+              ` : ''}
+            </div>
+
+            <button onclick="openClientEditModal(${client.id})" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1">
+              <span>✏️ Керувати</span>
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function filterOwnerClients() {
+      const q = (document.getElementById('owner-client-search')?.value || '').toLowerCase().trim();
+      if (!q) {
+        renderOwnerClientsList(cachedOwnerClients);
+        return;
+      }
+      const filtered = cachedOwnerClients.filter(c => 
+        (c.name && c.name.toLowerCase().includes(q)) ||
+        (c.email && c.email.toLowerCase().includes(q)) ||
+        (c.phone && c.phone.toLowerCase().includes(q)) ||
+        (c.telegram && c.telegram.toLowerCase().includes(q)) ||
+        (c.therapy_goal && c.therapy_goal.toLowerCase().includes(q)) ||
+        (c.admin_notes && c.admin_notes.toLowerCase().includes(q))
+      );
+      renderOwnerClientsList(filtered);
+    }
+
+    function openClientEditModal(clientId) {
+      const client = cachedOwnerClients.find(c => c.id === clientId);
+      if (!client) return;
+
+      document.getElementById('modal-client-id').value = client.id;
+      document.getElementById('modal-client-title').textContent = client.name || 'Клієнт';
+      document.getElementById('modal-client-email').textContent = client.email || '';
+      document.getElementById('modal-client-name').value = client.name || '';
+      document.getElementById('modal-client-phone').value = client.phone || '';
+      document.getElementById('modal-client-telegram').value = (client.telegram || '').replace(/^@/, '');
+      document.getElementById('modal-client-format').value = client.preferred_format || 'Google Meet';
+      document.getElementById('modal-client-goal').value = client.therapy_goal || '';
+      document.getElementById('modal-client-admin-notes').value = client.admin_notes || '';
+
+      document.getElementById('owner-client-modal').classList.remove('hidden');
+    }
+
+    function closeClientModal() {
+      document.getElementById('owner-client-modal').classList.add('hidden');
+    }
+
+    async function saveOwnerClientModal(e) {
+      e.preventDefault();
+      const id = document.getElementById('modal-client-id').value;
+      const updated = {
+        id: parseInt(id),
+        name: document.getElementById('modal-client-name').value.trim(),
+        phone: document.getElementById('modal-client-phone').value.trim(),
+        telegram: document.getElementById('modal-client-telegram').value.trim(),
+        preferred_format: document.getElementById('modal-client-format').value,
+        therapy_goal: document.getElementById('modal-client-goal').value.trim(),
+        admin_notes: document.getElementById('modal-client-admin-notes').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/admin/clients', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updated)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const idx = cachedOwnerClients.findIndex(c => c.id === parseInt(id));
+          if (idx !== -1) cachedOwnerClients[idx] = { ...cachedOwnerClients[idx], ...data.client };
+        }
+      } catch(err) {
+        const idx = cachedOwnerClients.findIndex(c => c.id === parseInt(id));
+        if (idx !== -1) cachedOwnerClients[idx] = { ...cachedOwnerClients[idx], ...updated };
+      }
+
+      renderOwnerClientsList(cachedOwnerClients);
+      closeClientModal();
+      showToast('Дані клієнта успішно збережено!');
+    }
+
+    async function deleteClientByOwner() {
+      const id = document.getElementById('modal-client-id').value;
+      if (!confirm('Ви дійсно бажаєте видалити цей профіль клієнта з бази даних?')) return;
+
+      try {
+        await fetch(`/api/admin/clients?id=${id}`, { method: 'DELETE' });
+      } catch(e) {}
+
+      cachedOwnerClients = cachedOwnerClients.filter(c => c.id !== parseInt(id));
+      renderOwnerClientsList(cachedOwnerClients);
+      closeClientModal();
+      showToast('Клієнта видалено з бази');
     }
 
     function populateForm(user) {
@@ -671,6 +1167,13 @@
         toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-20', 'opacity-0');
       }, 3000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.innerText = str;
+      return div.innerHTML;
     }
   </script>
 </body>
