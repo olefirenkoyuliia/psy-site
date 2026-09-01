@@ -135,6 +135,20 @@
 
       <!-- Official Google Sign-In (SSO) Container -->
       <div class="pt-2 space-y-4">
+        <!-- Telegram In-App Browser Helper Notice -->
+        <div id="telegram-browser-notice" class="hidden p-4 rounded-2xl bg-sky-50/90 border border-sky-200 text-sky-950 text-left space-y-2.5">
+          <div class="flex items-center gap-2 font-bold text-xs text-sky-900">
+            <span class="text-base">💡</span>
+            <span>Для входу через Google у Telegram:</span>
+          </div>
+          <p class="text-[11px] text-sky-800 leading-relaxed">
+            Google блокує авто-вхід усередині вікна Telegram. Будь ласка, натисніть <strong>•••</strong> у правому верхньому кутку екрана та оберіть <strong>«Відкрити у Safari»</strong> (або <strong>«Open in Chrome»</strong>).
+          </p>
+          <button onclick="openInNativeBrowser()" class="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 transition-all">
+            <span>🌐 Інструкція для Safari / Chrome</span>
+          </button>
+        </div>
+
         <!-- Official Google GIS Button Mount -->
         <div class="flex justify-center min-h-[46px] w-full" id="google-signin-btn-container">
           <button onclick="triggerGoogleLogin()" id="fallback-google-btn" class="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-white hover:bg-gray-50 text-gray-800 font-bold text-sm border border-gray-300 shadow-sm hover:shadow transition-all duration-200">
@@ -1093,7 +1107,20 @@
       await checkOAuthHashRedirect();
       checkExistingSession();
       initGoogleSso();
+      detectTelegramWebView();
     });
+
+    function detectTelegramWebView() {
+      const isTelegram = /Telegram/i.test(navigator.userAgent) || Boolean(window.TelegramWebviewProxy || (window.Telegram && window.Telegram.WebApp));
+      const notice = document.getElementById('telegram-browser-notice');
+      if (notice && isTelegram) {
+        notice.classList.remove('hidden');
+      }
+    }
+
+    function openInNativeBrowser() {
+      alert('У Telegram натисніть кнопку з трьома крапками (•••) у правому верхньому кутку та виберіть "Відкрити у Safari" або "Відкрити у Chrome". Після цього Google SSO спрацює автоматично.');
+    }
 
     function checkSSOParams() {
       const urlParams = new URLSearchParams(window.location.search);
