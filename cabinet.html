@@ -2252,7 +2252,7 @@
       }
 
       let successCount = 0;
-      let errorCount = 0;
+      let lastErrorMessage = '';
 
       for (const session of sessions) {
         try {
@@ -2262,28 +2262,27 @@
           const endDate = new Date(startDate.getTime() + durationMins * 60000);
 
           const pad = (n) => String(n).padStart(2, '0');
-          const formatKyivIso = (d) => {
-            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+          const formatRfc3339 = (d) => {
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}+03:00`;
           };
 
           const meetLink = session.google_meet_url || session.meet_url || 'https://meet.google.com/new';
           const eventBody = {
-            summary: `Консультація психотерапії: ${session.client_name || 'Клієнт'} & Юлія Олефіренко`,
+            summary: `Психотерапія: ${session.client_name || 'Клієнт'} & Юлія Олефіренко`,
             description: `Індивідуальна сесія психотерапії (${durationMins} хв).\nПряме посилання Google Meet: ${meetLink}\n${session.therapist_notes ? 'Нотатка: ' + session.therapist_notes : ''}\n\nОсобистий кабінет: https://olefirenko.pp.ua/cabinet.html`,
             start: {
-              dateTime: `${formatKyivIso(startDate)}+03:00`,
+              dateTime: formatRfc3339(startDate),
               timeZone: 'Europe/Kyiv'
             },
             end: {
-              dateTime: `${formatKyivIso(endDate)}+03:00`,
+              dateTime: formatRfc3339(endDate),
               timeZone: 'Europe/Kyiv'
             },
             attendees: [
               session.client_email ? { email: session.client_email, displayName: session.client_name } : null,
               { email: 'olefirenkou@gmail.com', displayName: 'Юлія Олефіренко' }
             ].filter(Boolean),
-            visibility: 'private',
-            guestsCanSeeOtherGuests: false
+            visibility: 'private'
           };
 
           const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=all', {
@@ -2297,31 +2296,39 @@
 
           if (res.ok) {
             successCount++;
-          } else if (res.status === 401) {
-            // Token expired
-            googleCalendarToken = null;
-            localStorage.removeItem('psy_google_cal_token');
-            pendingCalendarSyncSessions = sessions;
-            requestGoogleCalendarAccess(sessions);
-            return;
           } else {
-            errorCount++;
+            const errData = await res.json().catch(() => ({}));
+            console.error('Google Calendar API response error:', res.status, errData);
+            if (res.status === 401) {
+              googleCalendarToken = null;
+              localStorage.removeItem('psy_google_cal_token');
+              pendingCalendarSyncSessions = sessions;
+              requestGoogleCalendarAccess(sessions);
+              return;
+            }
+            lastErrorMessage = errData?.error?.message || `HTTP ${res.status}`;
           }
         } catch(err) {
-          errorCount++;
+          console.error('Fetch error calling Google Calendar API:', err);
+          lastErrorMessage = err.message;
         }
       }
 
       if (btnDirect) {
         btnDirect.disabled = false;
-        btnDirect.innerHTML = '<span>🚀 Записати всі ці зустрічі в основний Google Календар Юлі та клієнта</span>';
+        btnDirect.innerHTML = '<span>🚀 Записати всі ці зустрічі через Google API</span>';
       }
 
       if (successCount > 0) {
-        showToast(`🎉 Успішно записано ${successCount} сесій прямо в основний Google Календар Юлі та клієнта!`);
+        showToast(`🎉 Успішно записано ${successCount} сесій прямо в основний Google Календар!`);
         alert(`✅ Успішно створено ${successCount} зустрічей в основному Google Календарі!\n\nПодії додано в основний календар Юлії (olefirenkou@gmail.com) та надіслано офіційні запрошення на пошту клієнта з автоматичним додаванням у його основний Google Календар.`);
-      } else if (errorCount > 0) {
-        alert('Не вдалося записати автоматично через Google Calendar API. Перевірте Google Client ID або скористайтеся кнопками додавання кожної зустрічі нижче.');
+      } else {
+        if (lastErrorMessage.includes('Google Calendar API has not been used') || lastErrorMessage.includes('is disabled')) {
+          alert(`⚠️ У вашому Google Cloud проекті потрібно увімкнути "Google Calendar API" (робиться 1 раз в 1 клік):\n\n1. Перейдіть за посиланням: https://console.cloud.google.com/apis/library/calendar-json.googleapis.com\n2. Натисніть синю кнопку "ENABLE" ("Увімкнути").\n3. Поверніться сюди і натисніть кнопку запису ще раз.`);
+          window.open('https://console.cloud.google.com/apis/library/calendar-json.googleapis.com', '_blank');
+        } else {
+          alert(`Не вдалося записати через Google API: ${lastErrorMessage}\n\nВи можете скористатися кнопками "➕ Додати в Google" вище для миттєвого збереження кожного сеансу в 1 клік.`);
+        }
       }
     }
 
