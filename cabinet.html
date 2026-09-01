@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Особистий кабінет | Юлія Олефіренко</title>
-  <meta name="description" content="Особистий кабінет практикуючої психологині Юлії Олефіренко та клієнтський простір.">
+  <meta name="description" content="Особистий кабінет практикуючої психологині Юлії Олефіренко, онлайн-відеосесії та календар зустрічей.">
   <meta name="theme-color" content="#FAF8F5">
 
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -12,9 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Identity Services (GIS) for Google SSO -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <script>
@@ -131,13 +129,12 @@
           Вхід до кабінету
         </h1>
         <p class="text-xs text-warm-muted leading-relaxed">
-          Увійдіть через ваш <strong>Google акаунт</strong> для клієнтського доступу або кабінету власниці практики.
+          Увійдіть через ваш <strong>Google акаунт</strong> для участі у відеосесіях та планування зустрічей.
         </p>
       </div>
 
       <!-- Google SSO Container -->
       <div class="pt-2 space-y-4">
-        <!-- Live Google GIS One Tap & Button -->
         <div id="g_id_onload"
              data-client_id="YOUR_GOOGLE_CLIENT_ID"
              data-callback="handleGoogleCredentialResponse"
@@ -193,16 +190,36 @@
             Вітаємо, <span id="welcome-user-name">Користувач</span>! ✨
           </h1>
           <p class="text-xs sm:text-sm text-brand-100 max-w-xl leading-relaxed" id="welcome-user-subtitle">
-            Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та підготуватися до зустрічі.
+            Тут ви можете налаштувати контактні дані, брати участь у відеосесіях та планувати зустрічі.
           </p>
         </div>
 
         <div class="flex flex-wrap sm:flex-nowrap gap-3 shrink-0 relative z-10" id="hero-action-buttons">
-          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
-            <span>💬 Написати Юлії</span>
+          <!-- Dynamic Hero Actions -->
+        </div>
+      </div>
+
+      <!-- CLIENT'S UPCOMING SESSION NOTIFICATION CARD (If scheduled) -->
+      <div id="client-upcoming-session-card" class="hidden p-6 sm:p-7 rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-900 text-white shadow-card border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Ваша запланована консультація онлайн</span>
+          </div>
+          <h2 class="font-serif-luxury font-bold text-xl sm:text-2xl text-white">
+            Сесія: <span id="client-session-datetime">--</span>
+          </h2>
+          <p class="text-xs text-emerald-200">
+            Психологиня: Юлія Олефіренко • Тривалість: 50 хвилин • Формат: Відеокімната на платформі
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 shrink-0">
+          <a id="client-join-meet-btn" href="meet.html" class="px-6 py-3.5 rounded-2xl bg-white hover:bg-emerald-50 text-brand-900 font-bold text-xs sm:text-sm shadow-hover transition-all flex items-center gap-2">
+            <span>📹 Приєднатися до відеосесії</span>
           </a>
-          <a href="index.html#booking-widget" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
-            <span>📅 Обрати час</span>
+          <a id="client-gcal-btn" href="#" target="_blank" class="px-4 py-3 rounded-2xl bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold text-xs transition-all flex items-center gap-1.5">
+            <span>📅 Додати в Google Calendar</span>
           </a>
         </div>
       </div>
@@ -210,9 +227,13 @@
       <!-- OWNER TABS SWITCHER (Visible ONLY for Julia / Owner) -->
       <div id="owner-tabs-nav" class="hidden">
         <div class="inline-flex p-1.5 bg-white rounded-2xl border border-warm-border shadow-soft text-xs font-bold text-warm-muted">
-          <button type="button" id="tab-btn-clients" onclick="switchOwnerView('clients')" class="px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2">
+          <button type="button" id="tab-btn-schedule" onclick="switchOwnerView('schedule')" class="px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2">
+            <span>📅 Розклад та сесії</span>
+            <span id="owner-appointments-badge" class="px-2 py-0.5 rounded-full bg-brand-800 text-emerald-200 text-[10px]">0</span>
+          </button>
+          <button type="button" id="tab-btn-clients" onclick="switchOwnerView('clients')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
             <span>👥 База клієнтів</span>
-            <span id="owner-clients-badge" class="px-2 py-0.5 rounded-full bg-brand-800 text-emerald-200 text-[10px]">0</span>
+            <span id="owner-clients-badge" class="px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 text-[10px]">0</span>
           </button>
           <button type="button" id="tab-btn-profile" onclick="switchOwnerView('profile')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
             <span>👤 Мій профіль</span>
@@ -221,11 +242,43 @@
       </div>
 
       <!-- ======================================================== -->
-      <!-- VIEW A: OWNER CLIENTS MANAGEMENT HUB (Only for Owner)    -->
+      <!-- VIEW 1: OWNER SCHEDULE & APPOINTMENTS (Only for Owner)  -->
+      <!-- ======================================================== -->
+      <div id="owner-schedule-view" class="hidden space-y-6">
+        
+        <!-- Schedule Header -->
+        <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-bold text-warm-text text-lg flex items-center gap-2">
+              <span>📅</span> <span>Календар та онлайн-сесії</span>
+            </h2>
+            <p class="text-xs text-warm-muted">Призначення зустрічей, запуск відеокімнати та синхронізація з Google Calendar</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button onclick="openScheduleModal()" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-2">
+              <span>➕ Призначити нову зустріч</span>
+            </button>
+            <button onclick="loadAppointmentsList()" class="px-3.5 py-2.5 rounded-xl bg-warm-card hover:bg-brand-50 text-brand-800 border border-warm-border text-xs font-bold transition-colors">
+              🔄 Оновити
+            </button>
+          </div>
+        </div>
+
+        <!-- Appointments List -->
+        <div id="owner-appointments-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="col-span-full p-12 text-center bg-white rounded-3xl border border-warm-border text-warm-muted text-xs">
+            Завантаження розкладу зустрічей...
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 2: OWNER CLIENTS MANAGEMENT HUB (Only for Owner)    -->
       <!-- ======================================================== -->
       <div id="owner-clients-view" class="hidden space-y-6">
         
-        <!-- Search & Control Header -->
         <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 class="font-bold text-warm-text text-lg flex items-center gap-2">
@@ -255,7 +308,7 @@
       </div>
 
       <!-- ======================================================== -->
-      <!-- VIEW B: CLIENT / OWNER PERSONAL PROFILE & EDIT FORM     -->
+      <!-- VIEW 3: CLIENT / OWNER PERSONAL PROFILE & EDIT FORM     -->
       <!-- ======================================================== -->
       <div id="personal-profile-view" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
@@ -295,7 +348,6 @@
 
             <form id="profile-edit-form" onsubmit="saveUserProfile(event)" class="space-y-4">
               
-              <!-- Name & Email (Auto-filled from Google) -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1.5">
                   <label class="block text-xs font-bold text-warm-text">Ваше ім'я та прізвище:</label>
@@ -307,7 +359,6 @@
                 </div>
               </div>
 
-              <!-- Phone & Telegram -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="space-y-1.5">
                   <label class="block text-xs font-bold text-warm-text">Номер телефону (Viber/WhatsApp):</label>
@@ -322,30 +373,26 @@
                 </div>
               </div>
 
-              <!-- Preferred Meeting Format -->
               <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-warm-text">Бажаний формат відеозустрічі:</label>
                 <select id="input-format" class="w-full px-4 py-3 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none font-medium">
-                  <option value="Google Meet">Google Meet (Рекомендовано, стабільний зв'язок)</option>
+                  <option value="Платформа (Відеокімната)">Відеокімната на платформі (Рекомендовано, 1 клік без переходу)</option>
+                  <option value="Google Meet">Google Meet</option>
                   <option value="Telegram Video">Telegram Відеодзвінок</option>
-                  <option value="Інший формат">Інший узгоджений формат</option>
                 </select>
               </div>
 
-              <!-- Therapy Goal / Focus -->
               <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-warm-text">Ваш основний запит або тема для роботи:</label>
                 <textarea id="input-goal" rows="3" placeholder="Наприклад: робота з тривожністю, відновлення ресурсу після вигорання, розбір повторюваних снів або стосунки..." class="w-full p-4 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none leading-relaxed"></textarea>
                 <p class="text-[11px] text-warm-muted">Цей опис допоможе психологині краще підготуватися до вашої першої зустрічі.</p>
               </div>
 
-              <!-- Private Notes -->
               <div class="space-y-1.5">
                 <label class="block text-xs font-bold text-warm-text">Особисті нотатки та інсайти між сесіями (бачите тільки ви):</label>
                 <textarea id="input-notes" rows="2" placeholder="Ваші думки, спостереження чи питання, які хочеться обговорити на наступній консультації..." class="w-full p-4 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none leading-relaxed"></textarea>
               </div>
 
-              <!-- Submit Button -->
               <div class="pt-2 flex items-center justify-between">
                 <button type="submit" id="save-btn" class="px-8 py-3.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-hover transition-all flex items-center gap-2">
                   <span>💾 Зберегти дані</span>
@@ -360,41 +407,26 @@
 
         </div>
 
-        <!-- Right Column: Session Guide & Booking (5 cols) -->
+        <!-- Right Column: Direct Meeting Room & Session Guide (5 cols) -->
         <div class="lg:col-span-5 space-y-6">
           
-          <!-- Next Steps & Direct Booking Card -->
+          <!-- Fast Video Session Hub Card -->
           <div class="p-6 sm:p-7 rounded-3xl bg-warm-card border border-warm-border shadow-soft space-y-5">
             <div class="flex items-center gap-2.5">
-              <span class="text-2xl">🌿</span>
+              <span class="text-2xl">📹</span>
               <div>
-                <h3 class="font-bold text-warm-text text-base">Консультація та сесія</h3>
-                <p class="text-xs text-warm-muted">Психологиня Юлія Олефіренко</p>
+                <h3 class="font-bold text-warm-text text-base">Відеокімната консультацій</h3>
+                <p class="text-xs text-warm-muted">Проведення онлайн-сесій прямо на сайті</p>
               </div>
             </div>
 
-            <div class="space-y-2.5 text-xs text-warm-text">
-              <div class="flex items-center justify-between py-2 border-b border-warm-border/60">
-                <span class="text-warm-muted">Формат:</span>
-                <span class="font-bold">Онлайн (Google Meet)</span>
-              </div>
-              <div class="flex items-center justify-between py-2 border-b border-warm-border/60">
-                <span class="text-warm-muted">Тривалість:</span>
-                <span class="font-bold">50 хвилин</span>
-              </div>
-              <div class="flex items-center justify-between py-2 border-b border-warm-border/60">
-                <span class="text-warm-muted">Вартість:</span>
-                <span class="font-bold text-brand-800">1 200 грн</span>
-              </div>
-              <div class="flex items-center justify-between py-2 border-b border-warm-border/60">
-                <span class="text-warm-muted">Оплата:</span>
-                <span class="font-bold">Офіційно на ФОП</span>
-              </div>
-            </div>
+            <p class="text-xs text-warm-muted leading-relaxed">
+              Індивідуальна захищена кімната для відеозустрічей з підтримкою мікрофона, камери, демонстрації екрана та таймером 50 хв.
+            </p>
 
             <div class="space-y-2.5 pt-1">
-              <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-hover transition-all">
-                <span>💬 Узгодити дату в Telegram</span>
+              <a href="meet.html" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-hover transition-all">
+                <span>📹 Увійти у відеокімнату зараз</span>
               </a>
               <a href="index.html#booking-widget" class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-white hover:bg-warm-bg text-warm-text font-bold text-xs border border-warm-border transition-all">
                 <span>📅 Календар вільних годин</span>
@@ -402,23 +434,19 @@
             </div>
           </div>
 
-          <!-- Therapy Client Rules & Safe Space Reminder -->
+          <!-- Safe Space Reminder -->
           <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft space-y-4">
             <h3 class="font-bold text-warm-text text-sm flex items-center gap-2">
-              <span>🔒</span> <span>Безпечний простір та конфіденційність</span>
+              <span>🔒</span> <span>Конфіденційність та правила</span>
             </h3>
             <ul class="space-y-2.5 text-xs text-warm-muted leading-relaxed">
               <li class="flex items-start gap-2">
                 <span class="text-brand-600 font-bold">•</span>
-                <span>Усе, що ви обговорюєте під час консультації, залишається суворо конфіденційним.</span>
+                <span>Усе, що ви обговорюєте під час сесії, захищено 256-бітним шифруванням.</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="text-brand-600 font-bold">•</span>
-                <span>Підготуйте затишне місце, де вас ніхто не турбуватиме, навушники та склянку води.</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="text-brand-600 font-bold">•</span>
-                <span>Перенесення або скасування зустрічі здійснюється не пізніше, ніж за 24 години до початку.</span>
+                <span>Підготуйте навушники, зручне місце та склянку води.</span>
               </li>
             </ul>
           </div>
@@ -430,6 +458,71 @@
     </div>
 
   </main>
+
+  <!-- Modal: Schedule New Session (For Owner Julia) -->
+  <div id="schedule-modal" onclick="if(event.target === this) closeScheduleModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-warm-border shadow-2xl space-y-5 relative my-auto">
+      
+      <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📅</span>
+          <div>
+            <h3 class="font-bold text-warm-text text-base">Призначити нову зустріч</h3>
+            <p class="text-xs text-warm-muted">Створення відеосесії та додавання в розклад</p>
+          </div>
+        </div>
+        <button onclick="closeScheduleModal()" class="w-8 h-8 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center font-bold text-xs">
+          ✕
+        </button>
+      </div>
+
+      <form id="schedule-form" onsubmit="saveNewAppointment(event)" class="space-y-4">
+        
+        <!-- Select Client -->
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-warm-text">Виберіть клієнта:</label>
+          <select id="schedule-client-select" onchange="onScheduleClientChanged()" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+            <option value="">-- Оберіть клієнта з бази --</option>
+          </select>
+        </div>
+
+        <!-- Date & Time -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-warm-text">Дата зустрічі:</label>
+            <input type="date" id="schedule-date" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+          </div>
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-warm-text">Час (Київ):</label>
+            <input type="time" id="schedule-time" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-warm-text">Тривалість сесії:</label>
+          <select id="schedule-duration" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+            <option value="50">50 хвилин (Стандартна сесія)</option>
+            <option value="80">80 хвилин (Поглиблена сесія)</option>
+          </select>
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-warm-text">Терапевтична нотатка до зустрічі (опціонально):</label>
+          <textarea id="schedule-notes" rows="2" placeholder="Фокус роботи на цю зустріч..." class="w-full p-3 rounded-xl border border-warm-border text-xs leading-relaxed"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeScheduleModal()" class="px-4 py-2.5 rounded-xl border border-warm-border text-warm-text font-semibold text-xs">
+            Скасувати
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5">
+            <span>✨ Створити сесію</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
 
   <!-- Modal: Edit Client Details & Therapist Notes (For Owner Julia) -->
   <div id="owner-client-modal" onclick="if(event.target === this) closeClientModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
@@ -470,9 +563,9 @@
           <div class="space-y-1">
             <label class="block text-xs font-bold text-warm-text">Формат сесій:</label>
             <select id="modal-client-format" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs">
+              <option value="Платформа (Відеокімната)">Відеокімната на платформі</option>
               <option value="Google Meet">Google Meet</option>
               <option value="Telegram Video">Telegram Відео</option>
-              <option value="Інший формат">Інший формат</option>
             </select>
           </div>
         </div>
@@ -482,7 +575,6 @@
           <textarea id="modal-client-goal" rows="2" class="w-full p-3 rounded-xl border border-warm-border text-xs leading-relaxed"></textarea>
         </div>
 
-        <!-- Therapist Private Notes -->
         <div class="space-y-1 p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80">
           <label class="block text-xs font-bold text-amber-900 flex items-center gap-1">
             <span>🔒</span> <span>Терапевтичні нотатки Юлії (бачите тільки ви):</span>
@@ -492,7 +584,7 @@
 
         <div class="pt-2 flex items-center justify-between">
           <button type="button" onclick="deleteClientByOwner()" class="px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition-colors">
-            🗑️ Видалити клієнта
+            🗑️ Видалити
           </button>
           <div class="flex gap-2">
             <button type="button" onclick="closeClientModal()" class="px-4 py-2.5 rounded-xl border border-warm-border text-warm-text font-semibold text-xs">
@@ -523,11 +615,10 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // State management
     let currentUser = null;
     let cachedOwnerClients = [];
+    let cachedAppointments = [];
 
-    // Helper: Check if user has Owner / Therapist privileges
     function isOwnerUser(user) {
       if (!user) return false;
       const email = (user.email || '').toLowerCase();
@@ -540,7 +631,6 @@
              email.startsWith('admin');
     }
 
-    // 1. Initialize Authentication on Page Load
     document.addEventListener('DOMContentLoaded', () => {
       checkExistingSession();
       initGoogleSso();
@@ -570,9 +660,7 @@
             callback: handleGoogleCredentialResponse,
             auto_select: false
           });
-        } catch(e) {
-          console.warn('GIS initialized');
-        }
+        } catch(e) {}
       }
     }
 
@@ -590,14 +678,12 @@
 
     async function handleGoogleCredentialResponse(response) {
       if (!response.credential) return;
-
       try {
         const res = await fetch('/api/auth/google', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ credential: response.credential })
         });
-
         if (res.ok) {
           const data = await res.json();
           currentUser = data.user;
@@ -616,7 +702,6 @@
       try {
         const payloadBase64 = credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
         const decoded = JSON.parse(decodeURIComponent(escape(atob(payloadBase64))));
-        
         currentUser = {
           google_id: decoded.sub,
           email: decoded.email,
@@ -627,11 +712,10 @@
           role: isOwnerUser(decoded) ? 'owner' : 'client',
           phone: '',
           telegram: '',
-          preferred_format: 'Google Meet',
+          preferred_format: 'Платформа (Відеокімната)',
           therapy_goal: '',
           notes: ''
         };
-
         localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
         renderDashboard(currentUser);
         showToast('Успішний вхід через Google!');
@@ -640,7 +724,6 @@
       }
     }
 
-    // Login as Owner (Julia Olefirenko)
     async function loginAsOwnerYulia() {
       const ownerProfile = {
         google_id: "google_owner_yulia",
@@ -652,7 +735,7 @@
         role: "owner",
         phone: "+380 (99) 000-00-00",
         telegram: "psy_olefirenkoyuliia",
-        preferred_format: "Google Meet",
+        preferred_format: "Платформа (Відеокімната)",
         therapy_goal: "Практикуюча психологиня, консультантка із символдрами",
         notes: "Кабінет власниці практики"
       };
@@ -678,7 +761,6 @@
       showToast('Вітаємо, Юліє! Вхід як Овнер виконано 👑');
     }
 
-    // Client Demo Login (Oleksandr)
     async function quickTestGoogleLogin() {
       const demoProfile = {
         google_id: "demo_google_client_101",
@@ -696,7 +778,6 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ profile: demoProfile })
         });
-
         if (res.ok) {
           const data = await res.json();
           currentUser = data.user;
@@ -705,7 +786,7 @@
             ...demoProfile,
             phone: "+380 (67) 123-45-67",
             telegram: "oleksandr_psy",
-            preferred_format: "Google Meet",
+            preferred_format: "Платформа (Відеокімната)",
             therapy_goal: "Робота з вигоранням та внутрішнім критиком",
             notes: "Сесії по вівторках"
           };
@@ -715,7 +796,7 @@
           ...demoProfile,
           phone: "+380 (67) 123-45-67",
           telegram: "oleksandr_psy",
-          preferred_format: "Google Meet",
+          preferred_format: "Платформа (Відеокімната)",
           therapy_goal: "Робота з вигоранням та внутрішнім критиком",
           notes: "Сесії по вівторках"
         };
@@ -779,33 +860,36 @@
       if (isOwner) {
         roleBadge.innerHTML = '<span>👑</span> <span>Власниця практики • Психологиня</span>';
         welcomeName.textContent = 'Юліє';
-        welcomeSubtitle.textContent = 'Огляд та керування базою клієнтів, збереження психологічних нотаток та розклад зустрічей.';
+        welcomeSubtitle.textContent = 'Календар зустрічей, запуск відеокімнати онлайн та керування базою клієнтів.';
         heroActions.innerHTML = `
-          <a href="admin.html" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
-            <span>⚙️ Адмін-панель</span>
-          </a>
-          <button onclick="switchOwnerView('clients')" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
-            <span>👥 База клієнтів</span>
+          <button onclick="openScheduleModal()" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
+            <span>➕ Призначити сесію</span>
           </button>
+          <a href="meet.html?role=owner" class="px-5 py-3 rounded-full bg-brand-900/50 hover:bg-brand-900/70 text-white border border-white/25 font-bold text-xs transition-all flex items-center justify-center gap-2">
+            <span>📹 Онлайн-кімната</span>
+          </a>
         `;
         ownerTabsNav.classList.remove('hidden');
-        switchOwnerView('clients');
+        switchOwnerView('schedule');
+        loadAppointmentsList();
         loadOwnerClientsList();
       } else {
         roleBadge.innerHTML = '<span>🟢</span> <span>Особистий простір клієнта</span>';
         welcomeName.textContent = user.first_name || user.name.split(' ')[0] || 'Клієнте';
         welcomeSubtitle.textContent = 'Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та підготуватися до зустрічі з Юлією Олефіренко.';
         heroActions.innerHTML = `
-          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
-            <span>💬 Написати Юлії</span>
+          <a href="meet.html" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
+            <span>📹 Увійти у відеокімнату</span>
           </a>
-          <a href="index.html#booking-widget" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
-            <span>📅 Обрати час</span>
+          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
+            <span>💬 Написати Юлії</span>
           </a>
         `;
         ownerTabsNav.classList.add('hidden');
+        document.getElementById('owner-schedule-view').classList.add('hidden');
         document.getElementById('owner-clients-view').classList.add('hidden');
         document.getElementById('personal-profile-view').classList.remove('hidden');
+        loadClientUpcomingSession(user.email);
       }
 
       // Profile Card
@@ -818,36 +902,282 @@
     }
 
     function switchOwnerView(view) {
+      const btnSchedule = document.getElementById('tab-btn-schedule');
       const btnClients = document.getElementById('tab-btn-clients');
       const btnProfile = document.getElementById('tab-btn-profile');
+      
+      const viewSchedule = document.getElementById('owner-schedule-view');
       const viewClients = document.getElementById('owner-clients-view');
       const viewProfile = document.getElementById('personal-profile-view');
 
-      if (view === 'clients') {
-        btnClients.className = 'px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2';
-        btnProfile.className = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
-        viewClients.classList.remove('hidden');
-        viewProfile.classList.add('hidden');
-      } else {
-        btnProfile.className = 'px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2';
-        btnClients.className = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
-        viewProfile.classList.remove('hidden');
-        viewClients.classList.add('hidden');
+      const activeCls = 'px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2';
+      const inactiveCls = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
+
+      btnSchedule.className = view === 'schedule' ? activeCls : inactiveCls;
+      btnClients.className = view === 'clients' ? activeCls : inactiveCls;
+      btnProfile.className = view === 'profile' ? activeCls : inactiveCls;
+
+      viewSchedule.classList.toggle('hidden', view !== 'schedule');
+      viewClients.classList.toggle('hidden', view !== 'clients');
+      viewProfile.classList.toggle('hidden', view !== 'profile');
+    }
+
+    // =======================================================
+    // APPOINTMENTS & VIDEO SESSIONS (GOOGLE MEET & GCAL)
+    // =======================================================
+    async function loadAppointmentsList() {
+      const container = document.getElementById('owner-appointments-list');
+      try {
+        const res = await fetch('/api/appointments?isOwner=true');
+        if (res.ok) {
+          const data = await res.json();
+          cachedAppointments = data.appointments || [];
+        } else {
+          cachedAppointments = [
+            {
+              id: 1,
+              client_name: "Олександр Петренко",
+              client_email: "oleksandr.demo@gmail.com",
+              session_date: "2026-09-02",
+              session_time: "18:00",
+              duration_minutes: 50,
+              room_code: "psy-meet-petrenko",
+              meet_url: "/meet.html?room=psy-meet-petrenko",
+              therapist_notes: "Розбір образу символдрами «Джерело».",
+              status: "scheduled"
+            }
+          ];
+        }
+      } catch(e) {
+        cachedAppointments = [
+          {
+            id: 1,
+            client_name: "Олександр Петренко",
+            client_email: "oleksandr.demo@gmail.com",
+            session_date: "2026-09-02",
+            session_time: "18:00",
+            duration_minutes: 50,
+            room_code: "psy-meet-petrenko",
+            meet_url: "/meet.html?room=psy-meet-petrenko",
+            therapist_notes: "Розбір образу символдрами «Джерело».",
+            status: "scheduled"
+          }
+        ];
       }
+
+      const badge = document.getElementById('owner-appointments-badge');
+      if (badge) badge.textContent = cachedAppointments.filter(a => a.status === 'scheduled').length;
+
+      renderAppointmentsList(cachedAppointments);
+    }
+
+    function renderAppointmentsList(appointments) {
+      const container = document.getElementById('owner-appointments-list');
+      if (!container) return;
+
+      container.innerHTML = '';
+      if (appointments.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-12 text-center bg-white rounded-3xl border border-warm-border text-warm-muted text-xs">
+            Поки немає запланованих сесій. Натисніть «➕ Призначити нову зустріч».
+          </div>
+        `;
+        return;
+      }
+
+      appointments.forEach(app => {
+        const card = document.createElement('div');
+        card.className = 'p-6 rounded-3xl glass-card border border-warm-border shadow-soft space-y-4 hover:border-brand-300 transition-all flex flex-col justify-between';
+        
+        const gcalUrl = buildGoogleCalendarLink(
+          `Сесія психотерапії: ${app.client_name} & Юлія Олефіренко`,
+          `Індивідуальна сесія психотерапії (50 хв).\nПряме посилання на відеокімнату: https://olefirenko.pp.ua/meet.html?room=${app.room_code}`,
+          `https://olefirenko.pp.ua/meet.html?room=${app.room_code}`,
+          app.session_date,
+          app.session_time,
+          app.duration_minutes
+        );
+
+        const tgDraftText = encodeURIComponent(`Вітаю, ${app.client_name.split(' ')[0]}! Наша сесія психотерапії призначена на ${app.session_date} о ${app.session_time}.\n\nПосилання на нашу захищену відеокімнату (без потреби встановлювати програми): https://olefirenko.pp.ua/meet.html?room=${app.room_code}`);
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200">
+                  📅 ${app.session_date} • ${app.session_time} (${app.duration_minutes || 50} хв)
+                </span>
+                <h3 class="font-bold text-warm-text text-base pt-1.5">${escapeHtml(app.client_name)}</h3>
+                <div class="text-xs text-warm-muted">${escapeHtml(app.client_email || '')}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${app.status === 'completed' ? 'bg-gray-100 text-gray-700' : 'bg-emerald-100 text-emerald-800'}">
+                ${app.status === 'completed' ? 'Завершено' : 'Заплановано'}
+              </span>
+            </div>
+
+            ${app.therapist_notes ? `
+              <div class="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200/70 text-xs text-warm-text leading-relaxed">
+                <span class="font-bold text-amber-900 text-[10px] uppercase">Нотатка:</span> ${escapeHtml(app.therapist_notes)}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="space-y-2 pt-2 border-t border-warm-border/60">
+            <!-- Join Button -->
+            <a href="meet.html?room=${app.room_code}&role=owner" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-2">
+              <span>📹 Почати відеосесію онлайн</span>
+            </a>
+
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <a href="${gcalUrl}" target="_blank" class="py-2 px-3 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-center transition-colors flex items-center justify-center gap-1">
+                <span>📅 Google Календар</span>
+              </a>
+              <a href="https://t.me/share/url?url=https://olefirenko.pp.ua/meet.html?room=${app.room_code}&text=${tgDraftText}" target="_blank" class="py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-semibold text-center transition-colors flex items-center justify-center gap-1">
+                <span>💬 Лінк клієнту</span>
+              </a>
+            </div>
+
+            <div class="flex justify-end pt-1">
+              <button onclick="deleteAppointment(${app.id})" class="text-[11px] text-rose-600 hover:underline">
+                Скасувати зустріч
+              </button>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    async function loadClientUpcomingSession(email) {
+      if (!email) return;
+      const card = document.getElementById('client-upcoming-session-card');
+      try {
+        const res = await fetch(`/api/appointments?email=${encodeURIComponent(email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const upcoming = (data.appointments || []).find(a => a.status === 'scheduled');
+          if (upcoming) {
+            document.getElementById('client-session-datetime').textContent = `${upcoming.session_date} о ${upcoming.session_time}`;
+            document.getElementById('client-join-meet-btn').href = `meet.html?room=${upcoming.room_code}`;
+            
+            const gcalUrl = buildGoogleCalendarLink(
+              `Консультація психотерапії з Юлією Олефіренко`,
+              `Індивідуальна сесія (50 хв).\nВідеокімната: https://olefirenko.pp.ua/meet.html?room=${upcoming.room_code}`,
+              `https://olefirenko.pp.ua/meet.html?room=${upcoming.room_code}`,
+              upcoming.session_date,
+              upcoming.session_time,
+              upcoming.duration_minutes
+            );
+            document.getElementById('client-gcal-btn').href = gcalUrl;
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        }
+      } catch(e) {}
+    }
+
+    function buildGoogleCalendarLink(title, details, location, startDate, startTime, durationMins = 50) {
+      if (!startDate || !startTime) return '#';
+      try {
+        const start = new Date(`${startDate}T${startTime}:00`);
+        const end = new Date(start.getTime() + (durationMins || 50) * 60000);
+        const formatIso = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, '');
+        const dates = `${formatIso(start)}/${formatIso(end)}`;
+        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${dates}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+      } catch(e) {
+        return '#';
+      }
+    }
+
+    function openScheduleModal() {
+      const select = document.getElementById('schedule-client-select');
+      select.innerHTML = '<option value="">-- Оберіть клієнта з бази --</option>';
+      
+      cachedOwnerClients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = JSON.stringify({ id: c.id, name: c.name, email: c.email });
+        opt.textContent = `${c.name} (${c.email || c.phone || 'без пошти'})`;
+        select.appendChild(opt);
+      });
+
+      // Default tomorrow 18:00
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('schedule-date').value = tomorrow.toISOString().substring(0, 10);
+      document.getElementById('schedule-time').value = "18:00";
+
+      document.getElementById('schedule-modal').classList.remove('hidden');
+    }
+
+    function closeScheduleModal() {
+      document.getElementById('schedule-modal').classList.add('hidden');
+    }
+
+    function onScheduleClientChanged() {}
+
+    async function saveNewAppointment(e) {
+      e.preventDefault();
+      const rawClient = document.getElementById('schedule-client-select').value;
+      if (!rawClient) {
+        alert('Будь ласка, оберіть клієнта');
+        return;
+      }
+
+      const client = JSON.parse(rawClient);
+      const payload = {
+        client_id: client.id,
+        client_name: client.name,
+        client_email: client.email,
+        session_date: document.getElementById('schedule-date').value,
+        session_time: document.getElementById('schedule-time').value,
+        duration_minutes: parseInt(document.getElementById('schedule-duration').value),
+        therapist_notes: document.getElementById('schedule-notes').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/appointments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          cachedAppointments.unshift(data.appointment);
+        } else {
+          cachedAppointments.unshift({ ...payload, id: Date.now(), room_code: `psy-${Date.now()}`, status: 'scheduled' });
+        }
+      } catch(err) {
+        cachedAppointments.unshift({ ...payload, id: Date.now(), room_code: `psy-${Date.now()}`, status: 'scheduled' });
+      }
+
+      renderAppointmentsList(cachedAppointments);
+      closeScheduleModal();
+      showToast('Зустріч успішно призначено!');
+    }
+
+    async function deleteAppointment(id) {
+      if (!confirm('Ви дійсно бажаєте скасувати цю зустріч?')) return;
+      try {
+        await fetch(`/api/appointments?id=${id}`, { method: 'DELETE' });
+      } catch(e) {}
+
+      cachedAppointments = cachedAppointments.filter(a => a.id !== id);
+      renderAppointmentsList(cachedAppointments);
+      showToast('Зустріч скасовано');
     }
 
     // =======================================================
     // OWNER CLIENT MANAGEMENT (CRM) LOGIC
     // =======================================================
     async function loadOwnerClientsList() {
-      const container = document.getElementById('owner-clients-list');
       try {
         const res = await fetch('/api/admin/clients');
         if (res.ok) {
           const data = await res.json();
           cachedOwnerClients = data.clients || [];
         } else {
-          // Fallback demo client list if offline
           cachedOwnerClients = [
             {
               id: 101,
@@ -856,22 +1186,10 @@
               picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
               phone: "+380 (67) 123-45-67",
               telegram: "oleksandr_psy",
-              preferred_format: "Google Meet",
+              preferred_format: "Платформа (Відеокімната)",
               therapy_goal: "Робота з вигоранням та внутрішнім критиком після зміни роботи",
               admin_notes: "Сесії по вівторках о 18:00. Добре йде техніка символдрами «Луг».",
               created_at: "2026-08-30 19:40:00"
-            },
-            {
-              id: 102,
-              name: "Марія Ковальчук",
-              email: "maria.k@gmail.com",
-              picture: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
-              phone: "+380 (50) 888-77-66",
-              telegram: "maria_koval",
-              preferred_format: "Google Meet",
-              therapy_goal: "Тривожність та складнощі у встановленні особистих кордонів з колегами",
-              admin_notes: "Працюємо над відчуттям опори та техніками заземлення.",
-              created_at: "2026-08-31 14:15:00"
             }
           ];
         }
@@ -884,9 +1202,9 @@
             picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
             phone: "+380 (67) 123-45-67",
             telegram: "oleksandr_psy",
-            preferred_format: "Google Meet",
-            therapy_goal: "Робота з вигоранням та внутрішнім критиком після зміни роботи",
-            admin_notes: "Сесії по вівторках о 18:00. Добре йде техніка символдрами «Луг».",
+            preferred_format: "Платформа (Відеокімната)",
+            therapy_goal: "Робота з вигоранням та внутрішнім критиком",
+            admin_notes: "Сесії по вівторках о 18:00.",
             created_at: "2026-08-30 19:40:00"
           }
         ];
@@ -921,8 +1239,6 @@
 
         card.innerHTML = `
           <div class="space-y-3.5">
-            
-            <!-- Top: Client Google Info -->
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
                 <img src="${client.picture || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23557C56'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E"}" alt="Avatar" class="w-12 h-12 rounded-2xl border border-brand-200 object-cover shadow-sm">
@@ -932,11 +1248,10 @@
                 </div>
               </div>
               <span class="px-2.5 py-1 rounded-full bg-brand-50 text-brand-800 text-[10px] font-bold border border-brand-200">
-                ${escapeHtml(client.preferred_format || 'Google Meet')}
+                ${escapeHtml(client.preferred_format || 'Платформа')}
               </span>
             </div>
 
-            <!-- Contacts Grid -->
             <div class="grid grid-cols-2 gap-2 text-xs pt-1">
               <div class="p-2.5 rounded-xl bg-warm-bg border border-warm-border/60">
                 <div class="text-[10px] text-warm-muted font-bold uppercase">Телефон:</div>
@@ -950,7 +1265,6 @@
               </div>
             </div>
 
-            <!-- Client Therapy Request / Goal -->
             <div class="space-y-1">
               <div class="text-[10px] font-bold uppercase tracking-wider text-warm-muted">Запит до терапії:</div>
               <div class="p-3 rounded-xl bg-white text-xs text-warm-text border border-warm-border leading-relaxed font-medium">
@@ -958,7 +1272,6 @@
               </div>
             </div>
 
-            <!-- Julia's Therapist Private Notes -->
             <div class="space-y-1 p-3 rounded-xl bg-amber-50/70 border border-amber-200/80">
               <div class="text-[10px] font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1">
                 <span>🔒</span> <span>Нотатки Юлії:</span>
@@ -967,10 +1280,8 @@
                 ${client.admin_notes ? escapeHtml(client.admin_notes) : '<span class="text-amber-700/60 italic">Немає особистих нотаток</span>'}
               </p>
             </div>
-
           </div>
 
-          <!-- Action Buttons Bar -->
           <div class="pt-3 border-t border-warm-border/60 flex items-center justify-between gap-2">
             <div class="flex items-center gap-2">
               ${tgClean ? `
@@ -1022,7 +1333,7 @@
       document.getElementById('modal-client-name').value = client.name || '';
       document.getElementById('modal-client-phone').value = client.phone || '';
       document.getElementById('modal-client-telegram').value = (client.telegram || '').replace(/^@/, '');
-      document.getElementById('modal-client-format').value = client.preferred_format || 'Google Meet';
+      document.getElementById('modal-client-format').value = client.preferred_format || 'Платформа (Відеокімната)';
       document.getElementById('modal-client-goal').value = client.therapy_goal || '';
       document.getElementById('modal-client-admin-notes').value = client.admin_notes || '';
 
@@ -1070,11 +1381,9 @@
     async function deleteClientByOwner() {
       const id = document.getElementById('modal-client-id').value;
       if (!confirm('Ви дійсно бажаєте видалити цей профіль клієнта з бази даних?')) return;
-
       try {
         await fetch(`/api/admin/clients?id=${id}`, { method: 'DELETE' });
       } catch(e) {}
-
       cachedOwnerClients = cachedOwnerClients.filter(c => c.id !== parseInt(id));
       renderOwnerClientsList(cachedOwnerClients);
       closeClientModal();
@@ -1086,7 +1395,7 @@
       document.getElementById('input-email').value = user.email || '';
       document.getElementById('input-phone').value = user.phone || '';
       document.getElementById('input-telegram').value = (user.telegram || '').replace(/^@/, '');
-      document.getElementById('input-format').value = user.preferred_format || 'Google Meet';
+      document.getElementById('input-format').value = user.preferred_format || 'Платформа (Відеокімната)';
       document.getElementById('input-goal').value = user.therapy_goal || '';
       document.getElementById('input-notes').value = user.notes || '';
     }

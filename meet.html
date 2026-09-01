@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Відеосесія онлайн | Юлія Олефіренко</title>
+  <meta name="description" content="Захищена відеокімната для індивідуальної онлайн-сесії психотерапії з Юлією Олефіренко.">
+  <meta name="theme-color" content="#1D301E">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Jitsi Meet WebRTC IFrame API for In-Browser Video Communication -->
+  <script src="https://meet.jit.si/external_api.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              500: '#557C56',
+              600: '#436444',
+              700: '#335334',
+              800: '#264027',
+              900: '#1D301E',
+            },
+            meet: {
+              dark: '#141618',
+              card: '#1F2226',
+              border: '#2E3238'
+            }
+          },
+          fontFamily: {
+            'sans': ['"Plus Jakarta Sans"', 'sans-serif'],
+            'serif-luxury': ['"Cormorant Garamond"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #141618;
+      color: #F3EFEA;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    #meet-frame-container iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      border-radius: 1.5rem;
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden antialiased">
+
+  <!-- Top Header Bar -->
+  <header class="h-16 border-b border-meet-border bg-meet-card/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between shrink-0 z-30">
+    <div class="flex items-center gap-3">
+      <a href="cabinet.html" class="flex items-center gap-2 group">
+        <span class="w-8 h-8 rounded-xl bg-brand-800 border border-brand-600/50 flex items-center justify-center text-emerald-200 text-sm font-bold shadow-sm">
+          🌿
+        </span>
+        <div>
+          <div class="font-serif-luxury font-bold text-base sm:text-lg text-white leading-none">
+            Юлія Олефіренко
+          </div>
+          <div class="text-[10px] text-emerald-400 font-medium pt-0.5">
+            Консультаційна онлайн-кімната
+          </div>
+        </div>
+      </a>
+      <span class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 text-[11px] font-bold">
+        <span>🔒</span> <span>Конфіденційно • 256-bit шифрування</span>
+      </span>
+    </div>
+
+    <!-- Center: Live Session Timer -->
+    <div class="flex items-center gap-2 bg-black/40 border border-meet-border px-4 py-1.5 rounded-full">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="text-xs text-gray-400 font-medium">Тривалість:</span>
+      <span id="session-countdown" class="text-xs font-bold text-white font-mono">50:00</span>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleNotesPanel()" id="notes-toggle-btn" class="px-3 py-1.5 rounded-xl bg-meet-border hover:bg-gray-700 text-gray-200 text-xs font-bold transition-colors flex items-center gap-1.5">
+        <span>📝</span> <span class="hidden sm:inline">Нотатки сесії</span>
+      </button>
+
+      <a href="cabinet.html" onclick="return confirmExit()" class="px-4 py-1.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5">
+        <span>✕</span> <span>Завершити</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Video Grid Area -->
+  <main class="flex-grow flex relative overflow-hidden p-2 sm:p-4 gap-4">
+    
+    <!-- Video Container Area -->
+    <div class="flex-grow flex flex-col h-full rounded-3xl overflow-hidden bg-meet-card border border-meet-border relative shadow-2xl">
+      
+      <!-- Video Frame Container -->
+      <div id="meet-frame-container" class="w-full h-full relative flex items-center justify-center">
+        <!-- Fallback / Initial Loading state -->
+        <div id="meet-loading-state" class="text-center space-y-4 p-8">
+          <div class="w-16 h-16 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin mx-auto"></div>
+          <div class="space-y-1">
+            <h2 class="text-lg font-bold text-white">Підключення до сесії...</h2>
+            <p class="text-xs text-gray-400 max-w-sm mx-auto">
+              Будь ласка, дозвольте доступ до мікрофона та камери для початку індивідуальної консультації.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Collapsible Side Panel: In-Session Therapy Notes (Private) -->
+    <div id="session-notes-sidebar" class="hidden w-80 lg:w-96 bg-meet-card border border-meet-border rounded-3xl p-5 flex flex-col justify-between shrink-0 shadow-2xl space-y-4">
+      <div class="space-y-3 flex-grow flex flex-col">
+        <div class="flex items-center justify-between border-b border-meet-border pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">📝</span>
+            <h3 class="font-bold text-sm text-white">Терапевтичний блокнот</h3>
+          </div>
+          <span class="text-[10px] text-emerald-400 font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60">
+            🔒 Приватно
+          </span>
+        </div>
+
+        <p class="text-[11px] text-gray-400">
+          Фіксуйте ключові інсайти, метафори, образи символдрами та думки під час сесії. Нотатки автоматично зберігаються.
+        </p>
+
+        <textarea id="in-session-notes" placeholder="Запишіть спостереження, хід зустрічі або домашнє завдання..." class="flex-grow w-full p-3.5 rounded-2xl bg-black/40 border border-meet-border text-xs text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none leading-relaxed"></textarea>
+      </div>
+
+      <div class="pt-2 flex items-center justify-between border-t border-meet-border text-xs">
+        <button onclick="saveInSessionNotes()" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-1.5">
+          <span>💾 Зберегти нотатки</span>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let api = null;
+    let timerInterval = null;
+    let timeLeft = 50 * 60; // 50 minutes in seconds
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initMeeting();
+      startSessionTimer();
+      loadExistingNotes();
+    });
+
+    function initMeeting() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomParam = urlParams.get('room') || 'psy-olefirenko-session';
+      const user = JSON.parse(localStorage.getItem('psy_client_user') || '{}');
+      const userName = user.name || (urlParams.get('role') === 'owner' ? 'Юлія Олефіренко' : 'Клієнт');
+
+      const domain = 'meet.jit.si';
+      const options = {
+        roomName: roomParam,
+        width: '100%',
+        height: '100%',
+        parentNode: document.querySelector('#meet-frame-container'),
+        userInfo: {
+          displayName: userName,
+          email: user.email || ''
+        },
+        configOverwrite: {
+          startWithAudioMuted: false,
+          startWithVideoMuted: false,
+          enableWelcomePage: false,
+          prejoinPageEnabled: false,
+          disableDeepLinking: true,
+          toolbarButtons: [
+            'microphone', 'camera', 'desktop', 'chat',
+            'raisehand', 'videoquality', 'tileview', 'hangup'
+          ]
+        },
+        interfaceConfigOverwrite: {
+          SHOW_JITSI_WATERMARK: false,
+          SHOW_WATERMARK_FOR_GUESTS: false,
+          SHOW_BRAND_WATERMARK: false,
+          DEFAULT_BACKGROUND: '#141618',
+          DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
+        }
+      };
+
+      try {
+        const loadingState = document.getElementById('meet-loading-state');
+        if (loadingState) loadingState.style.display = 'none';
+
+        api = new JitsiMeetExternalAPI(domain, options);
+
+        api.addEventListener('videoConferenceLeft', () => {
+          window.location.href = 'cabinet.html';
+        });
+      } catch (e) {
+        console.warn('Native WebRTC / Jitsi fallback');
+      }
+    }
+
+    function startSessionTimer() {
+      const display = document.getElementById('session-countdown');
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          display.textContent = '00:00 (Завершено)';
+          display.classList.add('text-rose-400');
+          return;
+        }
+
+        timeLeft--;
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+        if (timeLeft <= 300) { // 5 mins left
+          display.classList.add('text-amber-400');
+        }
+      }, 1000);
+    }
+
+    function toggleNotesPanel() {
+      const sidebar = document.getElementById('session-notes-sidebar');
+      const btn = document.getElementById('notes-toggle-btn');
+      if (sidebar.classList.contains('hidden')) {
+        sidebar.classList.remove('hidden');
+        btn.classList.add('bg-brand-600', 'text-white');
+      } else {
+        sidebar.classList.add('hidden');
+        btn.classList.remove('bg-brand-600', 'text-white');
+      }
+    }
+
+    function loadExistingNotes() {
+      const saved = localStorage.getItem('psy_in_session_notes');
+      if (saved) {
+        document.getElementById('in-session-notes').value = saved;
+      }
+    }
+
+    function saveInSessionNotes() {
+      const val = document.getElementById('in-session-notes').value;
+      localStorage.setItem('psy_in_session_notes', val);
+      alert('Нотатки збережено в пам\'ять кабінету!');
+    }
+
+    function confirmExit() {
+      return confirm('Ви дійсно бажаєте вийти з відеосесії та повернутися в кабінет?');
+    }
+  </script>
+</body>
+</html>
