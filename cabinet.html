@@ -500,6 +500,28 @@
           </select>
         </div>
 
+        <!-- Meeting Format Selection -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-warm-text">Формат зустрічі:</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label class="flex items-center gap-2.5 p-3 rounded-2xl border border-emerald-500/60 bg-emerald-50/60 cursor-pointer text-xs font-bold text-brand-900 transition-all" id="format-label-gmeet">
+              <input type="radio" name="schedule_meet_format" value="google_meet" checked onchange="toggleScheduleMeetFormat()" class="text-brand-600 focus:ring-brand-500">
+              <span>🌐 Google Meet (Основний)</span>
+            </label>
+            <label class="flex items-center gap-2.5 p-3 rounded-2xl border border-warm-border bg-white cursor-pointer text-xs font-semibold text-warm-text hover:bg-warm-bg transition-all" id="format-label-webrtc">
+              <input type="radio" name="schedule_meet_format" value="webrtc" onchange="toggleScheduleMeetFormat()" class="text-brand-600 focus:ring-brand-500">
+              <span>🌿 Відеокімната сайту</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Google Meet URL Field -->
+        <div id="schedule-gmeet-url-box" class="space-y-1">
+          <label class="block text-xs font-bold text-warm-text">Посилання на Google Meet:</label>
+          <input type="url" id="schedule-gmeet-url" placeholder="https://meet.google.com/xxx-yyyy-zzz" value="https://meet.google.com/new" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+          <p class="text-[10px] text-warm-muted">Вкажіть посилання на створений Google Meet (або залиште посилання швидкого старту).</p>
+        </div>
+
         <div class="space-y-1">
           <label class="block text-xs font-bold text-warm-text">Терапевтична нотатка до зустрічі (опціонально):</label>
           <textarea id="schedule-notes" rows="2" placeholder="Фокус роботи на цю зустріч..." class="w-full p-3 rounded-xl border border-warm-border text-xs leading-relaxed"></textarea>
@@ -1177,25 +1199,40 @@
         const card = document.createElement('div');
         card.className = 'p-6 rounded-3xl glass-card border border-warm-border shadow-soft space-y-4 hover:border-brand-300 transition-all flex flex-col justify-between';
         
+        const isGmeet = (app.meet_format === 'google_meet') || (app.meet_url && app.meet_url.includes('meet.google.com')) || (!app.meet_format && !app.meet_url?.includes('meet.html'));
+        const gmeetLink = app.google_meet_url || (app.meet_url?.includes('meet.google.com') ? app.meet_url : 'https://meet.google.com/new');
+        const platformRoomCode = app.room_code || `psy-meet-${app.id || Date.now()}`;
+        const platformMeetUrl = `https://olefirenko.pp.ua/meet.html?room=${platformRoomCode}`;
+
         const gcalUrl = buildGoogleCalendarLink(
           `Сесія психотерапії: ${app.client_name} & Юлія Олефіренко`,
-          `Індивідуальна сесія психотерапії (50 хв).\nПряме посилання на відеокімнату: https://olefirenko.pp.ua/meet.html?room=${app.room_code}`,
-          `https://olefirenko.pp.ua/meet.html?room=${app.room_code}`,
+          `Індивідуальна сесія психотерапії (${app.duration_minutes || 50} хв).\n\n` +
+          (isGmeet ? `🌐 Google Meet (Основний): ${gmeetLink}\n🌿 Відеокімната на сайті: ${platformMeetUrl}` : `🌿 Відеокімната на сайті (Основний): ${platformMeetUrl}\n🌐 Google Meet: ${gmeetLink}`),
+          isGmeet ? gmeetLink : platformMeetUrl,
           app.session_date,
           app.session_time,
           app.duration_minutes
         );
 
-        const tgDraftText = encodeURIComponent(`Вітаю, ${app.client_name.split(' ')[0]}! Наша сесія психотерапії призначена на ${app.session_date} о ${app.session_time}.\n\nПосилання на нашу захищену відеокімнату (без потреби встановлювати програми): https://olefirenko.pp.ua/meet.html?room=${app.room_code}`);
+        const tgText = isGmeet
+          ? `Вітаю, ${app.client_name.split(' ')[0]}! Наша сесія психотерапії призначена на ${app.session_date} о ${app.session_time}.\n\n🌐 Посилання Google Meet: ${gmeetLink}\n🌿 Або через кабінет на сайті: https://olefirenko.pp.ua/cabinet.html`
+          : `Вітаю, ${app.client_name.split(' ')[0]}! Наша сесія психотерапії призначена на ${app.session_date} о ${app.session_time}.\n\n🌿 Посилання на відеокімнату: ${platformMeetUrl}\n🌐 Google Meet (резерв): ${gmeetLink}`;
+
+        const tgDraftText = encodeURIComponent(tgText);
 
         card.innerHTML = `
           <div class="space-y-3">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200">
-                  📅 ${app.session_date} • ${app.session_time} (${app.duration_minutes || 50} хв)
-                </span>
-                <h3 class="font-bold text-warm-text text-base pt-1.5">${escapeHtml(app.client_name)}</h3>
+                <div class="flex flex-wrap items-center gap-1.5 pb-1">
+                  <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200">
+                    📅 ${app.session_date} • ${app.session_time} (${app.duration_minutes || 50} хв)
+                  </span>
+                  <span class="px-2 py-0.5 rounded-full ${isGmeet ? 'bg-sky-50 text-sky-800 border border-sky-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'} text-[10px] font-bold">
+                    ${isGmeet ? '🌐 Google Meet' : '🌿 Відеокімната'}
+                  </span>
+                </div>
+                <h3 class="font-bold text-warm-text text-base">${escapeHtml(app.client_name)}</h3>
                 <div class="text-xs text-warm-muted">${escapeHtml(app.client_email || '')}</div>
               </div>
               <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${app.status === 'completed' ? 'bg-gray-100 text-gray-700' : 'bg-emerald-100 text-emerald-800'}">
@@ -1211,16 +1248,28 @@
           </div>
 
           <div class="space-y-2 pt-2 border-t border-warm-border/60">
-            <!-- Join Button -->
-            <a href="meet.html?room=${app.room_code}&role=owner" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-2">
-              <span>📹 Почати відеосесію онлайн</span>
-            </a>
+            <!-- Primary Action Button -->
+            ${isGmeet ? `
+              <a href="${gmeetLink}" target="_blank" class="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-2">
+                <span>🌐 Відкрити Google Meet</span>
+              </a>
+              <a href="meet.html?room=${platformRoomCode}&role=owner" class="w-full py-1.5 rounded-xl bg-warm-card hover:bg-brand-50 border border-warm-border text-warm-muted hover:text-brand-800 font-medium text-[11px] transition-colors flex items-center justify-center gap-1.5">
+                <span>🌿 Або відкрити відеокімнату сайту</span>
+              </a>
+            ` : `
+              <a href="meet.html?room=${platformRoomCode}&role=owner" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-2">
+                <span>📹 Почати відеосесію онлайн</span>
+              </a>
+              <a href="${gmeetLink}" target="_blank" class="w-full py-1.5 rounded-xl bg-warm-card hover:bg-emerald-50 border border-warm-border text-warm-muted hover:text-emerald-800 font-medium text-[11px] transition-colors flex items-center justify-center gap-1.5">
+                <span>🌐 Або відкрити Google Meet</span>
+              </a>
+            `}
 
-            <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="grid grid-cols-2 gap-2 text-xs pt-1">
               <a href="${gcalUrl}" target="_blank" class="py-2 px-3 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-center transition-colors flex items-center justify-center gap-1">
                 <span>📅 Google Календар</span>
               </a>
-              <a href="https://t.me/share/url?url=https://olefirenko.pp.ua/meet.html?room=${app.room_code}&text=${tgDraftText}" target="_blank" class="py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-semibold text-center transition-colors flex items-center justify-center gap-1">
+              <a href="https://t.me/share/url?url=${encodeURIComponent(isGmeet ? gmeetLink : platformMeetUrl)}&text=${tgDraftText}" target="_blank" class="py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-semibold text-center transition-colors flex items-center justify-center gap-1">
                 <span>💬 Лінк клієнту</span>
               </a>
             </div>
@@ -1246,13 +1295,29 @@
           const data = await res.json();
           const upcoming = (data.appointments || []).find(a => a.status === 'scheduled');
           if (upcoming) {
+            const isGmeet = (upcoming.meet_format === 'google_meet') || (upcoming.meet_url && upcoming.meet_url.includes('meet.google.com')) || (!upcoming.meet_format && !upcoming.meet_url?.includes('meet.html'));
+            const gmeetLink = upcoming.google_meet_url || (upcoming.meet_url?.includes('meet.google.com') ? upcoming.meet_url : 'https://meet.google.com/new');
+            const roomCode = upcoming.room_code || `psy-session-${upcoming.id || Date.now()}`;
+            const platformLink = `meet.html?room=${roomCode}`;
+
             document.getElementById('client-session-datetime').textContent = `${upcoming.session_date} о ${upcoming.session_time}`;
-            document.getElementById('client-join-meet-btn').href = `meet.html?room=${upcoming.room_code}`;
+            
+            const joinBtn = document.getElementById('client-join-meet-btn');
+            if (isGmeet) {
+              joinBtn.href = gmeetLink;
+              joinBtn.target = '_blank';
+              joinBtn.innerHTML = '<span>🌐 Увійти в Google Meet</span>';
+            } else {
+              joinBtn.href = platformLink;
+              joinBtn.target = '_self';
+              joinBtn.innerHTML = '<span>📹 Увійти у відеокімнату на сайті</span>';
+            }
             
             const gcalUrl = buildGoogleCalendarLink(
               `Консультація психотерапії з Юлією Олефіренко`,
-              `Індивідуальна сесія (50 хв).\nВідеокімната: https://olefirenko.pp.ua/meet.html?room=${upcoming.room_code}`,
-              `https://olefirenko.pp.ua/meet.html?room=${upcoming.room_code}`,
+              `Індивідуальна сесія (${upcoming.duration_minutes || 50} хв).\n` +
+              (isGmeet ? `🌐 Google Meet: ${gmeetLink}\n🌿 Відеокімната на сайті: https://olefirenko.pp.ua/${platformLink}` : `🌿 Відеокімната на сайті: https://olefirenko.pp.ua/${platformLink}\n🌐 Google Meet: ${gmeetLink}`),
+              isGmeet ? gmeetLink : `https://olefirenko.pp.ua/${platformLink}`,
               upcoming.session_date,
               upcoming.session_time,
               upcoming.duration_minutes
@@ -1279,13 +1344,30 @@
       }
     }
 
+    function toggleScheduleMeetFormat() {
+      const isGmeet = document.querySelector('input[name="schedule_meet_format"]:checked').value === 'google_meet';
+      const labelGmeet = document.getElementById('format-label-gmeet');
+      const labelWebrtc = document.getElementById('format-label-webrtc');
+      const gmeetBox = document.getElementById('schedule-gmeet-url-box');
+
+      if (isGmeet) {
+        labelGmeet.className = 'flex items-center gap-2.5 p-3 rounded-2xl border border-emerald-500/60 bg-emerald-50/60 cursor-pointer text-xs font-bold text-brand-900 transition-all';
+        labelWebrtc.className = 'flex items-center gap-2.5 p-3 rounded-2xl border border-warm-border bg-white cursor-pointer text-xs font-semibold text-warm-text hover:bg-warm-bg transition-all';
+        gmeetBox.classList.remove('hidden');
+      } else {
+        labelGmeet.className = 'flex items-center gap-2.5 p-3 rounded-2xl border border-warm-border bg-white cursor-pointer text-xs font-semibold text-warm-text hover:bg-warm-bg transition-all';
+        labelWebrtc.className = 'flex items-center gap-2.5 p-3 rounded-2xl border border-emerald-500/60 bg-emerald-50/60 cursor-pointer text-xs font-bold text-brand-900 transition-all';
+        gmeetBox.classList.add('hidden');
+      }
+    }
+
     function openScheduleModal() {
       const select = document.getElementById('schedule-client-select');
       select.innerHTML = '<option value="">-- Оберіть клієнта з бази --</option>';
       
       cachedOwnerClients.forEach(c => {
         const opt = document.createElement('option');
-        opt.value = JSON.stringify({ id: c.id, name: c.name, email: c.email });
+        opt.value = JSON.stringify({ id: c.id, name: c.name, email: c.email, preferred_format: c.preferred_format });
         opt.textContent = `${c.name} (${c.email || c.phone || 'без пошти'})`;
         select.appendChild(opt);
       });
@@ -1296,6 +1378,11 @@
       document.getElementById('schedule-date').value = tomorrow.toISOString().substring(0, 10);
       document.getElementById('schedule-time').value = "18:00";
 
+      // Reset to Google Meet by default
+      const radioGmeet = document.querySelector('input[name="schedule_meet_format"][value="google_meet"]');
+      if (radioGmeet) radioGmeet.checked = true;
+      toggleScheduleMeetFormat();
+
       openModal('schedule-modal');
     }
 
@@ -1303,7 +1390,24 @@
       closeModal('schedule-modal');
     }
 
-    function onScheduleClientChanged() {}
+    function onScheduleClientChanged() {
+      const raw = document.getElementById('schedule-client-select').value;
+      if (!raw) return;
+      try {
+        const client = JSON.parse(raw);
+        const pref = (client.preferred_format || '').toLowerCase();
+        const isWebrtc = pref.includes('платформа') || pref.includes('webrtc') || pref.includes('відеокімната');
+        
+        const radioGmeet = document.querySelector('input[name="schedule_meet_format"][value="google_meet"]');
+        const radioWebrtc = document.querySelector('input[name="schedule_meet_format"][value="webrtc"]');
+        
+        if (radioGmeet && radioWebrtc) {
+          if (isWebrtc) radioWebrtc.checked = true;
+          else radioGmeet.checked = true;
+          toggleScheduleMeetFormat();
+        }
+      } catch(e) {}
+    }
 
     async function saveNewAppointment(e) {
       e.preventDefault();
@@ -1314,6 +1418,12 @@
       }
 
       const client = JSON.parse(rawClient);
+      const meetFormat = document.querySelector('input[name="schedule_meet_format"]:checked')?.value || 'google_meet';
+      let customGmeetUrl = document.getElementById('schedule-gmeet-url').value.trim();
+      if (meetFormat === 'google_meet' && !customGmeetUrl) {
+        customGmeetUrl = 'https://meet.google.com/new';
+      }
+
       const payload = {
         client_id: client.id,
         client_name: client.name,
@@ -1321,6 +1431,8 @@
         session_date: document.getElementById('schedule-date').value,
         session_time: document.getElementById('schedule-time').value,
         duration_minutes: parseInt(document.getElementById('schedule-duration').value),
+        meet_format: meetFormat,
+        google_meet_url: customGmeetUrl,
         therapist_notes: document.getElementById('schedule-notes').value.trim()
       };
 
@@ -1334,10 +1446,22 @@
           const data = await res.json();
           cachedAppointments.unshift(data.appointment);
         } else {
-          cachedAppointments.unshift({ ...payload, id: Date.now(), room_code: `psy-${Date.now()}`, status: 'scheduled' });
+          cachedAppointments.unshift({
+            ...payload,
+            id: Date.now(),
+            room_code: `psy-${Date.now()}`,
+            meet_url: meetFormat === 'google_meet' ? customGmeetUrl : `/meet.html?room=psy-${Date.now()}`,
+            status: 'scheduled'
+          });
         }
       } catch(err) {
-        cachedAppointments.unshift({ ...payload, id: Date.now(), room_code: `psy-${Date.now()}`, status: 'scheduled' });
+        cachedAppointments.unshift({
+          ...payload,
+          id: Date.now(),
+          room_code: `psy-${Date.now()}`,
+          meet_url: meetFormat === 'google_meet' ? customGmeetUrl : `/meet.html?room=psy-${Date.now()}`,
+          status: 'scheduled'
+        });
       }
 
       renderAppointmentsList(cachedAppointments);

@@ -147,8 +147,13 @@
       <span id="session-countdown" class="text-xs sm:text-sm font-bold text-white font-mono tracking-wider">50:00</span>
     </div>
 
-    <!-- Right: Quick Tools (Notes & Fullscreen) -->
+    <!-- Right: Quick Tools (Google Meet switch, Notes & Fullscreen) -->
     <div class="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
+      <!-- Quick switch to Google Meet if preferred -->
+      <a href="https://meet.google.com/new" target="_blank" class="px-2.5 py-1.5 rounded-full bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold shadow-lg transition-all flex items-center gap-1" title="Відкрити Google Meet">
+        <span>🌐</span> <span class="hidden md:inline">Google Meet</span>
+      </a>
+
       <!-- Fullscreen toggle -->
       <button onclick="toggleFullscreen()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-xl border border-white/10 text-white flex items-center justify-center text-xs shadow-lg transition-all" title="На весь екран">
         <span id="fs-icon">⛶</span>

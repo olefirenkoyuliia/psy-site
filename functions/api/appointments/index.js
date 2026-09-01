@@ -69,7 +69,9 @@ export async function onRequestPost(context) {
     // Generate clean unique room code (e.g. psy-meet-xyz789)
     const randomHex = Math.random().toString(36).substring(2, 8);
     const roomCode = data.room_code || `psy-olefirenko-${randomHex}`;
-    const meetUrl = `/meet.html?room=${roomCode}`;
+    const meetFormat = data.meet_format || 'google_meet';
+    const googleMeetUrl = (data.google_meet_url || 'https://meet.google.com/new').trim();
+    const meetUrl = meetFormat === 'google_meet' ? googleMeetUrl : `/meet.html?room=${roomCode}`;
 
     if (!clientName || !sessionDate || !sessionTime) {
       return new Response(JSON.stringify({ error: 'Client name, session date and time are required' }), {
@@ -81,7 +83,21 @@ export async function onRequestPost(context) {
     if (!env.DB) {
       return new Response(JSON.stringify({
         success: true,
-        appointment: { id: Date.now(), client_id: clientId, client_name: clientName, client_email: clientEmail, session_date: sessionDate, session_time: sessionTime, room_code: roomCode, meet_url: meetUrl, status: 'scheduled' },
+        appointment: {
+          id: Date.now(),
+          client_id: clientId,
+          client_name: clientName,
+          client_email: clientEmail,
+          session_date: sessionDate,
+          session_time: sessionTime,
+          duration_minutes: durationMinutes,
+          meet_format: meetFormat,
+          google_meet_url: googleMeetUrl,
+          room_code: roomCode,
+          meet_url: meetUrl,
+          therapist_notes: therapistNotes,
+          status: 'scheduled'
+        },
         message: 'Зустріч призначено локально'
       }), {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
@@ -108,7 +124,11 @@ export async function onRequestPost(context) {
 
     return new Response(JSON.stringify({
       success: true,
-      appointment: appointment,
+      appointment: {
+        ...appointment,
+        meet_format: meetFormat,
+        google_meet_url: googleMeetUrl
+      },
       message: 'Сесію успішно призначено та додано до розкладу'
     }), {
       headers: {
