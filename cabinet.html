@@ -1921,7 +1921,7 @@
             ` : ''}
 
             <div class="grid grid-cols-3 gap-1.5 text-xs pt-1">
-              <a href="${gcalUrl}" target="_blank" class="py-2 px-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-center transition-colors flex items-center justify-center gap-1 text-[11px]" title="Додати в Google Календар (Private)">
+              <a href="https://calendar.google.com/calendar/u/0/r/day/${app.session_date.replace(/-/g, '/')}" target="_blank" class="py-2 px-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-center transition-colors flex items-center justify-center gap-1 text-[11px]" title="Відкрити цей день у Google Календарі">
                 <span>📅 Календар</span>
               </a>
               <button onclick="downloadPrivateIcsFile('Сесія психотерапії: ${escapeHtml(app.client_name)}', 'Індивідуальна сесія психотерапії (${app.duration_minutes || 50} хв).\\nПосилання Google Meet: ${gmeetLink}', '${gmeetLink}', '${app.session_date}', '${app.session_time}', ${app.duration_minutes || 50}, '${app.client_email}', '${escapeHtml(app.client_name)}')" class="py-2 px-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-center transition-colors flex items-center justify-center gap-1 text-[11px]" title="Завантажити приватний файл .ics">
