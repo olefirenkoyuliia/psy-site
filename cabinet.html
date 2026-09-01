@@ -2014,27 +2014,20 @@
           ...payload
         };
 
-        // Sync date/time change to Google Calendar if connected
+        // Sync date/time change to Google Calendar if connected: Delete old event + Re-create on new date
         if (googleCalendarToken || localStorage.getItem('psy_google_cal_token')) {
-          updateGoogleCalendarEvent(cachedAppointments[idx], oldApp.session_date, newDate, newTime, duration);
+          await deleteGoogleCalendarEvent(oldApp, oldApp.session_date);
+          await syncSessionsToGoogleCalendarDirectly([cachedAppointments[idx]]);
         }
       }
 
       renderAppointmentsList(cachedAppointments);
       renderCalendarGridView();
       closeRescheduleModal();
-      showToast('Зустріч успішно перенесено та оновлено!');
-
-      // Prompt to notify client or update calendar
-      const tgReschedText = encodeURIComponent(`Вітаю, ${clientName.split(' ')[0]}! Повідомляємо про перенесення нашої зустрічі психотерапії на ${newDate} о ${newTime}.\n\nПосилання на Google Meet: ${gmeetUrl || 'https://meet.google.com/new'}`);
-      const gcalUpdatedUrl = buildGoogleCalendarLink(`Сесія психотерапії: ${clientName}`, `Індивідуальна сесія (50 хв).\nGoogle Meet: ${gmeetUrl}`, gmeetUrl, newDate, newTime, duration, clientEmail);
-
-      if (confirm(`Зустріч перенесено на ${newDate} о ${newTime}!\n\nБажаєте відкрити оновлений Google Календар?`)) {
-        window.open(gcalUpdatedUrl, '_blank');
-      }
+      showToast(`Зустріч перенесено на ${newDate} о ${newTime} та оновлено в Google Календарі!`);
     }
 
-    async function deleteGoogleCalendarEvent(app, oldDate) {
+    async function deleteGoogleCalendarEvent(app, specificDate) {
       if (!app) return;
       if (!googleCalendarToken) {
         googleCalendarToken = localStorage.getItem('psy_google_cal_token') || null;
@@ -2042,31 +2035,36 @@
       if (!googleCalendarToken) return;
 
       try {
-        let eventId = app.google_event_id;
+        let eventIdsToDelete = [];
+        if (app.google_event_id) {
+          eventIdsToDelete.push(app.google_event_id);
+        }
 
-        // If no saved google_event_id, search primary calendar by client name or email
-        if (!eventId && (app.client_name || app.client_email)) {
+        // Search primary calendar by client name or email
+        if (app.client_name || app.client_email) {
           const query = encodeURIComponent(app.client_name || app.client_email || '');
-          const searchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?q=${query}&maxResults=25`, {
+          const searchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?q=${query}&maxResults=50`, {
             headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
           });
           if (searchRes.ok) {
             const data = await searchRes.json();
             const items = data.items || [];
-            const matching = items.find(item => {
-              const itemStart = item.start?.dateTime || item.start?.date || '';
-              return (app.session_date && itemStart.includes(app.session_date)) || 
-                     (oldDate && itemStart.includes(oldDate)) ||
-                     (app.session_time && itemStart.includes(app.session_time));
-            }) || items[0];
+            const targetDate = specificDate || app.session_date;
 
-            if (matching) {
-              eventId = matching.id;
-            }
+            items.forEach(item => {
+              const itemStart = item.start?.dateTime || item.start?.date || '';
+              if (targetDate) {
+                if (itemStart.includes(targetDate)) {
+                  if (!eventIdsToDelete.includes(item.id)) eventIdsToDelete.push(item.id);
+                }
+              } else {
+                if (!eventIdsToDelete.includes(item.id)) eventIdsToDelete.push(item.id);
+              }
+            });
           }
         }
 
-        if (eventId) {
+        for (const eventId of eventIdsToDelete) {
           const delRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}?sendUpdates=all`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
