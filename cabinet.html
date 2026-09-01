@@ -980,53 +980,6 @@
     </div>
   </div>
 
-  <!-- Modal: Direct User Registration / Sign-In -->
-  <div id="register-client-modal" onclick="if(event.target === this) closeRegisterModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
-    <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-warm-border shadow-2xl space-y-5 relative my-auto">
-      
-      <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
-        <div class="flex items-center gap-2.5">
-          <span class="text-2xl">✍️</span>
-          <div>
-            <h3 class="font-bold text-warm-text text-base">Реєстрація / Вхід</h3>
-            <p class="text-xs text-warm-muted">Створення клієнтського кабінету</p>
-          </div>
-        </div>
-        <button onclick="closeRegisterModal()" class="w-8 h-8 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center font-bold text-xs">
-          ✕
-        </button>
-      </div>
-
-      <form id="direct-register-form" onsubmit="submitRegisterModal(event)" class="space-y-4">
-        
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-warm-text">Ваше ім'я та прізвище:</label>
-          <input type="text" id="reg-name" required placeholder="Наприклад: Олена Мельник" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium outline-none focus:ring-2 focus:ring-brand-500">
-        </div>
-
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-warm-text">Ваш Email (Google / робочий):</label>
-          <input type="email" id="reg-email" required placeholder="name@gmail.com" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium outline-none focus:ring-2 focus:ring-brand-500">
-        </div>
-
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-warm-text">Телефон (опціонально):</label>
-          <input type="tel" id="reg-phone" placeholder="+380..." class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs outline-none focus:ring-2 focus:ring-brand-500">
-        </div>
-
-        <div class="pt-2 flex items-center justify-end gap-2">
-          <button type="button" onclick="closeRegisterModal()" class="px-4 py-2.5 rounded-xl border border-warm-border text-warm-text font-semibold text-xs">
-            Скасувати
-          </button>
-          <button type="submit" id="reg-submit-btn" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5">
-            <span>✨ Зареєструватися та увійти</span>
-          </button>
-        </div>
-
-      </form>
-    </div>
-  </div>
-
   <!-- Modal: Edit Client Details & Therapist Notes (For Owner Julia) -->
   <div id="owner-client-modal" onclick="if(event.target === this) closeClientModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full border border-warm-border shadow-2xl space-y-5 relative my-auto">
@@ -1042,8 +995,6 @@
         <button onclick="closeClientModal()" class="w-8 h-8 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center font-bold text-xs">
           ✕
         </button>
-      </div>
-
       <form id="owner-client-edit-form" onsubmit="saveOwnerClientModal(event)" class="space-y-4">
         <input type="hidden" id="modal-client-id">
 
@@ -1137,10 +1088,32 @@
              email.startsWith('admin');
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkOAuthHashRedirect();
       checkExistingSession();
       initGoogleSso();
     });
+
+    async function checkOAuthHashRedirect() {
+      if (window.location.hash && window.location.hash.includes('access_token=')) {
+        const params = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = params.get('access_token');
+        if (accessToken) {
+          try {
+            const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            if (userInfoRes.ok) {
+              const userInfo = await userInfoRes.json();
+              history.replaceState(null, '', window.location.pathname);
+              await handleGoogleProfile(userInfo);
+            }
+          } catch(e) {
+            console.error('Hash token error:', e);
+          }
+        }
+      }
+    }
 
     function checkExistingSession() {
       const savedUser = localStorage.getItem('psy_client_user');
@@ -1249,81 +1222,97 @@
         el.classList.remove('flex');
         el.classList.add('hidden');
       }
-    }
+    function triggerGoogleLogin() {
+      // 1. Try Google Identity Services & OAuth2 popup
+      if (activeGoogleClientId && window.google && window.google.accounts) {
+        if (window.google.accounts.oauth2) {
+          try {
+            const client = google.accounts.oauth2.initTokenClient({
+              client_id: activeGoogleClientId,
+              scope: 'email profile openid',
+              callback: async (tokenResponse) => {
+                if (tokenResponse && tokenResponse.access_token) {
+                  try {
+                    const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                      headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                    });
+                    if (userInfoRes.ok) {
+                      const userInfo = await userInfoRes.json();
+                      await handleGoogleProfile(userInfo);
+                      return;
+                    }
+                  } catch(e) {}
+                }
+              }
+            });
+            client.requestAccessToken();
+            return;
+          } catch(e) {
+            console.warn('OAuth token client failed:', e);
+          }
+        }
 
-    function openRegisterModal() {
-      openModal('register-client-modal');
-    }
-
-    function closeRegisterModal() {
-      closeModal('register-client-modal');
-    }
-
-    async function submitRegisterModal(e) {
-      e.preventDefault();
-      const name = document.getElementById('reg-name').value.trim();
-      const email = document.getElementById('reg-email').value.trim().toLowerCase();
-      const phone = document.getElementById('reg-phone').value.trim();
-
-      if (!name || !email) {
-        alert('Будь ласка, заповніть ім\'я та email');
-        return;
+        if (window.google.accounts.id) {
+          google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+              const redirectUri = window.location.origin + '/cabinet.html';
+              window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${activeGoogleClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=email%20profile%20openid`;
+            }
+          });
+          return;
+        }
       }
 
-      const regBtn = document.getElementById('reg-submit-btn');
-      const origText = regBtn.innerHTML;
-      regBtn.innerHTML = '<span>⏳ Реєстрація...</span>';
-      regBtn.disabled = true;
+      // 2. Direct 1-click Google Email prompt if Client ID isn't linked yet (No password modal)
+      const enteredEmail = prompt('Введіть ваш Google Email для входу в кабінет (без пароля):');
+      if (enteredEmail && enteredEmail.includes('@')) {
+        const namePart = enteredEmail.split('@')[0];
+        const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+        handleGoogleProfile({
+          email: enteredEmail.toLowerCase().trim(),
+          name: formattedName,
+          first_name: formattedName,
+          last_name: '',
+          picture: ''
+        });
+      }
+    }
 
-      const parts = name.split(' ');
-      const firstName = parts[0] || name;
-      const lastName = parts.slice(1).join(' ') || '';
-
-      const profilePayload = {
-        name: name,
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-        phone: phone,
-        google_id: `usr_${Date.now()}`,
-        preferred_format: 'Платформа (Відеокімната)'
-      };
-
+    async function handleGoogleProfile(profile) {
       try {
         const res = await fetch('/api/auth/google', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ profile: profilePayload })
+          body: JSON.stringify({ profile: profile })
         });
-
         if (res.ok) {
           const data = await res.json();
           currentUser = data.user;
+          localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
+          renderDashboard(currentUser);
+          showToast('Успішний вхід через Google!');
         } else {
           currentUser = {
-            ...profilePayload,
-            id: Date.now(),
-            role: isOwnerUser(profilePayload) ? 'owner' : 'client'
+            google_id: profile.sub || profile.id || `usr_${Date.now()}`,
+            email: profile.email,
+            name: profile.name || 'Користувач',
+            first_name: profile.first_name || profile.given_name || 'Користувач',
+            last_name: profile.last_name || profile.family_name || '',
+            picture: profile.picture || '',
+            role: isOwnerUser(profile) ? 'owner' : 'client',
+            phone: '',
+            telegram: '',
+            preferred_format: 'Платформа (Відеокімната)',
+            therapy_goal: '',
+            notes: ''
           };
+          localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
+          renderDashboard(currentUser);
+          showToast('Успішний вхід!');
         }
-      } catch(err) {
-        currentUser = {
-          ...profilePayload,
-          id: Date.now(),
-          role: isOwnerUser(profilePayload) ? 'owner' : 'client'
-        };
+      } catch(e) {
+        showToast('Помилка авторизації', '⚠️');
       }
-
-      localStorage.setItem('psy_client_user', JSON.stringify(currentUser));
-      regBtn.innerHTML = origText;
-      regBtn.disabled = false;
-      closeRegisterModal();
-      renderDashboard(currentUser);
-      showToast('Акаунт успішно зареєстровано!');
-    }
-
-    function triggerGoogleLogin() {
-      openRegisterModal();
     }
 
     async function handleGoogleCredentialResponse(response) {
