@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Відеосесія онлайн | Юлія Олефіренко</title>
-  <meta name="description" content="Захищена відеокімната для індивідуальної онлайн-сесії психотерапії з Юлією Олефіренко.">
-  <meta name="theme-color" content="#000000">
+  <title>Онлайн-сесія Google Meet | Юлія Олефіренко</title>
+  <meta name="description" content="Підключення до індивідуальної онлайн-сесії психотерапії з Юлією Олефіренко через Google Meet.">
+  <meta name="theme-color" content="#1D301E">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
@@ -16,8 +16,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PeerJS for WebRTC Video Calling -->
-  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -25,16 +23,23 @@
         extend: {
           colors: {
             brand: {
+              50: '#F4F7F4',
+              100: '#E5EDE5',
+              200: '#CCDCCC',
+              300: '#A9C4AA',
+              400: '#7FA781',
               500: '#557C56',
               600: '#436444',
               700: '#335334',
               800: '#264027',
               900: '#1D301E',
             },
-            meet: {
-              dark: '#0B0C0E',
-              card: '#141619',
-              border: '#24272D'
+            warm: {
+              bg: '#FDFBF7',
+              card: '#F7F4EE',
+              border: '#E8E2D5',
+              text: '#2D312E',
+              muted: '#6B726C',
             }
           },
           fontFamily: {
@@ -47,787 +52,170 @@
   </script>
 
   <style>
-    :root {
-      --sat: env(safe-area-inset-top, 0px);
-      --sab: env(safe-area-inset-bottom, 0px);
-      --sal: env(safe-area-inset-left, 0px);
-      --sar: env(safe-area-inset-right, 0px);
-    }
-    html, body {
-      height: 100%;
-      height: 100dvh;
-      width: 100%;
-      width: 100vw;
-      background-color: #000000;
-      color: #F3EFEA;
+    body {
+      background-color: #FDFBF7;
+      color: #2D312E;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
     }
-    .video-mirror {
-      transform: scaleX(-1);
-    }
-    .safe-top-p {
-      padding-top: max(0.75rem, env(safe-area-inset-top));
-    }
-    .safe-bottom-p {
-      padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
-    }
-    .safe-top-m {
-      top: max(0.75rem, env(safe-area-inset-top));
-    }
-    .safe-bottom-m {
-      bottom: max(1.25rem, env(safe-area-inset-bottom));
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(232, 226, 213, 0.9);
     }
   </style>
 </head>
-<body class="h-full h-[100dvh] w-full w-[100vw] relative bg-black antialiased select-none overflow-hidden">
+<body class="min-h-full flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white">
 
-  <!-- ======================================================== -->
-  <!-- 1. FULLSCREEN EDGE-TO-EDGE VIDEO CONTAINER               -->
-  <!-- ======================================================== -->
-  <div id="video-stage" class="absolute inset-0 w-full h-full bg-black flex items-center justify-center overflow-hidden">
-    
-    <!-- Remote Video (Fills the entire screen edge-to-edge) -->
-    <video id="remote-video" autoplay playsinline webkit-playsinline class="w-full h-full object-cover sm:object-contain bg-black hidden"></video>
-
-    <!-- Waiting / Reconnecting Placeholder Screen -->
-    <div id="remote-placeholder" class="text-center space-y-4 p-6 max-w-sm sm:max-w-md z-10">
-      <div class="w-20 h-20 rounded-3xl bg-brand-900/80 border border-emerald-500/40 flex items-center justify-center text-4xl mx-auto shadow-2xl animate-pulse">
-        🌱
-      </div>
-      <div class="space-y-1.5">
-        <h2 class="text-lg sm:text-2xl font-bold text-white font-serif-luxury tracking-wide" id="waiting-title">Очікування підключення...</h2>
-        <p class="text-xs text-gray-400 leading-relaxed" id="waiting-desc">
-          Ви в захищеній відеокімнаті. Зв'язок почнеться автоматично, щойно співрозмовник увійде.
-        </p>
-      </div>
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-emerald-300 text-xs font-mono shadow-md">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-        <span id="room-status-badge">Кімната: <strong id="room-code-badge">psy-room</strong></span>
-      </div>
-    </div>
-
-    <!-- Local Self-View PIP (Floating in top-right or bottom-right) -->
-    <div id="local-video-container" class="absolute top-16 sm:top-20 right-3 sm:right-6 w-24 sm:w-44 h-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-emerald-500/70 shadow-2xl bg-gray-900 z-30 transition-all cursor-pointer">
-      <video id="local-video" autoplay playsinline webkit-playsinline muted class="w-full h-full object-cover video-mirror"></video>
-      <div class="absolute bottom-1 left-2 text-[9px] sm:text-[10px] bg-black/70 px-1.5 py-0.5 rounded text-white font-bold" id="local-user-label">
-        Ви
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- 2. OVERLAID FLOATING TOP HEADER BAR                      -->
-  <!-- ======================================================== -->
-  <header id="top-floating-header" class="absolute top-0 left-0 right-0 z-40 safe-top-p px-3 sm:px-6 flex items-center justify-between pointer-events-none transition-all duration-300 ease-out transform translate-y-0 opacity-100">
-    
-    <!-- Left: Brand / Psychologist Tag -->
-    <div class="pointer-events-auto flex items-center gap-2 bg-black/60 backdrop-blur-xl border border-white/10 px-3 py-1.5 rounded-full shadow-lg">
-      <a href="cabinet.html" class="flex items-center gap-2 group">
-        <span class="w-6 h-6 rounded-full bg-brand-700 flex items-center justify-center text-xs text-white">
+  <!-- Header -->
+  <header class="w-full border-b border-warm-border bg-white/80 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <a href="cabinet.html" class="flex items-center gap-2.5 group">
+        <span class="w-9 h-9 rounded-2xl bg-brand-700 text-white flex items-center justify-center text-sm shadow-sm group-hover:scale-105 transition-transform">
           🌿
         </span>
-        <div class="leading-none">
-          <div class="font-serif-luxury font-bold text-xs sm:text-sm text-white truncate max-w-[110px] sm:max-w-none">
-            Юлія Олефіренко
-          </div>
-          <div class="text-[8px] sm:text-[9px] text-emerald-400 font-medium">
-            Онлайн-сесія
-          </div>
+        <div>
+          <div class="font-serif-luxury font-bold text-base text-warm-text leading-tight">Юлія Олефіренко</div>
+          <div class="text-[10px] text-brand-700 font-semibold uppercase tracking-wider">Кабінет практики</div>
         </div>
       </a>
-    </div>
 
-    <!-- Center: Live Session Timer -->
-    <div class="pointer-events-auto flex items-center gap-1.5 bg-black/60 backdrop-blur-xl border border-white/10 px-3 py-1.5 rounded-full text-xs shadow-lg">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-      <span id="session-countdown" class="text-xs sm:text-sm font-bold text-white font-mono tracking-wider">50:00</span>
-    </div>
-
-    <!-- Right: Quick Tools (Google Meet switch, Notes & Fullscreen) -->
-    <div class="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
-      <!-- Quick switch to Google Meet if preferred -->
-      <a href="https://meet.google.com/new" target="_blank" class="px-2.5 py-1.5 rounded-full bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold shadow-lg transition-all flex items-center gap-1" title="Відкрити Google Meet">
-        <span>🌐</span> <span class="hidden md:inline">Google Meet</span>
+      <a href="cabinet.html" class="px-4 py-2 rounded-xl bg-warm-card hover:bg-warm-border/60 text-warm-text font-semibold text-xs transition-colors flex items-center gap-1.5">
+        <span>← До кабінету</span>
       </a>
-
-      <!-- Fullscreen toggle -->
-      <button onclick="toggleFullscreen()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-xl border border-white/10 text-white flex items-center justify-center text-xs shadow-lg transition-all" title="На весь екран">
-        <span id="fs-icon">⛶</span>
-      </button>
-
-      <!-- Notes toggle -->
-      <button onclick="toggleNotesPanel()" id="notes-header-btn" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-xl border border-white/10 text-white flex items-center justify-center text-xs shadow-lg transition-all" title="Терапевтичні нотатки">
-        <span>📝</span>
-      </button>
     </div>
   </header>
 
-  <!-- ======================================================== -->
-  <!-- 3. OVERLAID FLOATING BOTTOM CONTROLS DOCK                -->
-  <!-- ======================================================== -->
-  <div id="bottom-floating-dock" class="absolute bottom-0 left-0 right-0 z-40 safe-bottom-p px-3 flex justify-center pointer-events-none transition-all duration-300 ease-out transform translate-y-0 opacity-100">
-    <div class="pointer-events-auto w-[94%] max-w-sm sm:max-w-md bg-black/75 backdrop-blur-2xl border border-white/15 px-3 sm:px-6 py-2.5 sm:py-3.5 rounded-3xl sm:rounded-full shadow-2xl flex items-center justify-around sm:justify-center sm:gap-4">
+  <!-- Main Content -->
+  <main class="max-w-2xl w-full mx-auto px-4 py-8 sm:py-12 my-auto">
+    <div class="glass-panel rounded-3xl p-6 sm:p-10 shadow-xl space-y-6 text-center border border-warm-border relative overflow-hidden">
       
-      <!-- Mic Toggle -->
-      <button onclick="toggleAudio()" id="btn-mic" class="flex flex-col items-center gap-1 group focus:outline-none">
-        <div id="btn-mic-icon-box" class="w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95">
-          <span id="mic-icon">🎤</span>
+      <!-- Top Decorative Glow -->
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-emerald-300/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Icon & Badges -->
+      <div class="relative space-y-3">
+        <div class="w-20 h-20 rounded-3xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-4xl mx-auto shadow-inner">
+          🌐
         </div>
-        <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="mic-label">Мікр</span>
-      </button>
-
-      <!-- Camera Toggle -->
-      <button onclick="toggleVideo()" id="btn-cam" class="flex flex-col items-center gap-1 group focus:outline-none">
-        <div id="btn-cam-icon-box" class="w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95">
-          <span id="cam-icon">📹</span>
-        </div>
-        <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="cam-label">Камера</span>
-      </button>
-
-      <!-- Flip Camera (Mobile) / Screen Share (Desktop) -->
-      <button onclick="handleFlipOrScreen()" id="btn-flip-or-screen" class="flex flex-col items-center gap-1 group focus:outline-none">
-        <div class="w-12 h-12 rounded-2xl sm:rounded-full bg-gray-800 hover:bg-gray-700 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95 border border-white/10">
-          <span id="flip-icon">🔄</span>
-        </div>
-        <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="flip-label">Камера</span>
-      </button>
-
-      <!-- Fit / Fill Toggle (Aspect Switcher) -->
-      <button onclick="toggleVideoFit()" id="btn-fit-toggle" class="flex flex-col items-center gap-1 group focus:outline-none">
-        <div class="w-12 h-12 rounded-2xl sm:rounded-full bg-gray-800 hover:bg-gray-700 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95 border border-white/10">
-          <span id="fit-icon">↔️</span>
-        </div>
-        <span class="text-[9px] sm:text-[10px] font-semibold text-gray-300" id="fit-label">Масштаб</span>
-      </button>
-
-      <div class="h-8 w-px bg-white/20 mx-1"></div>
-
-      <!-- Hangup / End Call Button -->
-      <button onclick="hangUpCall()" class="flex flex-col items-center gap-1 group focus:outline-none">
-        <div class="w-12 h-12 rounded-2xl sm:rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center text-xl transition-all shadow-lg active:scale-95">
-          <span>✕</span>
-        </div>
-        <span class="text-[9px] sm:text-[10px] font-semibold text-rose-400">Вийти</span>
-      </button>
-
-    </div>
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- 4. MODAL / DRAWER: PRIVATE THERAPY NOTEPAD               -->
-  <!-- ======================================================== -->
-  <div id="session-notes-sidebar" class="fixed inset-x-3 bottom-24 sm:bottom-auto sm:right-6 sm:left-auto sm:top-20 sm:w-96 bg-meet-card/95 backdrop-blur-2xl border border-meet-border rounded-3xl p-5 hidden flex-col justify-between shadow-2xl z-50 space-y-4 max-h-[75vh]">
-    <div class="space-y-3 flex-grow flex flex-col">
-      <div class="flex items-center justify-between border-b border-meet-border pb-2.5">
-        <div class="flex items-center gap-2">
-          <span class="text-lg">📝</span>
-          <h3 class="font-bold text-sm text-white">Терапевтичний блокнот</h3>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-[10px] text-emerald-400 font-bold px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60">
-            🔒 Приватно
-          </span>
-          <button onclick="toggleNotesPanel()" class="text-gray-400 hover:text-white p-1">✕</button>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold">
+          <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+          <span>Google Meet онлайн-сесія</span>
         </div>
       </div>
 
-      <p class="text-[11px] text-gray-400 leading-relaxed">
-        Фіксуйте ключові інсайти, метафори, образи символдрами та думки під час сесії. Нотатки зберігаються автоматично.
-      </p>
-
-      <textarea id="in-session-notes" oninput="autoSaveNotes()" placeholder="Запишіть спостереження, хід зустрічі або домашнє завдання..." class="flex-grow w-full p-3.5 rounded-2xl bg-black/60 border border-meet-border text-xs text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none leading-relaxed min-h-[160px]"></textarea>
-    </div>
-
-    <div class="pt-2 flex items-center justify-between border-t border-meet-border text-xs">
-      <span class="text-[10px] text-gray-400" id="notes-status-text">Збережено автоматично ✓</span>
-      <button onclick="saveInSessionNotes()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center gap-1">
-        <span>💾 Зберегти</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- 5. MODAL: SESSION ENDED CONFIRMATION SCREEN              -->
-  <!-- ======================================================== -->
-  <div id="session-ended-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-2xl hidden flex items-center justify-center p-4">
-    <div class="bg-meet-card border border-meet-border rounded-3xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
-      <div class="w-16 h-16 rounded-2xl bg-brand-900 border border-emerald-500/40 flex items-center justify-center text-3xl mx-auto shadow-md">
-        🌿
-      </div>
-      <div class="space-y-2">
-        <h2 class="font-serif-luxury font-bold text-2xl text-white">Консультацію завершено</h2>
-        <p class="text-xs text-gray-400 leading-relaxed" id="session-ended-desc">
-          Сесія була успішно завершена. Усі ваші нотатки надійно збережено в системі.
+      <!-- Heading & Explanation -->
+      <div class="space-y-2 relative">
+        <h1 class="font-serif-luxury font-bold text-2xl sm:text-3xl text-warm-text" id="meet-title">
+          Індивідуальна сесія психотерапії
+        </h1>
+        <p class="text-xs sm:text-sm text-warm-muted max-w-md mx-auto leading-relaxed">
+          Зустріч проходить через захищений сервіс <strong>Google Meet</strong> з високою якістю зв'язку та шумоподавленням.
         </p>
       </div>
-      <div class="pt-2">
-        <a href="cabinet.html" class="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-lg transition-all">
-          <span>← Повернутися до кабінету</span>
+
+      <!-- Primary Action Buttons -->
+      <div class="space-y-3 pt-2 max-w-sm mx-auto">
+        <a id="btn-open-gmeet" href="https://meet.google.com/new" target="_blank" class="w-full py-4 px-6 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2.5 transform active:scale-95">
+          <span>🌐 Відкрити Google Meet</span>
+          <span>→</span>
+        </a>
+
+        <a id="btn-gcal-sync" href="#" target="_blank" class="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-colors flex items-center justify-center gap-1.5">
+          <span>📅 Додати в Google Календар</span>
         </a>
       </div>
+
+      <!-- Helpful Prep Checklist -->
+      <div class="pt-4 border-t border-warm-border/60 text-left space-y-2">
+        <div class="text-xs font-bold text-warm-text">Перед початком зустрічі:</div>
+        <ul class="text-[11px] sm:text-xs text-warm-muted space-y-1.5">
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-600 font-bold">✓</span> Перевірте підключення навушників та мікрофона
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-600 font-bold">✓</span> Знайдіть затишне місце, де вас ніхто не турбуватиме
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-600 font-bold">✓</span> Підготуйте склянку води та зручно сядьте
+          </li>
+        </ul>
+      </div>
+
+      <!-- Private Notes Area for Julia (If logged in as owner) -->
+      <div id="owner-notepad-box" class="hidden pt-4 border-t border-warm-border/60 text-left space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-warm-text flex items-center gap-1.5">
+            <span>📝</span> Терапевтичний блокнот сесії (видно тільки вам):
+          </span>
+          <span class="text-[10px] text-emerald-700 font-semibold" id="notes-status">Збережено</span>
+        </div>
+        <textarea id="session-notes-input" oninput="autoSaveNotes()" rows="4" placeholder="Фіксуйте ключові інсайти, образи символдрами та хід консультації..." class="w-full p-3.5 rounded-2xl bg-white border border-warm-border text-xs leading-relaxed outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+      </div>
+
     </div>
-  </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full py-4 text-center text-xs text-warm-muted border-t border-warm-border bg-white/50">
+    <div>Юлія Олефіренко • Психотерапія, символдрама та EMDR</div>
+  </footer>
 
   <script>
-    let localStream = null;
-    let peer = null;
-    let currentCall = null;
-    let dataConnection = null;
-    let isAudioMuted = false;
-    let isVideoMuted = false;
-    let isScreenSharing = false;
-    let isSessionExplicitlyEnded = false;
-    let isConnectedWithPeer = false;
-    let isCoverMode = true; // Full screen cover mode by default on mobile
-    let autoReconnectInterval = null;
-    let currentFacingMode = 'user'; // 'user' or 'environment'
-    let timerInterval = null;
-    let timeLeft = 50 * 60; // 50 minutes in seconds
-
     const urlParams = new URLSearchParams(window.location.search);
-    const roomParam = (urlParams.get('room') || 'psy-olefirenko-session').toLowerCase().replace(/[^a-z0-9_-]/g, '');
-    const isOwnerRole = urlParams.get('role') === 'owner';
+    const roomParam = urlParams.get('room') || '';
+    const gmeetParam = urlParams.get('gmeet') || '';
+    const isOwner = urlParams.get('role') === 'owner';
     const currentUser = JSON.parse(localStorage.getItem('psy_client_user') || '{}');
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 640;
 
-    let controlsTimeout = null;
-    let areControlsVisible = true;
+    // Configure Meet URL
+    let meetUrl = gmeetParam || 'https://meet.google.com/new';
+    if (gmeetParam) {
+      meetUrl = gmeetParam;
+    }
+    
+    document.getElementById('btn-open-gmeet').href = meetUrl;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('room-code-badge').textContent = roomParam;
-      document.getElementById('local-user-label').textContent = currentUser.name ? currentUser.name.split(' ')[0] : (isOwnerRole ? 'Юлія' : 'Ви');
+    // Show notepad if owner
+    if (isOwner || currentUser.role === 'owner' || (currentUser.email && currentUser.email.includes('olefirenko'))) {
+      const box = document.getElementById('owner-notepad-box');
+      if (box) box.classList.remove('hidden');
       
-      if (!isMobileDevice) {
-        document.getElementById('flip-icon').textContent = '🖥️';
-        document.getElementById('flip-label').textContent = 'Екран';
-      }
-
-      initWebRTC();
-      startSessionTimer();
-      loadExistingNotes();
-      initAutoHideControls();
-    });
-
-    let lastMouseX = 0, lastMouseY = 0;
-
-    function initAutoHideControls() {
-      // Mouse movement on desktop (only on real cursor motion > 8px)
-      window.addEventListener('mousemove', (e) => {
-        if (Math.abs(e.clientX - lastMouseX) > 8 || Math.abs(e.clientY - lastMouseY) > 8) {
-          lastMouseX = e.clientX;
-          lastMouseY = e.clientY;
-          if (!areControlsVisible) {
-            showControls();
-          } else {
-            resetControlsTimer();
-          }
-        }
-      }, { passive: true });
-
-      window.addEventListener('keydown', () => {
-        showControls();
-      }, { passive: true });
-
-      // Tap/click on video screen toggles controls: 1st tap shows, 2nd tap collapses
-      document.body.addEventListener('click', (e) => {
-        // Ignore if clicked on interactive elements
-        if (e.target.closest('button') || e.target.closest('a') || e.target.closest('textarea') || e.target.closest('input') || e.target.closest('#local-video-container') || e.target.closest('#session-notes-sidebar') || e.target.closest('#bottom-floating-dock') || e.target.closest('#top-floating-header')) {
-          return;
-        }
-
-        if (areControlsVisible) {
-          hideControls();
-        } else {
-          showControls();
-        }
-      });
-
-      // Keep awake when interacting with dock or header buttons
-      const dock = document.getElementById('bottom-floating-dock');
-      if (dock) {
-        dock.addEventListener('pointerdown', (e) => {
-          e.stopPropagation();
-          resetControlsTimer();
-        });
-      }
-
-      const header = document.getElementById('top-floating-header');
-      if (header) {
-        header.addEventListener('pointerdown', (e) => {
-          e.stopPropagation();
-          resetControlsTimer();
-        });
-      }
-
-      // Start initial timer
-      resetControlsTimer();
-    }
-
-    function showControls() {
-      lastWakeTime = Date.now();
-      const topHeader = document.getElementById('top-floating-header');
-      const bottomDock = document.getElementById('bottom-floating-dock');
-      
-      if (topHeader) {
-        topHeader.classList.remove('opacity-0', '-translate-y-6', 'pointer-events-none');
-        topHeader.classList.add('opacity-100', 'translate-y-0');
-      }
-      if (bottomDock) {
-        bottomDock.classList.remove('opacity-0', 'translate-y-8', 'pointer-events-none');
-        bottomDock.classList.add('opacity-100', 'translate-y-0');
-      }
-      
-      areControlsVisible = true;
-      resetControlsTimer();
-    }
-
-    function hideControls() {
-      const notesSidebar = document.getElementById('session-notes-sidebar');
-      if (notesSidebar && !notesSidebar.classList.contains('hidden')) {
-        return; // Don't hide if user has notes open
-      }
-      
-      const topHeader = document.getElementById('top-floating-header');
-      const bottomDock = document.getElementById('bottom-floating-dock');
-      
-      if (topHeader) {
-        topHeader.classList.remove('opacity-100', 'translate-y-0');
-        topHeader.classList.add('opacity-0', '-translate-y-6', 'pointer-events-none');
-      }
-      if (bottomDock) {
-        bottomDock.classList.remove('opacity-100', 'translate-y-0');
-        bottomDock.classList.add('opacity-0', 'translate-y-8', 'pointer-events-none');
-      }
-      
-      areControlsVisible = false;
-    }
-
-    function resetControlsTimer() {
-      clearTimeout(controlsTimeout);
-      controlsTimeout = setTimeout(() => {
-        hideControls();
-      }, 2800); // Hide after 2.8 seconds of inactivity
-    }
-
-    // Auto-fullscreen on first user tap if supported
-    document.addEventListener('click', () => {
-      if (isMobileDevice && !document.fullscreenElement && !document.webkitFullscreenElement) {
-        tryRequestFullscreen();
-      }
-    }, { once: true });
-
-    function tryRequestFullscreen() {
-      const el = document.documentElement;
-      if (el.requestFullscreen) {
-        el.requestFullscreen().catch(() => {});
-      } else if (el.webkitRequestFullscreen) {
-        el.webkitRequestFullscreen().catch(() => {});
-      }
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        tryRequestFullscreen();
-        document.getElementById('fs-icon').textContent = '🗗';
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        document.getElementById('fs-icon').textContent = '⛶';
-      }
-    }
-
-    function toggleVideoFit() {
-      const vid = document.getElementById('remote-video');
-      isCoverMode = !isCoverMode;
-      if (isCoverMode) {
-        vid.className = 'w-full h-full object-cover bg-black';
-        document.getElementById('fit-label').textContent = 'Повний';
-      } else {
-        vid.className = 'w-full h-full object-contain bg-black';
-        document.getElementById('fit-label').textContent = 'Вмістити';
-      }
-    }
-
-    async function initWebRTC() {
-      await startCameraStream(currentFacingMode);
-      setupPeerConnection();
-    }
-
-    async function startCameraStream(facingMode = 'user') {
-      try {
-        if (localStream) {
-          localStream.getTracks().forEach(t => t.stop());
-        }
-
-        const constraints = {
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-          },
-          video: {
-            facingMode: { ideal: facingMode },
-            width: { ideal: 1280, max: 1920 },
-            height: { ideal: 720, max: 1080 },
-            frameRate: { ideal: 30 }
-          }
-        };
-
-        try {
-          localStream = await navigator.mediaDevices.getUserMedia(constraints);
-        } catch(e) {
-          localStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: facingMode },
-            audio: true
-          });
-        }
-
-        const localVid = document.getElementById('local-video');
-        localVid.srcObject = localStream;
-        
-        if (facingMode === 'user') {
-          localVid.classList.add('video-mirror');
-        } else {
-          localVid.classList.remove('video-mirror');
-        }
-
-        if (currentCall && currentCall.peerConnection) {
-          const videoTrack = localStream.getVideoTracks()[0];
-          const sender = currentCall.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
-          if (sender && videoTrack) {
-            sender.replaceTrack(videoTrack);
-          }
-        }
-      } catch (err) {
-        console.warn('Camera access error:', err);
-      }
-    }
-
-    function setupPeerConnection() {
-      const peerId = isOwnerRole ? `${roomParam}-host` : `${roomParam}-client-${Math.floor(Math.random()*1000)}`;
-      
-      peer = new Peer(peerId, {
-        debug: 1,
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:global.stun.twilio.com:3478' }
-          ]
-        }
-      });
-
-      peer.on('open', (id) => {
-        console.log('Peer connected with ID:', id);
-        if (!isOwnerRole) {
-          connectToHost();
-          startAutoReconnectHeartbeat();
-        }
-      });
-
-      peer.on('call', (call) => {
-        console.log('Incoming call received, answering');
-        currentCall = call;
-        call.answer(localStream);
-        handleStream(call);
-      });
-
-      peer.on('connection', (conn) => {
-        setupDataChannel(conn);
-      });
-
-      peer.on('error', (err) => {
-        console.log('Peer status:', err.type);
-        if (err.type === 'peer-unavailable' && !isOwnerRole) {
-          showWaitingOrReconnectingState(false);
-        }
-      });
-    }
-
-    function setupDataChannel(conn) {
-      dataConnection = conn;
-      dataConnection.on('data', (data) => {
-        if (data && data.type === 'SESSION_TERMINATED') {
-          isSessionExplicitlyEnded = true;
-          showSessionEndedScreen(data.by);
-        }
-      });
-    }
-
-    function connectToHost() {
-      if (!peer || peer.destroyed || isSessionExplicitlyEnded) return;
-      if (isConnectedWithPeer) return;
-
-      const hostPeerId = `${roomParam}-host`;
-      
-      try {
-        const conn = peer.connect(hostPeerId);
-        if (conn) setupDataChannel(conn);
-      } catch(e) {}
-
-      if (localStream) {
-        const call = peer.call(hostPeerId, localStream);
-        if (call) {
-          currentCall = call;
-          handleStream(call);
-        }
-      }
-    }
-
-    function startAutoReconnectHeartbeat() {
-      clearInterval(autoReconnectInterval);
-      autoReconnectInterval = setInterval(() => {
-        if (!isSessionExplicitlyEnded && !isConnectedWithPeer) {
-          connectToHost();
-        }
-      }, 2000);
-    }
-
-    function handleStream(call) {
-      call.on('stream', (remoteStream) => {
-        console.log('Remote stream received');
-        isConnectedWithPeer = true;
-
-        const remoteVideo = document.getElementById('remote-video');
-        const placeholder = document.getElementById('remote-placeholder');
-        
-        remoteVideo.srcObject = remoteStream;
-        remoteVideo.classList.remove('hidden');
-        placeholder.classList.add('hidden');
-      });
-
-      call.on('close', () => {
-        console.log('Call stream closed');
-        isConnectedWithPeer = false;
-
-        if (!isSessionExplicitlyEnded) {
-          showWaitingOrReconnectingState(true);
-          if (!isOwnerRole) {
-            connectToHost();
-          }
-        }
-      });
-    }
-
-    function showWaitingOrReconnectingState(isReconnect = false) {
-      const remoteVideo = document.getElementById('remote-video');
-      const placeholder = document.getElementById('remote-placeholder');
-      const title = document.getElementById('waiting-title');
-      const desc = document.getElementById('waiting-desc');
-      const badge = document.getElementById('room-status-badge');
-
-      remoteVideo.classList.add('hidden');
-      placeholder.classList.remove('hidden');
-
-      if (isReconnect) {
-        title.textContent = "📡 Відновлення зв'язку...";
-        desc.textContent = "Тимчасове перепідключення або оновлення сторінки співрозмовником. Зв'язок автоматично відновиться.";
-        badge.innerHTML = `<span class="text-amber-300">Перепідключення...</span>`;
-      } else {
-        title.textContent = "Очікування співрозмовника...";
-        desc.textContent = "Ви в захищеній відеокімнаті. Зв'язок розпочнеться автоматично, щойно співрозмовник увійде.";
-        badge.innerHTML = `Кімната: <strong id="room-code-badge">${roomParam}</strong>`;
-      }
-    }
-
-    function toggleAudio() {
-      if (!localStream) return;
-      isAudioMuted = !isAudioMuted;
-      localStream.getAudioTracks().forEach(t => t.enabled = !isAudioMuted);
-      
-      const iconBox = document.getElementById('btn-mic-icon-box');
-      const icon = document.getElementById('mic-icon');
-      const label = document.getElementById('mic-label');
-
-      if (isAudioMuted) {
-        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-rose-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95';
-        icon.textContent = '🔇';
-        label.textContent = 'Вимкнено';
-        label.className = 'text-[9px] sm:text-[10px] font-semibold text-rose-400';
-      } else {
-        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95';
-        icon.textContent = '🎤';
-        label.textContent = 'Мікр';
-        label.className = 'text-[9px] sm:text-[10px] font-semibold text-gray-300';
-      }
-    }
-
-    function toggleVideo() {
-      if (!localStream) return;
-      isVideoMuted = !isVideoMuted;
-      localStream.getVideoTracks().forEach(t => t.enabled = !isVideoMuted);
-      
-      const iconBox = document.getElementById('btn-cam-icon-box');
-      const icon = document.getElementById('cam-icon');
-      const label = document.getElementById('cam-label');
-
-      if (isVideoMuted) {
-        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-rose-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95';
-        icon.textContent = '🚫';
-        label.textContent = 'Вимкнено';
-        label.className = 'text-[9px] sm:text-[10px] font-semibold text-rose-400';
-      } else {
-        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl transition-all shadow-md active:scale-95';
-        icon.textContent = '📹';
-        label.textContent = 'Камера';
-        label.className = 'text-[9px] sm:text-[10px] font-semibold text-gray-300';
-      }
-    }
-
-    async function handleFlipOrScreen() {
-      if (isMobileDevice) {
-        currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
-        await startCameraStream(currentFacingMode);
-      } else {
-        toggleScreenShare();
-      }
-    }
-
-    async function toggleScreenShare() {
-      if (!isScreenSharing) {
-        try {
-          const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-          const videoTrack = screenStream.getVideoTracks()[0];
-          
-          if (currentCall && currentCall.peerConnection) {
-            const sender = currentCall.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
-            if (sender) sender.replaceTrack(videoTrack);
-          }
-          
-          document.getElementById('local-video').srcObject = screenStream;
-          isScreenSharing = true;
-
-          videoTrack.onended = () => {
-            stopScreenShare();
-          };
-        } catch (e) {}
-      } else {
-        stopScreenShare();
-      }
-    }
-
-    function stopScreenShare() {
-      if (localStream) {
-        const videoTrack = localStream.getVideoTracks()[0];
-        if (currentCall && currentCall.peerConnection) {
-          const sender = currentCall.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
-          if (sender && videoTrack) sender.replaceTrack(videoTrack);
-        }
-        document.getElementById('local-video').srcObject = localStream;
-      }
-      isScreenSharing = false;
-    }
-
-    function startSessionTimer() {
-      const display = document.getElementById('session-countdown');
-      timerInterval = setInterval(() => {
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          display.textContent = '00:00';
-          display.classList.add('text-rose-400');
-          return;
-        }
-
-        timeLeft--;
-        const mins = Math.floor(timeLeft / 60);
-        const secs = timeLeft % 60;
-        display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
-        if (timeLeft <= 300) {
-          display.classList.add('text-amber-400');
-        }
-      }, 1000);
-    }
-
-    function toggleNotesPanel() {
-      const sidebar = document.getElementById('session-notes-sidebar');
-      const btn = document.getElementById('notes-header-btn');
-      if (sidebar.classList.contains('hidden')) {
-        sidebar.classList.remove('hidden');
-        sidebar.classList.add('flex');
-        if (btn) btn.classList.add('bg-brand-600', 'text-white');
-      } else {
-        sidebar.classList.add('hidden');
-        sidebar.classList.remove('flex');
-        if (btn) btn.classList.remove('bg-brand-600', 'text-white');
-      }
-    }
-
-    function loadExistingNotes() {
-      const saved = localStorage.getItem(`psy_notes_${roomParam}`);
-      if (saved) {
-        document.getElementById('in-session-notes').value = saved;
+      const savedNotes = localStorage.getItem(`psy_notes_${roomParam || 'general'}`);
+      if (savedNotes) {
+        document.getElementById('session-notes-input').value = savedNotes;
       }
     }
 
     let saveTimeout = null;
     function autoSaveNotes() {
-      clearTimeout(saveTimeout);
-      document.getElementById('notes-status-text').textContent = 'Збереження...';
-      saveTimeout = setTimeout(() => {
-        const val = document.getElementById('in-session-notes').value;
-        localStorage.setItem(`psy_notes_${roomParam}`, val);
-        document.getElementById('notes-status-text').textContent = 'Збережено автоматично ✓';
-      }, 600);
-    }
-
-    function saveInSessionNotes() {
-      const val = document.getElementById('in-session-notes').value;
-      localStorage.setItem(`psy_notes_${roomParam}`, val);
-      document.getElementById('notes-status-text').textContent = 'Збережено в базу ✓';
-      alert('Нотатки сесії успішно збережено!');
-    }
-
-    function hangUpCall() {
-      if (confirm('Ви дійсно бажаєте завершити онлайн-консультацію?')) {
-        isSessionExplicitlyEnded = true;
-        clearInterval(autoReconnectInterval);
-
-        if (dataConnection && dataConnection.open) {
-          try {
-            dataConnection.send({
-              type: 'SESSION_TERMINATED',
-              by: isOwnerRole ? 'Юлія Олефіренко' : (currentUser.name || 'Клієнт')
-            });
-          } catch(e) {}
-        }
-
-        closeMedia();
-        showSessionEndedScreen('Ви');
-      }
-    }
-
-    function showSessionEndedScreen(endedByName) {
-      clearInterval(autoReconnectInterval);
-      clearInterval(timerInterval);
-      closeMedia();
-
-      const modal = document.getElementById('session-ended-modal');
-      const desc = document.getElementById('session-ended-desc');
+      const text = document.getElementById('session-notes-input').value;
+      const status = document.getElementById('notes-status');
+      if (status) status.textContent = 'Збереження...';
       
-      if (endedByName && endedByName !== 'Ви') {
-        desc.textContent = `Консультація була завершена співрозмовником (${endedByName}). Усі нотатки сесії збережено.`;
-      } else {
-        desc.textContent = `Консультацію успішно завершено. Усі нотатки сесії збережено.`;
-      }
-
-      modal.classList.remove('hidden');
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        localStorage.setItem(`psy_notes_${roomParam || 'general'}`, text);
+        if (status) status.textContent = 'Збережено ✓';
+      }, 500);
     }
 
-    function closeMedia() {
-      if (localStream) {
-        localStream.getTracks().forEach(t => t.stop());
-      }
-      if (currentCall) {
-        try { currentCall.close(); } catch(e) {}
-      }
-      if (peer) {
-        try { peer.destroy(); } catch(e) {}
-      }
-    }
+    // Google Calendar Link
+    const tomorrow = new Date();
+    const gcalLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Консультація з Юлією Олефіренко')}&details=${encodeURIComponent('Індивідуальна онлайн-сесія психотерапії (50 хв).\nПосилання Google Meet: ' + meetUrl)}&location=${encodeURIComponent(meetUrl)}`;
+    document.getElementById('btn-gcal-sync').href = gcalLink;
   </script>
+
+  <!--
+  ============================================================================
+  PRESERVED WEBRTC ENGINE (BACKUP FOR FUTURE REACTIVATION)
+  ============================================================================
+  To restore full in-browser WebRTC PeerJS calling, swap this page with the WebRTC engine:
+  - PeerJS v1.5.4
+  - Deterministic room orchestration (${room}-host vs ${room}-client)
+  - STUN servers: stun.l.google.com:19302, global.stun.twilio.com:3478
+  - Natural HD camera constraints without crop
+  - Edge-to-edge fullscreen with auto-hiding floating controls
+  ============================================================================
+  -->
 </body>
 </html>

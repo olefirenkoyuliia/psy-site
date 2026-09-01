@@ -407,20 +407,20 @@
           <!-- Fast Video Session Hub Card -->
           <div class="p-6 sm:p-7 rounded-3xl bg-warm-card border border-warm-border shadow-soft space-y-5">
             <div class="flex items-center gap-2.5">
-              <span class="text-2xl">📹</span>
+              <span class="text-2xl">🌐</span>
               <div>
-                <h3 class="font-bold text-warm-text text-base">Відеокімната консультацій</h3>
-                <p class="text-xs text-warm-muted">Проведення онлайн-сесій прямо на сайті</p>
+                <h3 class="font-bold text-warm-text text-base">Відеозустрічі Google Meet</h3>
+                <p class="text-xs text-warm-muted">Офіційний сервіс захищеного відеозв'язку</p>
               </div>
             </div>
 
             <p class="text-xs text-warm-muted leading-relaxed">
-              Індивідуальна захищена кімната для відеозустрічей з підтримкою мікрофона, камери, демонстрації екрана та таймером 50 хв.
+              Консультації проходять через Google Meet з підтримкою високої якості відео, шумоподавлення та зручної синхронізації з календарем.
             </p>
 
             <div class="space-y-2.5 pt-1">
-              <a href="meet.html" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-hover transition-all">
-                <span>📹 Увійти у відеокімнату зараз</span>
+              <a href="https://meet.google.com/" target="_blank" class="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-hover transition-all">
+                <span>🌐 Відкрити Google Meet</span>
               </a>
               <a href="index.html#booking-widget" class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-white hover:bg-warm-bg text-warm-text font-bold text-xs border border-warm-border transition-all">
                 <span>📅 Календар вільних годин</span>
@@ -500,26 +500,20 @@
           </select>
         </div>
 
-        <!-- Meeting Format Selection -->
-        <div class="space-y-1.5">
-          <label class="block text-xs font-bold text-warm-text">Формат зустрічі:</label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <label class="flex items-center gap-2.5 p-3 rounded-2xl border border-emerald-500/60 bg-emerald-50/60 cursor-pointer text-xs font-bold text-brand-900 transition-all" id="format-label-gmeet">
-              <input type="radio" name="schedule_meet_format" value="google_meet" checked onchange="toggleScheduleMeetFormat()" class="text-brand-600 focus:ring-brand-500">
-              <span>🌐 Google Meet (Основний)</span>
-            </label>
-            <label class="flex items-center gap-2.5 p-3 rounded-2xl border border-warm-border bg-white cursor-pointer text-xs font-semibold text-warm-text hover:bg-warm-bg transition-all" id="format-label-webrtc">
-              <input type="radio" name="schedule_meet_format" value="webrtc" onchange="toggleScheduleMeetFormat()" class="text-brand-600 focus:ring-brand-500">
-              <span>🌿 Відеокімната сайту</span>
-            </label>
-          </div>
-        </div>
+        <!-- Meeting Format (Google Meet) -->
+        <input type="hidden" name="schedule_meet_format" value="google_meet">
+        <!-- Preserved WebRTC format selector for future re-activation:
+        <input type="radio" name="schedule_meet_format" value="webrtc">
+        -->
 
         <!-- Google Meet URL Field -->
         <div id="schedule-gmeet-url-box" class="space-y-1">
-          <label class="block text-xs font-bold text-warm-text">Посилання на Google Meet:</label>
+          <label class="block text-xs font-bold text-warm-text flex items-center justify-between">
+            <span>Посилання на Google Meet:</span>
+            <span class="text-[10px] text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">🌐 Google Meet</span>
+          </label>
           <input type="url" id="schedule-gmeet-url" placeholder="https://meet.google.com/xxx-yyyy-zzz" value="https://meet.google.com/new" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
-          <p class="text-[10px] text-warm-muted">Вкажіть посилання на створений Google Meet (або залиште посилання швидкого старту).</p>
+          <p class="text-[10px] text-warm-muted">Вкажіть посилання на кімнату Google Meet (або залиште посилання швидкого старту).</p>
         </div>
 
         <div class="space-y-1">
@@ -1070,13 +1064,13 @@
       if (isOwner) {
         roleBadge.innerHTML = '<span>👑</span> <span>Власниця практики • Психологиня</span>';
         welcomeName.textContent = 'Юліє';
-        welcomeSubtitle.textContent = 'Календар зустрічей, запуск відеокімнати онлайн та керування базою клієнтів.';
+        welcomeSubtitle.textContent = 'Календар зустрічей, онлайн-сесії Google Meet та керування базою клієнтів.';
         heroActions.innerHTML = `
           <button onclick="openScheduleModal()" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
             <span>➕ Призначити сесію</span>
           </button>
-          <a href="meet.html?role=owner" class="px-5 py-3 rounded-full bg-brand-900/50 hover:bg-brand-900/70 text-white border border-white/25 font-bold text-xs transition-all flex items-center justify-center gap-2">
-            <span>📹 Онлайн-кімната</span>
+          <a href="https://meet.google.com/new" target="_blank" class="px-5 py-3 rounded-full bg-brand-900/50 hover:bg-brand-900/70 text-white border border-white/25 font-bold text-xs transition-all flex items-center justify-center gap-2">
+            <span>🌐 Створити Google Meet</span>
           </a>
         `;
         ownerTabsNav.classList.remove('hidden');
@@ -1088,8 +1082,8 @@
         welcomeName.textContent = user.first_name || user.name.split(' ')[0] || 'Клієнте';
         welcomeSubtitle.textContent = 'Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та підготуватися до зустрічі з Юлією Олефіренко.';
         heroActions.innerHTML = `
-          <a href="meet.html" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
-            <span>📹 Увійти у відеокімнату</span>
+          <a href="https://meet.google.com/" target="_blank" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
+            <span>🌐 Відкрити Google Meet</span>
           </a>
           <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
             <span>💬 Написати Юлії</span>
@@ -1228,8 +1222,8 @@
                   <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200">
                     📅 ${app.session_date} • ${app.session_time} (${app.duration_minutes || 50} хв)
                   </span>
-                  <span class="px-2 py-0.5 rounded-full ${isGmeet ? 'bg-sky-50 text-sky-800 border border-sky-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'} text-[10px] font-bold">
-                    ${isGmeet ? '🌐 Google Meet' : '🌿 Відеокімната'}
+                  <span class="px-2 py-0.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200 text-[10px] font-bold">
+                    🌐 Google Meet
                   </span>
                 </div>
                 <h3 class="font-bold text-warm-text text-base">${escapeHtml(app.client_name)}</h3>
@@ -1248,28 +1242,16 @@
           </div>
 
           <div class="space-y-2 pt-2 border-t border-warm-border/60">
-            <!-- Primary Action Button -->
-            ${isGmeet ? `
-              <a href="${gmeetLink}" target="_blank" class="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-2">
-                <span>🌐 Відкрити Google Meet</span>
-              </a>
-              <a href="meet.html?room=${platformRoomCode}&role=owner" class="w-full py-1.5 rounded-xl bg-warm-card hover:bg-brand-50 border border-warm-border text-warm-muted hover:text-brand-800 font-medium text-[11px] transition-colors flex items-center justify-center gap-1.5">
-                <span>🌿 Або відкрити відеокімнату сайту</span>
-              </a>
-            ` : `
-              <a href="meet.html?room=${platformRoomCode}&role=owner" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-2">
-                <span>📹 Почати відеосесію онлайн</span>
-              </a>
-              <a href="${gmeetLink}" target="_blank" class="w-full py-1.5 rounded-xl bg-warm-card hover:bg-emerald-50 border border-warm-border text-warm-muted hover:text-emerald-800 font-medium text-[11px] transition-colors flex items-center justify-center gap-1.5">
-                <span>🌐 Або відкрити Google Meet</span>
-              </a>
-            `}
+            <!-- Google Meet Button -->
+            <a href="${gmeetLink}" target="_blank" class="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-2">
+              <span>🌐 Відкрити Google Meet</span>
+            </a>
 
             <div class="grid grid-cols-2 gap-2 text-xs pt-1">
               <a href="${gcalUrl}" target="_blank" class="py-2 px-3 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-center transition-colors flex items-center justify-center gap-1">
                 <span>📅 Google Календар</span>
               </a>
-              <a href="https://t.me/share/url?url=${encodeURIComponent(isGmeet ? gmeetLink : platformMeetUrl)}&text=${tgDraftText}" target="_blank" class="py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-semibold text-center transition-colors flex items-center justify-center gap-1">
+              <a href="https://t.me/share/url?url=${encodeURIComponent(gmeetLink)}&text=${tgDraftText}" target="_blank" class="py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-semibold text-center transition-colors flex items-center justify-center gap-1">
                 <span>💬 Лінк клієнту</span>
               </a>
             </div>
@@ -1295,29 +1277,19 @@
           const data = await res.json();
           const upcoming = (data.appointments || []).find(a => a.status === 'scheduled');
           if (upcoming) {
-            const isGmeet = (upcoming.meet_format === 'google_meet') || (upcoming.meet_url && upcoming.meet_url.includes('meet.google.com')) || (!upcoming.meet_format && !upcoming.meet_url?.includes('meet.html'));
             const gmeetLink = upcoming.google_meet_url || (upcoming.meet_url?.includes('meet.google.com') ? upcoming.meet_url : 'https://meet.google.com/new');
-            const roomCode = upcoming.room_code || `psy-session-${upcoming.id || Date.now()}`;
-            const platformLink = `meet.html?room=${roomCode}`;
 
             document.getElementById('client-session-datetime').textContent = `${upcoming.session_date} о ${upcoming.session_time}`;
             
             const joinBtn = document.getElementById('client-join-meet-btn');
-            if (isGmeet) {
-              joinBtn.href = gmeetLink;
-              joinBtn.target = '_blank';
-              joinBtn.innerHTML = '<span>🌐 Увійти в Google Meet</span>';
-            } else {
-              joinBtn.href = platformLink;
-              joinBtn.target = '_self';
-              joinBtn.innerHTML = '<span>📹 Увійти у відеокімнату на сайті</span>';
-            }
+            joinBtn.href = gmeetLink;
+            joinBtn.target = '_blank';
+            joinBtn.innerHTML = '<span>🌐 Увійти в Google Meet</span>';
             
             const gcalUrl = buildGoogleCalendarLink(
               `Консультація психотерапії з Юлією Олефіренко`,
-              `Індивідуальна сесія (${upcoming.duration_minutes || 50} хв).\n` +
-              (isGmeet ? `🌐 Google Meet: ${gmeetLink}\n🌿 Відеокімната на сайті: https://olefirenko.pp.ua/${platformLink}` : `🌿 Відеокімната на сайті: https://olefirenko.pp.ua/${platformLink}\n🌐 Google Meet: ${gmeetLink}`),
-              isGmeet ? gmeetLink : `https://olefirenko.pp.ua/${platformLink}`,
+              `Індивідуальна сесія (${upcoming.duration_minutes || 50} хв).\nПряме посилання на Google Meet: ${gmeetLink}`,
+              gmeetLink,
               upcoming.session_date,
               upcoming.session_time,
               upcoming.duration_minutes
