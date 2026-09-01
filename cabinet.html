@@ -837,7 +837,7 @@
           <span class="text-2xl">🗓️</span>
           <div>
             <h3 class="font-bold text-warm-text text-base" id="sync-modal-title">Синхронізація з Google Календарем</h3>
-            <p class="text-xs text-warm-muted">Додавання сесій у Google Календар та підключення живої автосинхронізації</p>
+            <p class="text-xs text-warm-muted">Створення подій прямо в основному Google Календарі Юлі та клієнта</p>
           </div>
         </div>
         <button onclick="closeModal('calendar-sync-modal')" class="w-8 h-8 rounded-full bg-warm-bg hover:bg-gray-200 text-warm-muted flex items-center justify-center font-bold text-xs">
@@ -845,17 +845,34 @@
         </button>
       </div>
 
+      <!-- Option 0: Direct Instant Push to Primary Google Calendar -->
+      <div class="p-4 rounded-2xl bg-emerald-700 text-white space-y-2.5 shadow-md">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">⚡</span>
+            <span class="font-bold text-sm">Прямий запис в основний Google Календар (Primary)</span>
+          </div>
+          <span id="sync-modal-direct-badge" class="text-[10px] bg-white/20 text-emerald-100 font-bold px-2.5 py-0.5 rounded-full">Автозапис</span>
+        </div>
+        <p class="text-xs text-emerald-100 leading-relaxed">
+          Натисніть кнопку нижче, щоб система автоматично записала ці сесії в <strong>основний Google Календар Юлі</strong> та надіслала офіційне запрошення з Google Meet в <strong>основний Google Календар клієнта</strong>.
+        </p>
+        <button type="button" onclick="syncSessionsToGoogleCalendarDirectly()" id="btn-direct-gcal-sync" class="w-full py-3 rounded-xl bg-white text-emerald-950 hover:bg-emerald-50 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
+          <span>🚀 Записати всі ці зустрічі в основний Google Календар Юлі та клієнта</span>
+        </button>
+      </div>
+
       <!-- Option 1: Live Automatic Sync Feed URL -->
       <div class="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-2.5">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5">
-            <span class="text-emerald-800 text-sm">⚡</span>
-            <span class="font-bold text-emerald-950 text-xs">Постійна автосинхронізація (Рекомендовано):</span>
+            <span class="text-emerald-800 text-sm">🌐</span>
+            <span class="font-bold text-emerald-950 text-xs">Посилання для автосинхронізації (iCal Feed):</span>
           </div>
           <span class="text-[10px] text-emerald-800 bg-emerald-100 font-bold px-2 py-0.5 rounded-full">1 раз підключити</span>
         </div>
         <p class="text-[11px] text-emerald-900 leading-relaxed">
-          Додайте це посилання один раз у свій Google Календар (пункт <strong>«Інші календарі» ➔ «Додати за URL»</strong>). Усі нові, перенесені та створені зустрічі будуть <strong>автоматично з'являтися у вашому календарі на телефоні та ноутбуці</strong>!
+          Або додайте це посилання один раз у свій Google Календар (пункт <strong>«Інші календарі» ➔ «Додати за URL»</strong>). Усі зустрічі будуть <strong>автоматично оновлюватися в календарі на телефоні та ноутбуці</strong>.
         </p>
         <div class="flex items-center gap-2 pt-1">
           <input type="text" id="sync-modal-feed-url" readonly value="https://dev.psy-site.pages.dev/api/calendar/feed?role=owner" class="w-full px-3 py-2 rounded-xl border border-emerald-300 text-[11px] font-mono bg-white text-emerald-950">
@@ -2162,6 +2179,166 @@
       }
     }
 
+    let currentSyncModalSessions = [];
+    let googleCalendarToken = localStorage.getItem('psy_google_cal_token') || null;
+    let googleTokenClient = null;
+    let pendingCalendarSyncSessions = null;
+
+    function initGoogleCalendarTokenClient() {
+      if (activeGoogleClientId && window.google && window.google.accounts && window.google.accounts.oauth2) {
+        try {
+          googleTokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: activeGoogleClientId,
+            scope: 'https://www.googleapis.com/auth/calendar.events',
+            callback: async (tokenResponse) => {
+              if (tokenResponse && tokenResponse.access_token) {
+                googleCalendarToken = tokenResponse.access_token;
+                localStorage.setItem('psy_google_cal_token', googleCalendarToken);
+                updateGoogleCalendarStatusBadge();
+                showToast('✅ Доступ до Google Календаря надано!');
+                
+                const sessionsToSync = pendingCalendarSyncSessions || currentSyncModalSessions;
+                if (sessionsToSync && sessionsToSync.length > 0) {
+                  await syncSessionsToGoogleCalendarDirectly(sessionsToSync);
+                  pendingCalendarSyncSessions = null;
+                }
+              }
+            }
+          });
+          updateGoogleCalendarStatusBadge();
+        } catch(e) {
+          console.warn('initTokenClient error:', e);
+        }
+      }
+    }
+
+    function updateGoogleCalendarStatusBadge() {
+      const badge = document.getElementById('sync-modal-direct-badge');
+      const btnDirect = document.getElementById('btn-direct-gcal-sync');
+      if (googleCalendarToken) {
+        if (badge) {
+          badge.textContent = '🟢 Підключено (OAuth)';
+          badge.className = 'text-[10px] bg-emerald-300 text-emerald-950 font-bold px-2.5 py-0.5 rounded-full';
+        }
+        if (btnDirect) {
+          btnDirect.innerHTML = '<span>⚡ Записати в основний Google Календар Юлі та клієнта</span>';
+        }
+      } else {
+        if (badge) {
+          badge.textContent = '1 клік авторизація';
+          badge.className = 'text-[10px] bg-white/20 text-emerald-100 font-bold px-2.5 py-0.5 rounded-full';
+        }
+      }
+    }
+
+    function requestGoogleCalendarAccess(sessionsToSync) {
+      if (sessionsToSync) pendingCalendarSyncSessions = sessionsToSync;
+      
+      if (!googleTokenClient) {
+        initGoogleCalendarTokenClient();
+      }
+
+      if (googleTokenClient) {
+        googleTokenClient.requestAccessToken({ prompt: 'consent' });
+      } else {
+        alert('Для прямого автозапису в Google Календар вкажіть ваш Google Client ID у налаштуваннях');
+        toggleGoogleConfigBox();
+      }
+    }
+
+    async function syncSessionsToGoogleCalendarDirectly(customSessions) {
+      const sessions = customSessions || currentSyncModalSessions;
+      if (!sessions || sessions.length === 0) {
+        showToast('Немає сесій для запису');
+        return;
+      }
+
+      if (!googleCalendarToken) {
+        pendingCalendarSyncSessions = sessions;
+        requestGoogleCalendarAccess(sessions);
+        return;
+      }
+
+      const btnDirect = document.getElementById('btn-direct-gcal-sync');
+      if (btnDirect) {
+        btnDirect.disabled = true;
+        btnDirect.innerHTML = '<span>⏳ Запис у Google Календар...</span>';
+      }
+
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const session of sessions) {
+        try {
+          const startDateTime = `${session.session_date}T${session.session_time}:00`;
+          const startDate = new Date(startDateTime);
+          const durationMins = session.duration_minutes || 50;
+          const endDate = new Date(startDate.getTime() + durationMins * 60000);
+
+          const pad = (n) => String(n).padStart(2, '0');
+          const formatKyivIso = (d) => {
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+          };
+
+          const meetLink = session.google_meet_url || session.meet_url || 'https://meet.google.com/new';
+          const eventBody = {
+            summary: `Консультація психотерапії: ${session.client_name || 'Клієнт'} & Юлія Олефіренко`,
+            description: `Індивідуальна сесія психотерапії (${durationMins} хв).\nПряме посилання Google Meet: ${meetLink}\n${session.therapist_notes ? 'Нотатка: ' + session.therapist_notes : ''}\n\nОсобистий кабінет: https://olefirenko.pp.ua/cabinet.html`,
+            start: {
+              dateTime: `${formatKyivIso(startDate)}+03:00`,
+              timeZone: 'Europe/Kyiv'
+            },
+            end: {
+              dateTime: `${formatKyivIso(endDate)}+03:00`,
+              timeZone: 'Europe/Kyiv'
+            },
+            attendees: [
+              session.client_email ? { email: session.client_email, displayName: session.client_name } : null,
+              { email: 'olefirenkou@gmail.com', displayName: 'Юлія Олефіренко' }
+            ].filter(Boolean),
+            visibility: 'private',
+            guestsCanSeeOtherGuests: false
+          };
+
+          const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=all', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${googleCalendarToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(eventBody)
+          });
+
+          if (res.ok) {
+            successCount++;
+          } else if (res.status === 401) {
+            // Token expired
+            googleCalendarToken = null;
+            localStorage.removeItem('psy_google_cal_token');
+            pendingCalendarSyncSessions = sessions;
+            requestGoogleCalendarAccess(sessions);
+            return;
+          } else {
+            errorCount++;
+          }
+        } catch(err) {
+          errorCount++;
+        }
+      }
+
+      if (btnDirect) {
+        btnDirect.disabled = false;
+        btnDirect.innerHTML = '<span>🚀 Записати всі ці зустрічі в основний Google Календар Юлі та клієнта</span>';
+      }
+
+      if (successCount > 0) {
+        showToast(`🎉 Успішно записано ${successCount} сесій прямо в основний Google Календар Юлі та клієнта!`);
+        alert(`✅ Успішно створено ${successCount} зустрічей в основному Google Календарі!\n\nПодії додано в основний календар Юлії (olefirenkou@gmail.com) та надіслано офіційні запрошення на пошту клієнта з автоматичним додаванням у його основний Google Календар.`);
+      } else if (errorCount > 0) {
+        alert('Не вдалося записати автоматично через Google Calendar API. Перевірте Google Client ID або скористайтеся кнопками додавання кожної зустрічі нижче.');
+      }
+    }
+
     function openCalendarSyncModal(customTitle, specificSessions) {
       const modal = document.getElementById('calendar-sync-modal');
       const titleEl = document.getElementById('sync-modal-title');
@@ -2174,7 +2351,10 @@
       if (customTitle && titleEl) titleEl.textContent = customTitle;
 
       const sessions = specificSessions || cachedAppointments.filter(a => a.status === 'scheduled');
+      currentSyncModalSessions = sessions;
       if (countEl) countEl.textContent = `${sessions.length} зустрічей`;
+
+      updateGoogleCalendarStatusBadge();
 
       // Feed URL
       const host = window.location.origin && window.location.origin.startsWith('http') 
