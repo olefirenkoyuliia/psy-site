@@ -593,15 +593,18 @@
 
       <form id="schedule-form" onsubmit="saveNewAppointment(event)" class="space-y-4">
         
-        <!-- Mode Switcher: Single Session vs Course / Multi-Sessions -->
+        <!-- Mode Switcher: Slots from Calendar vs Single Session vs Course Generator -->
         <div class="space-y-1">
           <label class="block text-xs font-bold text-warm-text">Тип запису:</label>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-2" id="schedule-modes-nav-grid">
             <button type="button" onclick="setScheduleMode('single')" id="sched-mode-single-btn" class="py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5">
               <span>1️⃣ Разова сесія</span>
             </button>
             <button type="button" onclick="setScheduleMode('course')" id="sched-mode-course-btn" class="py-2.5 px-3 rounded-2xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5">
-              <span>📚 Курс (4, 8, 10+ сесій)</span>
+              <span>📅 Авторозклад за днями</span>
+            </button>
+            <button type="button" onclick="setScheduleMode('slots')" id="sched-mode-slots-btn" class="col-span-2 hidden py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5">
+              <span>🎯 Обрані слоти з календаря (<span id="sched-mode-slots-count">0</span>)</span>
             </button>
           </div>
         </div>
@@ -614,24 +617,24 @@
           </select>
         </div>
 
-        <!-- Date & Time (Start date of course or single session) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Single Session Date & Time Box (Visible in 'single' and 'course' start date) -->
+        <div id="single-datetime-box" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="space-y-1">
-            <label class="block text-xs font-bold text-warm-text" id="schedule-date-label">Дата зустрічі (або 1-ї сесії):</label>
-            <input type="date" id="schedule-date" onchange="updateCourseSchedulePreview()" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+            <label class="block text-xs font-bold text-warm-text" id="schedule-date-label">Дата зустрічі:</label>
+            <input type="date" id="schedule-date" onchange="updateCourseSchedulePreview()" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
           </div>
           <div class="space-y-1">
             <label class="block text-xs font-bold text-warm-text">Час (Київ):</label>
-            <input type="time" id="schedule-time" onchange="updateCourseSchedulePreview()" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+            <input type="time" id="schedule-time" onchange="updateCourseSchedulePreview()" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
           </div>
         </div>
 
-        <!-- Course / Multi-Session Options Box (Shown when Course mode is active) -->
-        <div id="course-options-box" class="hidden space-y-4 p-4 rounded-3xl bg-emerald-50/70 border border-emerald-200">
+        <!-- Generator Options (Only shown in 'course' auto-generator mode) -->
+        <div id="course-generator-box" class="hidden space-y-4 p-4 rounded-3xl bg-emerald-50/70 border border-emerald-200">
           
           <!-- Package Count Selection -->
           <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-emerald-950">Кількість сесій у пакеті / курсі:</label>
+            <label class="block text-xs font-bold text-emerald-950">Кількість сесій для генерації (1 - 100+):</label>
             <div class="grid grid-cols-4 gap-1.5">
               <button type="button" onclick="setCourseCount(4)" id="course-pill-4" class="course-count-pill py-2 rounded-xl border border-warm-border bg-white text-xs font-semibold hover:border-brand-500 transition-all">4 сесії</button>
               <button type="button" onclick="setCourseCount(8)" id="course-pill-8" class="course-count-pill py-2 rounded-xl border border-warm-border bg-white text-xs font-semibold hover:border-brand-500 transition-all">8 сесій</button>
@@ -639,7 +642,7 @@
               <button type="button" onclick="setCourseCount('custom')" id="course-pill-custom" class="course-count-pill py-2 rounded-xl border border-warm-border bg-white text-xs font-semibold hover:border-brand-500 transition-all">Своя</button>
             </div>
             <div id="custom-course-count-box" class="hidden pt-1">
-              <input type="number" id="schedule-course-count-input" value="10" min="1" max="50" oninput="recalculateCourseSessions()" placeholder="Введіть кількість зустрічей" class="w-full px-3.5 py-2 rounded-xl border border-warm-border text-xs font-medium bg-white">
+              <input type="number" id="schedule-course-count-input" value="10" min="1" oninput="recalculateCourseSessions()" placeholder="Введіть будь-яку кількість зустрічей (наприклад, 12, 20, 50, 100)" class="w-full px-3.5 py-2 rounded-xl border border-warm-border text-xs font-medium bg-white">
             </div>
           </div>
 
@@ -665,25 +668,25 @@
               <!-- Dynamically populated time inputs for active days -->
             </div>
           </div>
+        </div>
 
-          <!-- Interactive Schedule List with Direct Date & Time Editing for Each Session -->
-          <div class="space-y-2 pt-2 border-t border-emerald-200/60">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-bold text-emerald-950">Покроковий розклад сесій (налаштуйте кожну дату та час):</span>
-              <span class="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded-full" id="course-preview-count-badge">10 сесій</span>
-            </div>
-            
-            <!-- List of editable rows -->
-            <div id="course-schedule-preview-list" class="max-h-52 overflow-y-auto space-y-1.5 p-2 rounded-2xl bg-white border border-warm-border">
-              <!-- Dynamically populated rows with date, time inputs and delete button -->
-            </div>
+        <!-- Sessions List Box (Shown in 'slots' mode and 'course' mode) -->
+        <div id="course-sessions-list-box" class="hidden space-y-2 p-4 rounded-3xl bg-emerald-50/50 border border-emerald-200">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-emerald-950" id="course-sessions-list-title">Список призначених сесій:</span>
+            <span class="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-2.5 py-0.5 rounded-full" id="course-preview-count-badge">0 сесій</span>
+          </div>
+          
+          <!-- List of editable rows -->
+          <div id="course-schedule-preview-list" class="max-h-56 overflow-y-auto space-y-1.5 p-2 rounded-2xl bg-white border border-warm-border">
+            <!-- Dynamically populated rows with date, time inputs and delete button -->
+          </div>
 
-            <!-- Add Extra Session Button -->
-            <div class="flex justify-end pt-1">
-              <button type="button" onclick="addExtraCourseSession()" class="px-3 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 text-xs font-bold transition-colors flex items-center gap-1">
-                <span>➕ Додати зустріч</span>
-              </button>
-            </div>
+          <!-- Add Extra Session Button -->
+          <div class="flex justify-end pt-1">
+            <button type="button" onclick="addExtraCourseSession()" class="px-3 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 text-xs font-bold transition-colors flex items-center gap-1">
+              <span>➕ Додати зустріч</span>
+            </button>
           </div>
         </div>
 
@@ -1549,17 +1552,20 @@
         };
       });
 
-      openScheduleModal();
-      setScheduleMode('course');
-      
+      // Populate client select
+      const select = document.getElementById('schedule-client-select');
+      select.innerHTML = '<option value="">-- Оберіть клієнта з бази --</option>';
+      cachedOwnerClients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = JSON.stringify({ id: c.id, name: c.name, email: c.email, preferred_format: c.preferred_format });
+        opt.textContent = `${c.name} (${c.email || c.phone || 'без пошти'})`;
+        select.appendChild(opt);
+      });
+
       coursePlannedSessions = sessions;
-      if (sessions.length > 0) {
-        document.getElementById('schedule-date').value = sessions[0].dateStr;
-        document.getElementById('schedule-time').value = sessions[0].timeStr;
-      }
+      setScheduleMode('slots');
       renderCourseSchedulePreviewList();
-      
-      clearCalendarSlotSelection();
+      openModal('schedule-modal');
     }
 
     const STANDARD_CALENDAR_HOURS = [
@@ -2069,24 +2075,79 @@
       currentScheduleMode = mode;
       const singleBtn = document.getElementById('sched-mode-single-btn');
       const courseBtn = document.getElementById('sched-mode-course-btn');
-      const courseBox = document.getElementById('course-options-box');
+      const slotsBtn = document.getElementById('sched-mode-slots-btn');
+      const slotsCount = document.getElementById('sched-mode-slots-count');
+      
+      const singleBox = document.getElementById('single-datetime-box');
+      const generatorBox = document.getElementById('course-generator-box');
+      const sessionsListBox = document.getElementById('course-sessions-list-box');
+      const sessionsListTitle = document.getElementById('course-sessions-list-title');
       const dateLabel = document.getElementById('schedule-date-label');
       const submitBtn = document.getElementById('schedule-submit-btn');
 
-      if (mode === 'course') {
-        singleBtn.className = 'py-2.5 px-3 rounded-2xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5';
-        courseBtn.className = 'py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5';
-        courseBox.classList.remove('hidden');
-        dateLabel.textContent = 'Дата старту курсу:';
+      const btnActive = 'py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5';
+      const btnInactive = 'py-2.5 px-3 rounded-2xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5';
+
+      if (mode === 'slots') {
+        if (slotsBtn) {
+          slotsBtn.classList.remove('hidden');
+          slotsBtn.className = 'col-span-2 ' + btnActive;
+          if (slotsCount) slotsCount.textContent = coursePlannedSessions.length;
+        }
+        if (singleBtn) singleBtn.className = btnInactive;
+        if (courseBtn) courseBtn.className = btnInactive;
+
+        if (singleBox) singleBox.classList.add('hidden');
+        if (generatorBox) generatorBox.classList.add('hidden');
+        if (sessionsListBox) sessionsListBox.classList.remove('hidden');
+        if (sessionsListTitle) sessionsListTitle.textContent = `🎯 Обрані слоти з календаря:`;
+
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span>✨ Призначити ${coursePlannedSessions.length} обраних сесій</span>`;
+        }
+        renderCourseSchedulePreviewList();
+      } else if (mode === 'course') {
+        if (slotsBtn) {
+          if (coursePlannedSessions.length > 0) {
+            slotsBtn.classList.remove('hidden');
+            slotsBtn.className = 'col-span-2 ' + btnInactive;
+          } else {
+            slotsBtn.classList.add('hidden');
+          }
+        }
+        if (singleBtn) singleBtn.className = btnInactive;
+        if (courseBtn) courseBtn.className = btnActive;
+
+        if (singleBox) singleBox.classList.remove('hidden');
+        if (generatorBox) generatorBox.classList.remove('hidden');
+        if (sessionsListBox) sessionsListBox.classList.remove('hidden');
+        if (sessionsListTitle) sessionsListTitle.textContent = `📅 Згенерований розклад курсу:`;
+        if (dateLabel) dateLabel.textContent = 'Дата старту курсу:';
+
         renderCourseWeekdayChips();
         renderWeekdayTimePickers();
         recalculateCourseSessions();
       } else {
-        singleBtn.className = 'py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5';
-        courseBtn.className = 'py-2.5 px-3 rounded-2xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5';
-        courseBox.classList.add('hidden');
-        dateLabel.textContent = 'Дата зустрічі:';
-        submitBtn.innerHTML = `<span>✨ Створити зустріч</span>`;
+        // Single session mode
+        if (slotsBtn) {
+          if (coursePlannedSessions.length > 0) {
+            slotsBtn.classList.remove('hidden');
+            slotsBtn.className = 'col-span-2 ' + btnInactive;
+          } else {
+            slotsBtn.classList.add('hidden');
+          }
+        }
+        if (singleBtn) singleBtn.className = btnActive;
+        if (courseBtn) courseBtn.className = btnInactive;
+
+        if (singleBox) singleBox.classList.remove('hidden');
+        if (generatorBox) generatorBox.classList.add('hidden');
+        if (sessionsListBox) sessionsListBox.classList.add('hidden');
+        if (dateLabel) dateLabel.textContent = 'Дата зустрічі:';
+
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span>✨ Створити зустріч</span>`;
+        }
       }
     }
 
@@ -2437,7 +2498,7 @@
       const activeAppointments = cachedAppointments.filter(a => a.status !== 'cancelled');
       const conflicts = [];
 
-      if (currentScheduleMode === 'course') {
+      if (currentScheduleMode === 'course' || currentScheduleMode === 'slots') {
         coursePlannedSessions.forEach((s, idx) => {
           const conflict = activeAppointments.find(a => a.session_date === s.dateStr && (a.session_time === s.timeStr || a.session_time?.startsWith(s.timeStr.substring(0, 2))));
           if (conflict) {
@@ -2456,9 +2517,9 @@
         return;
       }
 
-      if (currentScheduleMode === 'course') {
+      if (currentScheduleMode === 'course' || currentScheduleMode === 'slots') {
         if (coursePlannedSessions.length === 0) {
-          alert('Будь ласка, оберіть хоча б одну дату для курсу');
+          alert('Будь ласка, оберіть хоча б одну дату для зустрічі');
           return;
         }
 
@@ -2472,7 +2533,7 @@
           duration_minutes: durationMinutes,
           meet_format: 'google_meet',
           google_meet_url: customGmeetUrl,
-          therapist_notes: notes ? `${notes} (Сесія ${idx + 1}/${count})` : `Курс терапії (Сесія ${idx + 1}/${count})`
+          therapist_notes: notes ? `${notes} (Сесія ${idx + 1}/${count})` : (count > 1 ? `Курс терапії (Сесія ${idx + 1}/${count})` : 'Сесія терапії')
         }));
 
         try {
@@ -2508,24 +2569,26 @@
           });
         }
 
+        clearCalendarSlotSelection();
         renderAppointmentsList(cachedAppointments);
+        renderCalendarGridView();
         closeScheduleModal();
         
         const firstSession = coursePlannedSessions[0] || { dateStr: startDate, timeStr: startTime };
         const fullGcalUrl = buildGoogleCalendarLink(
-          `Курс психотерапії: ${client.name} & Юлія Олефіренко`,
-          `Індивідуальний курс психотерапії (${count} сесій по 50 хв).\nПряме посилання Google Meet: ${customGmeetUrl}`,
+          count > 1 ? `Курс психотерапії: ${client.name} & Юлія Олефіренко` : `Сесія психотерапії: ${client.name} & Юлія Олефіренко`,
+          count > 1 ? `Індивідуальний курс психотерапії (${count} сесій по ${durationMinutes} хв).\nПряме посилання Google Meet: ${customGmeetUrl}` : `Консультація психотерапії (${durationMinutes} хв).\nПряме посилання Google Meet: ${customGmeetUrl}`,
           customGmeetUrl,
           firstSession.dateStr,
           firstSession.timeStr,
           durationMinutes,
           client.email,
-          count
+          count > 1 ? count : 0
         );
 
-        showToast(`🎉 Успішно створено розклад курсу із ${count} зустрічей!`);
+        showToast(`🎉 Успішно призначено ${count} зустрічей для клієнта!`);
         
-        if (confirm(`Курс із ${count} зустрічей успішно створено за вашим розкладом!\n\nБажаєте відкрити Google Календар, щоб зберегти всю приватну серію (${count} сесій) в один клік?`)) {
+        if (confirm(`Успішно призначено ${count} зустрічей для клієнта "${client.name}"!\n\nБажаєте відкрити Google Календар, щоб зберегти приватну подію / серію в один клік?`)) {
           window.open(fullGcalUrl, '_blank');
         }
 
