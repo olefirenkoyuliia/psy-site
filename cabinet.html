@@ -2008,13 +2008,20 @@
       // Update cached appointment locally
       const idx = cachedAppointments.findIndex(a => a.id === id);
       if (idx !== -1) {
+        const oldApp = { ...cachedAppointments[idx] };
         cachedAppointments[idx] = {
           ...cachedAppointments[idx],
           ...payload
         };
+
+        // Sync date/time change to Google Calendar if connected
+        if (googleCalendarToken) {
+          updateGoogleCalendarEvent(cachedAppointments[idx], newDate, newTime, duration);
+        }
       }
 
       renderAppointmentsList(cachedAppointments);
+      renderCalendarGridView();
       closeRescheduleModal();
       showToast('Зустріч успішно перенесено та оновлено!');
 
@@ -2022,8 +2029,90 @@
       const tgReschedText = encodeURIComponent(`Вітаю, ${clientName.split(' ')[0]}! Повідомляємо про перенесення нашої зустрічі психотерапії на ${newDate} о ${newTime}.\n\nПосилання на Google Meet: ${gmeetUrl || 'https://meet.google.com/new'}`);
       const gcalUpdatedUrl = buildGoogleCalendarLink(`Сесія психотерапії: ${clientName}`, `Індивідуальна сесія (50 хв).\nGoogle Meet: ${gmeetUrl}`, gmeetUrl, newDate, newTime, duration, clientEmail);
 
-      if (confirm(`Зустріч перенесено на ${newDate} о ${newTime}!\n\nБажаєте оновити запис у Google Календарі прямо зараз?`)) {
+      if (confirm(`Зустріч перенесено на ${newDate} о ${newTime}!\n\nБажаєте відкрити оновлений Google Календар?`)) {
         window.open(gcalUpdatedUrl, '_blank');
+      }
+    }
+
+    async function deleteGoogleCalendarEvent(app) {
+      if (!app || !googleCalendarToken) return;
+      try {
+        let eventId = app.google_event_id;
+
+        // If no saved google_event_id, search primary calendar around that date
+        if (!eventId && app.session_date) {
+          const minTime = `${app.session_date}T00:00:00+03:00`;
+          const maxTime = `${app.session_date}T23:59:59+03:00`;
+          const query = encodeURIComponent(app.client_name || app.client_email || '');
+          const searchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(minTime)}&timeMax=${encodeURIComponent(maxTime)}&q=${query}`, {
+            headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
+          });
+          if (searchRes.ok) {
+            const data = await searchRes.json();
+            const matching = (data.items || []).find(item => {
+              const itemStart = item.start?.dateTime || '';
+              return itemStart.includes(app.session_date) && (itemStart.includes(app.session_time) || item.summary?.includes(app.client_name));
+            });
+            if (matching) {
+              eventId = matching.id;
+            }
+          }
+        }
+
+        if (eventId) {
+          await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}?sendUpdates=all`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
+          });
+          console.log(`Deleted Google Calendar event: ${eventId}`);
+        }
+      } catch(err) {
+        console.warn('Error deleting Google Calendar event:', err);
+      }
+    }
+
+    async function updateGoogleCalendarEvent(app, newDate, newTime, durationMins = 50) {
+      if (!app || !googleCalendarToken) return;
+      try {
+        let eventId = app.google_event_id;
+        if (!eventId && app.session_date) {
+          const minTime = `${app.session_date}T00:00:00+03:00`;
+          const maxTime = `${app.session_date}T23:59:59+03:00`;
+          const query = encodeURIComponent(app.client_name || app.client_email || '');
+          const searchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(minTime)}&timeMax=${encodeURIComponent(maxTime)}&q=${query}`, {
+            headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
+          });
+          if (searchRes.ok) {
+            const data = await searchRes.json();
+            const matching = (data.items || []).find(item => {
+              const itemStart = item.start?.dateTime || '';
+              return itemStart.includes(app.session_date) || item.summary?.includes(app.client_name);
+            });
+            if (matching) eventId = matching.id;
+          }
+        }
+
+        if (eventId) {
+          const startDateTime = `${newDate}T${newTime}:00`;
+          const startDate = new Date(startDateTime);
+          const endDate = new Date(startDate.getTime() + durationMins * 60000);
+          const pad = (n) => String(n).padStart(2, '0');
+          const formatRfc3339 = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}+03:00`;
+
+          await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}?sendUpdates=all`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${googleCalendarToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              start: { dateTime: formatRfc3339(startDate), timeZone: 'Europe/Kyiv' },
+              end: { dateTime: formatRfc3339(endDate), timeZone: 'Europe/Kyiv' }
+            })
+          });
+        }
+      } catch(err) {
+        console.warn('Error updating Google Calendar event:', err);
       }
     }
 
@@ -2031,6 +2120,11 @@
       const id = parseInt(document.getElementById('resched-appointment-id').value);
       if (!id) return;
       if (!confirm('Ви дійсно бажаєте скасувати цю зустріч?')) return;
+
+      const app = cachedAppointments.find(a => a.id === id);
+      if (app) {
+        await deleteGoogleCalendarEvent(app);
+      }
 
       try {
         await fetch(`/api/appointments?id=${id}`, { method: 'DELETE' });
@@ -2040,8 +2134,9 @@
       selectedAppointmentIds.delete(id);
       updateBatchDock();
       renderAppointmentsList(cachedAppointments);
+      renderCalendarGridView();
       closeRescheduleModal();
-      showToast('Зустріч скасовано');
+      showToast('Зустріч скасовано та видалено з Google Календаря');
     }
 
     // =======================================================
@@ -2052,6 +2147,13 @@
       if (ids.length === 0) return;
       if (!confirm(`Ви дійсно бажаєте скасувати ${ids.length} обраних зустрічей?`)) return;
 
+      for (const id of ids) {
+        const app = cachedAppointments.find(a => a.id === id);
+        if (app) {
+          await deleteGoogleCalendarEvent(app);
+        }
+      }
+
       try {
         await fetch(`/api/appointments?ids=${ids.join(',')}`, { method: 'DELETE' });
       } catch(e) {}
@@ -2060,7 +2162,8 @@
       selectedAppointmentIds.clear();
       updateBatchDock();
       renderAppointmentsList(cachedAppointments);
-      showToast(`Успішно скасовано ${ids.length} зустрічей`);
+      renderCalendarGridView();
+      showToast(`Успішно скасовано ${ids.length} зустрічей та видалено з Google Календаря`);
     }
 
     async function batchRescheduleSelected(daysToAdd = 7) {
@@ -2298,6 +2401,19 @@
           });
 
           if (res.ok) {
+            const eventData = await res.json().catch(() => null);
+            if (eventData && eventData.id) {
+              session.google_event_id = eventData.id;
+              if (session.id) {
+                fetch('/api/appointments', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id: session.id, google_event_id: eventData.id })
+                }).catch(() => {});
+                const cIdx = cachedAppointments.findIndex(a => a.id === session.id);
+                if (cIdx !== -1) cachedAppointments[cIdx].google_event_id = eventData.id;
+              }
+            }
             successCount++;
           } else {
             const errData = await res.json().catch(() => ({}));

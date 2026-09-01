@@ -198,6 +198,7 @@ export async function onRequestPut(context) {
         "duration_minutes = COALESCE(NULLIF(?, 0), duration_minutes), " +
         "status = COALESCE(NULLIF(?, ''), status), " +
         "therapist_notes = COALESCE(NULLIF(?, ''), therapist_notes), " +
+        "google_event_id = COALESCE(NULLIF(?, ''), google_event_id), " +
         "updated_at = CURRENT_TIMESTAMP WHERE id = ?"
       ).bind(
         data.session_date || '',
@@ -205,6 +206,7 @@ export async function onRequestPut(context) {
         data.duration_minutes || 0,
         data.status || '',
         data.therapist_notes || '',
+        data.google_event_id || '',
         id
       ).run();
     }
