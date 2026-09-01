@@ -1,3 +1,5 @@
+import { encryptText, decryptText } from '../_crypto.js';
+
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -42,6 +44,11 @@ export async function onRequestPost(context) {
       });
     }
 
+    const encryptedGoal = therapyGoal ? await encryptText(therapyGoal, env.ENCRYPTION_SECRET) : '';
+    const encryptedNotes = notes ? await encryptText(notes, env.ENCRYPTION_SECRET) : '';
+    const encryptedPhone = phone ? await encryptText(phone, env.ENCRYPTION_SECRET) : '';
+    const encryptedTg = telegram ? await encryptText(telegram, env.ENCRYPTION_SECRET) : '';
+
     // Update in D1
     await env.DB.prepare(
       "UPDATE users SET " +
@@ -55,24 +62,32 @@ export async function onRequestPost(context) {
       "WHERE email = ? OR google_id = ?"
     ).bind(
       name,
-      phone,
-      telegram,
+      encryptedPhone,
+      encryptedTg,
       preferredFormat,
-      therapyGoal,
-      notes,
+      encryptedGoal,
+      encryptedNotes,
       email,
       googleId
     ).run();
 
-    // Fetch updated record
+    // Fetch updated record and decrypt for return
     const updatedUser = await env.DB.prepare(
       "SELECT * FROM users WHERE email = ? OR google_id = ?"
     ).bind(email, googleId).first();
 
+    const returnUser = updatedUser ? {
+      ...updatedUser,
+      phone: await decryptText(updatedUser.phone, env.ENCRYPTION_SECRET),
+      telegram: await decryptText(updatedUser.telegram, env.ENCRYPTION_SECRET),
+      therapy_goal: await decryptText(updatedUser.therapy_goal, env.ENCRYPTION_SECRET),
+      notes: await decryptText(updatedUser.notes, env.ENCRYPTION_SECRET)
+    } : null;
+
     return new Response(JSON.stringify({
       success: true,
-      user: updatedUser,
-      message: 'Особисті дані успішно збережено'
+      user: returnUser,
+      message: 'Особисті дані успішно збережено в зашифрованому вигляді'
     }), {
       headers: {
         'Content-Type': 'application/json',

@@ -1,3 +1,5 @@
+import { decryptText } from '../_crypto.js';
+
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -48,9 +50,17 @@ export async function onRequestGet(context) {
       });
     }
 
+    const decryptedUser = {
+      ...user,
+      phone: await decryptText(user.phone, env.ENCRYPTION_SECRET),
+      telegram: await decryptText(user.telegram, env.ENCRYPTION_SECRET),
+      therapy_goal: await decryptText(user.therapy_goal, env.ENCRYPTION_SECRET),
+      notes: await decryptText(user.notes, env.ENCRYPTION_SECRET)
+    };
+
     return new Response(JSON.stringify({
       success: true,
-      user: user
+      user: decryptedUser
     }), {
       headers: {
         'Content-Type': 'application/json',

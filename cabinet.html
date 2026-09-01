@@ -576,6 +576,32 @@
             </form>
           </div>
 
+          <!-- Card: Privacy, Encryption & GDPR Data Management -->
+          <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft space-y-4">
+            <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🛡️</span>
+                <h3 class="font-bold text-warm-text text-sm">Конфіденційність та керування даними</h3>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold">
+                🔐 AES-256 Зашифровано
+              </span>
+            </div>
+
+            <p class="text-xs text-warm-muted leading-relaxed">
+              Ваші приватні дані (запитання, нотатки та цілі терапії) зберігаються в базі виключно в зашифрованому вигляді за стандартами <strong>GDPR</strong> та етики психолога. Розробники та сторонні сервіси не мають доступу до вашої конфіденційної інформації.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <a href="/privacy.html" target="_blank" class="text-xs font-semibold text-brand-700 hover:text-brand-900 underline flex items-center gap-1">
+                <span>📄 Політика конфіденційності</span>
+              </a>
+              <button type="button" onclick="confirmDeleteUserData()" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs">
+                <span>🗑️ Видалити всі мої дані (GDPR)</span>
+              </button>
+            </div>
+          </div>
+
         </div>
 
         <!-- Right Column: Direct Meeting Room & Session Guide (5 cols) -->
@@ -3893,6 +3919,41 @@
         currentUser = null;
         renderAuthScreen();
         showToast('Ви вийшли з особистого кабінету');
+      }
+    }
+
+    async function confirmDeleteUserData() {
+      if (!currentUser || !currentUser.email) {
+        alert('Помилка: не знайдено активного користувача');
+        return;
+      }
+
+      const confirmed = confirm(
+        `⚠️ УВАГА: Ви впевнені, що хочете безповоротно видалити всі свої персональні дані?\n\nБуде видалено:\n• Ваш обліковий запис та контакти\n• Усі ваші запитання та відповіді Юлії\n• Ваші сесії з бази даних\n\nЦю дію неможливо скасувати.`
+      );
+
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch('/api/user/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: currentUser.email })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert('🌿 ' + (data.message || 'Усі ваші дані успішно видалено.'));
+          localStorage.removeItem('psy_client_user');
+          localStorage.removeItem('psy_client_email');
+          localStorage.removeItem('psy_client_name');
+          currentUser = null;
+          renderAuthScreen();
+        } else {
+          alert('Помилка видалення: ' + (data.error || 'Спробуйте пізніше'));
+        }
+      } catch(e) {
+        alert('Помилка зв\'язку з сервером');
       }
     }
 

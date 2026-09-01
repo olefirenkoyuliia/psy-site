@@ -17,11 +17,19 @@ export async function onRequestPost(context) {
     const clientDevice = device || (/Mobile|Android|iPhone|iPad/i.test(userAgent) ? 'Мобільний' : 'Компʼютер');
     const clientSource = source || 'Прямий перехід';
 
+    // Sanitize metadata to completely exclude Personally Identifiable Information (PII)
+    const sanitizedMeta = {};
+    if (metadata && typeof metadata === 'object') {
+      if (metadata.topic) sanitizedMeta.topic = String(metadata.topic).substring(0, 50);
+      if (metadata.focus) sanitizedMeta.focus = String(metadata.focus).substring(0, 50);
+      if (metadata.category) sanitizedMeta.category = String(metadata.category).substring(0, 50);
+    }
+
     const metaObj = {
       country: cfCountry,
       city: cfCity,
       isBot: isBot,
-      rawMeta: metadata || null,
+      rawMeta: sanitizedMeta,
       time: new Date().toLocaleTimeString('uk-UA', { timeZone: 'Europe/Kyiv', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       date: new Date().toLocaleDateString('uk-UA', { timeZone: 'Europe/Kyiv' })
     };

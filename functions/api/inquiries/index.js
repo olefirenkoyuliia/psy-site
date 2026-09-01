@@ -1,3 +1,5 @@
+import { encryptText, decryptText } from '../_crypto.js';
+
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -34,9 +36,17 @@ export async function onRequestGet(context) {
       ).bind(email).all();
     }
 
+    const rawList = rows.results || [];
+    const decryptedList = await Promise.all(rawList.map(async (item) => ({
+      ...item,
+      question: await decryptText(item.question, env.ENCRYPTION_SECRET),
+      answer: item.answer ? await decryptText(item.answer, env.ENCRYPTION_SECRET) : null,
+      client_phone: item.client_phone ? await decryptText(item.client_phone, env.ENCRYPTION_SECRET) : null
+    })));
+
     return new Response(JSON.stringify({
       success: true,
-      inquiries: rows.results || []
+      inquiries: decryptedList
     }), {
       headers: {
         'Content-Type': 'application/json',
@@ -73,9 +83,12 @@ export async function onRequestPost(context) {
     let insertedId = Date.now();
 
     if (env.DB) {
+      const encryptedQuestion = await encryptText(question, env.ENCRYPTION_SECRET);
+      const encryptedPhone = clientPhone ? await encryptText(clientPhone, env.ENCRYPTION_SECRET) : '';
+
       const res = await env.DB.prepare(
         "INSERT INTO client_inquiries (client_name, client_email, client_phone, topic, question, status) VALUES (?, ?, ?, ?, ?, 'pending')"
-      ).bind(clientName, clientEmail, clientPhone, topic, question).run();
+      ).bind(clientName, clientEmail, encryptedPhone, topic, encryptedQuestion).run();
       insertedId = res.meta?.last_row_id || insertedId;
     }
 
@@ -114,9 +127,10 @@ export async function onRequestPut(context) {
     }
 
     if (env.DB) {
+      const encryptedAnswer = await encryptText(answer, env.ENCRYPTION_SECRET);
       await env.DB.prepare(
         "UPDATE client_inquiries SET answer = ?, status = 'answered', answered_at = CURRENT_TIMESTAMP WHERE id = ?"
-      ).bind(answer, id).run();
+      ).bind(encryptedAnswer, id).run();
     }
 
     return new Response(JSON.stringify({

@@ -1,3 +1,5 @@
+import { decryptText } from '../_crypto.js';
+
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -25,9 +27,18 @@ export async function onRequestGet(context) {
       "FROM users ORDER BY id DESC"
     ).all();
 
+    const rawList = rows.results || [];
+    const decryptedList = await Promise.all(rawList.map(async (c) => ({
+      ...c,
+      phone: await decryptText(c.phone, env.ENCRYPTION_SECRET),
+      telegram: await decryptText(c.telegram, env.ENCRYPTION_SECRET),
+      therapy_goal: await decryptText(c.therapy_goal, env.ENCRYPTION_SECRET),
+      notes: await decryptText(c.notes, env.ENCRYPTION_SECRET)
+    })));
+
     return new Response(JSON.stringify({
       success: true,
-      clients: rows.results || []
+      clients: decryptedList
     }), {
       headers: {
         'Content-Type': 'application/json',

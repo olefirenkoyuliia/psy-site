@@ -1,3 +1,5 @@
+import { encryptText, decryptText } from '../_crypto.js';
+
 export async function onRequestOptions() {
   return new Response(null, {
     status: 204,
@@ -34,9 +36,15 @@ export async function onRequestGet(context) {
       ).bind(email).all();
     }
 
+    const rawList = rows.results || [];
+    const decryptedList = await Promise.all(rawList.map(async (app) => ({
+      ...app,
+      therapist_notes: app.therapist_notes ? await decryptText(app.therapist_notes, env.ENCRYPTION_SECRET) : null
+    })));
+
     return new Response(JSON.stringify({
       success: true,
-      appointments: rows.results || []
+      appointments: decryptedList
     }), {
       headers: {
         'Content-Type': 'application/json',
@@ -119,6 +127,7 @@ export async function onRequestPost(context) {
           status: 'scheduled'
         });
       } else {
+        const encryptedNotes = therapistNotes ? await encryptText(therapistNotes, env.ENCRYPTION_SECRET) : '';
         const insertRes = await env.DB.prepare(
           "INSERT INTO appointments (client_id, client_name, client_email, session_date, session_time, duration_minutes, session_type, room_code, meet_url, therapist_notes, status) " +
           "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'scheduled')"
@@ -132,13 +141,14 @@ export async function onRequestPost(context) {
           sessionType,
           roomCode,
           meetUrl,
-          therapistNotes
+          encryptedNotes
         ).run();
 
         const newId = insertRes.meta?.last_row_id || 1;
         const appRow = await env.DB.prepare("SELECT * FROM appointments WHERE id = ?").bind(newId).first();
         createdList.push({
           ...appRow,
+          therapist_notes: therapistNotes,
           session_type: sessionType,
           meet_format: meetFormat,
           google_meet_url: googleMeetUrl
@@ -195,6 +205,9 @@ export async function onRequestPut(context) {
       });
     }
 
+    const encryptedNotes = data.therapist_notes !== undefined && data.therapist_notes !== null ? 
+      await encryptText(data.therapist_notes, env.ENCRYPTION_SECRET) : null;
+
     for (const id of ids) {
       await env.DB.prepare(
         "UPDATE appointments SET " +
@@ -203,7 +216,7 @@ export async function onRequestPut(context) {
         "duration_minutes = COALESCE(NULLIF(?, 0), duration_minutes), " +
         "session_type = COALESCE(NULLIF(?, ''), session_type), " +
         "status = COALESCE(NULLIF(?, ''), status), " +
-        "therapist_notes = COALESCE(NULLIF(?, ''), therapist_notes), " +
+        "therapist_notes = COALESCE(?, therapist_notes), " +
         "google_event_id = COALESCE(NULLIF(?, ''), google_event_id), " +
         "updated_at = CURRENT_TIMESTAMP WHERE id = ?"
       ).bind(
@@ -212,7 +225,7 @@ export async function onRequestPut(context) {
         data.duration_minutes || 0,
         data.session_type || '',
         data.status || '',
-        data.therapist_notes || '',
+        encryptedNotes,
         data.google_event_id || '',
         id
       ).run();
