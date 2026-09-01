@@ -13,8 +13,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Jitsi Meet WebRTC IFrame API for In-Browser Video Communication -->
-  <script src="https://meet.jit.si/external_api.js"></script>
+  <!-- PeerJS for direct zero-limit peer-to-peer WebRTC video calls -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -29,9 +29,9 @@
               900: '#1D301E',
             },
             meet: {
-              dark: '#141618',
-              card: '#1F2226',
-              border: '#2E3238'
+              dark: '#121416',
+              card: '#1C1F23',
+              border: '#2A2E34'
             }
           },
           fontFamily: {
@@ -45,19 +45,16 @@
 
   <style>
     body {
-      background-color: #141618;
+      background-color: #121416;
       color: #F3EFEA;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    #meet-frame-container iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      border-radius: 1.5rem;
+    .video-mirror {
+      transform: scaleX(-1);
     }
   </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden antialiased">
+<body class="h-screen flex flex-col overflow-hidden antialiased select-none">
 
   <!-- Top Header Bar -->
   <header class="h-16 border-b border-meet-border bg-meet-card/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between shrink-0 z-30">
@@ -70,20 +67,20 @@
           <div class="font-serif-luxury font-bold text-base sm:text-lg text-white leading-none">
             Юлія Олефіренко
           </div>
-          <div class="text-[10px] text-emerald-400 font-medium pt-0.5">
+          <div class="text-[10px] text-emerald-400 font-medium pt-0.5" id="room-header-role">
             Консультаційна онлайн-кімната
           </div>
         </div>
       </a>
       <span class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 text-[11px] font-bold">
-        <span>🔒</span> <span>Конфіденційно • 256-bit шифрування</span>
+        <span>🔒</span> <span>Конфіденційно • Безлімітна сесія (WebRTC)</span>
       </span>
     </div>
 
     <!-- Center: Live Session Timer -->
     <div class="flex items-center gap-2 bg-black/40 border border-meet-border px-4 py-1.5 rounded-full">
-      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span class="text-xs text-gray-400 font-medium">Тривалість:</span>
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" id="timer-dot"></span>
+      <span class="text-xs text-gray-400 font-medium">Час сесії:</span>
       <span id="session-countdown" class="text-xs font-bold text-white font-mono">50:00</span>
     </div>
 
@@ -102,26 +99,70 @@
   <!-- Main Video Grid Area -->
   <main class="flex-grow flex relative overflow-hidden p-2 sm:p-4 gap-4">
     
-    <!-- Video Container Area -->
-    <div class="flex-grow flex flex-col h-full rounded-3xl overflow-hidden bg-meet-card border border-meet-border relative shadow-2xl">
+    <!-- Video Stage -->
+    <div class="flex-grow flex flex-col h-full rounded-3xl overflow-hidden bg-meet-card border border-meet-border relative shadow-2xl justify-between">
       
-      <!-- Video Frame Container -->
-      <div id="meet-frame-container" class="w-full h-full relative flex items-center justify-center">
-        <!-- Fallback / Initial Loading state -->
-        <div id="meet-loading-state" class="text-center space-y-4 p-8">
-          <div class="w-16 h-16 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin mx-auto"></div>
-          <div class="space-y-1">
-            <h2 class="text-lg font-bold text-white">Підключення до сесії...</h2>
-            <p class="text-xs text-gray-400 max-w-sm mx-auto">
-              Будь ласка, дозвольте доступ до мікрофона та камери для початку індивідуальної консультації.
+      <!-- Video Streams Area -->
+      <div class="relative w-full h-full flex items-center justify-center bg-black/50 overflow-hidden">
+        
+        <!-- Remote Video (Fullscreen / Large) -->
+        <video id="remote-video" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+
+        <!-- Remote Waiting Placeholder (Shown when alone in room) -->
+        <div id="remote-placeholder" class="text-center space-y-4 p-8">
+          <div class="w-20 h-20 rounded-3xl bg-brand-900/60 border border-emerald-500/30 flex items-center justify-center text-4xl mx-auto shadow-lg animate-pulse">
+            🌱
+          </div>
+          <div class="space-y-1.5">
+            <h2 class="text-xl font-bold text-white" id="waiting-title">Очікування співрозмовника...</h2>
+            <p class="text-xs text-gray-400 max-w-md mx-auto" id="waiting-desc">
+              Ви підключені до захищеної відеокімнати. Сесія розпочнеться автоматично, щойно другий учасник приєднається.
             </p>
           </div>
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-950/60 border border-emerald-800/40 text-emerald-300 text-xs font-mono">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Кімната: <strong id="room-code-badge">psy-room</strong></span>
+          </div>
         </div>
+
+        <!-- Local Self View Video (Small floating PIP in bottom-right) -->
+        <div id="local-video-container" class="absolute bottom-20 sm:bottom-6 right-4 sm:right-6 w-36 sm:w-48 h-28 sm:h-36 rounded-2xl overflow-hidden border-2 border-emerald-500/50 shadow-2xl bg-gray-900 z-20 transition-all">
+          <video id="local-video" autoplay playsinline muted class="w-full h-full object-cover video-mirror"></video>
+          <div class="absolute bottom-1 left-2 text-[10px] bg-black/60 px-1.5 py-0.5 rounded text-white font-bold" id="local-user-label">
+            Ви
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Floating In-Call Action Toolbar -->
+      <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 flex items-center gap-3 bg-black/70 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-full shadow-2xl">
+        <!-- Mic Button -->
+        <button onclick="toggleAudio()" id="btn-mic" class="w-11 h-11 rounded-full bg-meet-border hover:bg-gray-700 text-white flex items-center justify-center text-lg transition-all shadow-sm" title="Увімкнути/Вимкнути мікрофон">
+          <span id="mic-icon">🎤</span>
+        </button>
+
+        <!-- Camera Button -->
+        <button onclick="toggleVideo()" id="btn-cam" class="w-11 h-11 rounded-full bg-meet-border hover:bg-gray-700 text-white flex items-center justify-center text-lg transition-all shadow-sm" title="Увімкнути/Вимкнути камеру">
+          <span id="cam-icon">📹</span>
+        </button>
+
+        <!-- Screen Share Button -->
+        <button onclick="toggleScreenShare()" id="btn-screen" class="w-11 h-11 rounded-full bg-meet-border hover:bg-gray-700 text-white flex items-center justify-center text-lg transition-all shadow-sm" title="Демонстрація екрана">
+          <span>🖥️</span>
+        </button>
+
+        <div class="h-6 w-px bg-white/20 mx-1"></div>
+
+        <!-- End Call Button -->
+        <button onclick="hangUpCall()" class="px-5 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition-all">
+          <span>✕</span> <span>Завершити</span>
+        </button>
       </div>
 
     </div>
 
-    <!-- Collapsible Side Panel: In-Session Therapy Notes (Private) -->
+    <!-- Collapsible Side Panel: In-Session Therapy Notes (Private for Julia) -->
     <div id="session-notes-sidebar" class="hidden w-80 lg:w-96 bg-meet-card border border-meet-border rounded-3xl p-5 flex flex-col justify-between shrink-0 shadow-2xl space-y-4">
       <div class="space-y-3 flex-grow flex flex-col">
         <div class="flex items-center justify-between border-b border-meet-border pb-2.5">
@@ -135,15 +176,16 @@
         </div>
 
         <p class="text-[11px] text-gray-400">
-          Фіксуйте ключові інсайти, метафори, образи символдрами та думки під час сесії. Нотатки автоматично зберігаються.
+          Фіксуйте ключові інсайти, метафори, образи символдрами та думки під час сесії. Нотатки зберігаються автоматично.
         </p>
 
-        <textarea id="in-session-notes" placeholder="Запишіть спостереження, хід зустрічі або домашнє завдання..." class="flex-grow w-full p-3.5 rounded-2xl bg-black/40 border border-meet-border text-xs text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none leading-relaxed"></textarea>
+        <textarea id="in-session-notes" oninput="autoSaveNotes()" placeholder="Запишіть спостереження, хід зустрічі або домашнє завдання..." class="flex-grow w-full p-3.5 rounded-2xl bg-black/40 border border-meet-border text-xs text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none leading-relaxed"></textarea>
       </div>
 
       <div class="pt-2 flex items-center justify-between border-t border-meet-border text-xs">
-        <button onclick="saveInSessionNotes()" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-1.5">
-          <span>💾 Зберегти нотатки</span>
+        <span class="text-[10px] text-gray-500" id="notes-status-text">Автозбереження увімкнено</span>
+        <button onclick="saveInSessionNotes()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-colors flex items-center gap-1">
+          <span>💾 Зберегти</span>
         </button>
       </div>
     </div>
@@ -151,64 +193,175 @@
   </main>
 
   <script>
-    let api = null;
+    let localStream = null;
+    let peer = null;
+    let currentCall = null;
+    let isAudioMuted = false;
+    let isVideoMuted = false;
+    let isScreenSharing = false;
     let timerInterval = null;
-    let timeLeft = 50 * 60; // 50 minutes in seconds
+    let timeLeft = 50 * 60; // 50 minutes
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomParam = (urlParams.get('room') || 'psy-olefirenko-session').toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    const isOwnerRole = urlParams.get('role') === 'owner';
+    const currentUser = JSON.parse(localStorage.getItem('psy_client_user') || '{}');
 
     document.addEventListener('DOMContentLoaded', () => {
-      initMeeting();
+      document.getElementById('room-code-badge').textContent = roomParam;
+      document.getElementById('local-user-label').textContent = currentUser.name ? currentUser.name.split(' ')[0] : (isOwnerRole ? 'Юлія' : 'Ви');
+      
+      initWebRTC();
       startSessionTimer();
       loadExistingNotes();
     });
 
-    function initMeeting() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomParam = urlParams.get('room') || 'psy-olefirenko-session';
-      const user = JSON.parse(localStorage.getItem('psy_client_user') || '{}');
-      const userName = user.name || (urlParams.get('role') === 'owner' ? 'Юлія Олефіренко' : 'Клієнт');
-
-      const domain = 'meet.jit.si';
-      const options = {
-        roomName: roomParam,
-        width: '100%',
-        height: '100%',
-        parentNode: document.querySelector('#meet-frame-container'),
-        userInfo: {
-          displayName: userName,
-          email: user.email || ''
-        },
-        configOverwrite: {
-          startWithAudioMuted: false,
-          startWithVideoMuted: false,
-          enableWelcomePage: false,
-          prejoinPageEnabled: false,
-          disableDeepLinking: true,
-          toolbarButtons: [
-            'microphone', 'camera', 'desktop', 'chat',
-            'raisehand', 'videoquality', 'tileview', 'hangup'
-          ]
-        },
-        interfaceConfigOverwrite: {
-          SHOW_JITSI_WATERMARK: false,
-          SHOW_WATERMARK_FOR_GUESTS: false,
-          SHOW_BRAND_WATERMARK: false,
-          DEFAULT_BACKGROUND: '#141618',
-          DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
-        }
-      };
-
+    async function initWebRTC() {
       try {
-        const loadingState = document.getElementById('meet-loading-state');
-        if (loadingState) loadingState.style.display = 'none';
-
-        api = new JitsiMeetExternalAPI(domain, options);
-
-        api.addEventListener('videoConferenceLeft', () => {
-          window.location.href = 'cabinet.html';
+        // 1. Get user camera and microphone
+        localStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+          audio: true
         });
-      } catch (e) {
-        console.warn('Native WebRTC / Jitsi fallback');
+        document.getElementById('local-video').srcObject = localStream;
+      } catch (err) {
+        console.warn('Media devices access error:', err);
       }
+
+      // 2. Setup PeerJS peer
+      // Therapist uses deterministic peer ID: room-owner; Client connects to room-owner
+      const peerId = isOwnerRole ? `${roomParam}-host` : `${roomParam}-client-${Math.floor(Math.random()*1000)}`;
+      
+      peer = new Peer(peerId, {
+        debug: 1,
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:global.stun.twilio.com:3478' }
+          ]
+        }
+      });
+
+      peer.on('open', (id) => {
+        console.log('Peer connected with ID:', id);
+
+        // If client, call therapist (host)
+        if (!isOwnerRole) {
+          connectToHost();
+        }
+      });
+
+      peer.on('call', (call) => {
+        currentCall = call;
+        call.answer(localStream);
+        handleStream(call);
+      });
+
+      peer.on('error', (err) => {
+        console.log('Peer error:', err.type);
+        if (err.type === 'peer-unavailable' && !isOwnerRole) {
+          // Retry connecting every 3 seconds if therapist hasn't opened room yet
+          setTimeout(connectToHost, 3000);
+        }
+      });
+    }
+
+    function connectToHost() {
+      if (!peer || peer.destroyed) return;
+      const hostPeerId = `${roomParam}-host`;
+      const call = peer.call(hostPeerId, localStream);
+      if (call) {
+        currentCall = call;
+        handleStream(call);
+      }
+    }
+
+    function handleStream(call) {
+      call.on('stream', (remoteStream) => {
+        const remoteVideo = document.getElementById('remote-video');
+        const placeholder = document.getElementById('remote-placeholder');
+        
+        remoteVideo.srcObject = remoteStream;
+        remoteVideo.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+      });
+
+      call.on('close', () => {
+        document.getElementById('remote-video').classList.add('hidden');
+        document.getElementById('remote-placeholder').classList.remove('hidden');
+        document.getElementById('waiting-title').textContent = 'Співрозмовник завершив дзвінок';
+      });
+    }
+
+    function toggleAudio() {
+      if (!localStream) return;
+      isAudioMuted = !isAudioMuted;
+      localStream.getAudioTracks().forEach(t => t.enabled = !isAudioMuted);
+      
+      const btn = document.getElementById('btn-mic');
+      const icon = document.getElementById('mic-icon');
+      if (isAudioMuted) {
+        btn.classList.add('bg-rose-600', 'hover:bg-rose-700');
+        btn.classList.remove('bg-meet-border', 'hover:bg-gray-700');
+        icon.textContent = '🔇';
+      } else {
+        btn.classList.remove('bg-rose-600', 'hover:bg-rose-700');
+        btn.classList.add('bg-meet-border', 'hover:bg-gray-700');
+        icon.textContent = '🎤';
+      }
+    }
+
+    function toggleVideo() {
+      if (!localStream) return;
+      isVideoMuted = !isVideoMuted;
+      localStream.getVideoTracks().forEach(t => t.enabled = !isVideoMuted);
+      
+      const btn = document.getElementById('btn-cam');
+      const icon = document.getElementById('cam-icon');
+      if (isVideoMuted) {
+        btn.classList.add('bg-rose-600', 'hover:bg-rose-700');
+        btn.classList.remove('bg-meet-border', 'hover:bg-gray-700');
+        icon.textContent = '🚫';
+      } else {
+        btn.classList.remove('bg-rose-600', 'hover:bg-rose-700');
+        btn.classList.add('bg-meet-border', 'hover:bg-gray-700');
+        icon.textContent = '📹';
+      }
+    }
+
+    async function toggleScreenShare() {
+      if (!isScreenSharing) {
+        try {
+          const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+          const videoTrack = screenStream.getVideoTracks()[0];
+          
+          if (currentCall && currentCall.peerConnection) {
+            const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+            if (sender) sender.replaceTrack(videoTrack);
+          }
+          
+          document.getElementById('local-video').srcObject = screenStream;
+          isScreenSharing = true;
+
+          videoTrack.onended = () => {
+            stopScreenShare();
+          };
+        } catch (e) {}
+      } else {
+        stopScreenShare();
+      }
+    }
+
+    function stopScreenShare() {
+      if (localStream) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (currentCall && currentCall.peerConnection) {
+          const sender = currentCall.peerConnection.getSenders().find(s => s.track.kind === 'video');
+          if (sender) sender.replaceTrack(videoTrack);
+        }
+        document.getElementById('local-video').srcObject = localStream;
+      }
+      isScreenSharing = false;
     }
 
     function startSessionTimer() {
@@ -245,16 +398,40 @@
     }
 
     function loadExistingNotes() {
-      const saved = localStorage.getItem('psy_in_session_notes');
+      const saved = localStorage.getItem(`psy_notes_${roomParam}`);
       if (saved) {
         document.getElementById('in-session-notes').value = saved;
       }
     }
 
+    let saveTimeout = null;
+    function autoSaveNotes() {
+      clearTimeout(saveTimeout);
+      document.getElementById('notes-status-text').textContent = 'Збереження...';
+      saveTimeout = setTimeout(() => {
+        const val = document.getElementById('in-session-notes').value;
+        localStorage.setItem(`psy_notes_${roomParam}`, val);
+        document.getElementById('notes-status-text').textContent = 'Збережено автоматично ✓';
+      }, 600);
+    }
+
     function saveInSessionNotes() {
       const val = document.getElementById('in-session-notes').value;
-      localStorage.setItem('psy_in_session_notes', val);
-      alert('Нотатки збережено в пам\'ять кабінету!');
+      localStorage.setItem(`psy_notes_${roomParam}`, val);
+      document.getElementById('notes-status-text').textContent = 'Збережено в базу ✓';
+      alert('Нотатки сесії успішно збережено!');
+    }
+
+    function hangUpCall() {
+      if (confirm('Ви дійсно бажаєте завершити консультацію та вийти?')) {
+        if (localStream) {
+          localStream.getTracks().forEach(t => t.stop());
+        }
+        if (peer) {
+          peer.destroy();
+        }
+        window.location.href = 'cabinet.html';
+      }
     }
 
     function confirmExit() {
