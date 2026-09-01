@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Відеосесія онлайн | Юлія Олефіренко</title>
   <meta name="description" content="Захищена відеокімната для індивідуальної онлайн-сесії психотерапії з Юлією Олефіренко.">
-  <meta name="theme-color" content="#121416">
+  <meta name="theme-color" content="#101214">
 
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -90,13 +90,13 @@
         </div>
       </a>
       <span class="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 text-[10px] font-bold">
-        <span>🔒</span> <span>Конфіденційно • WebRTC HD</span>
+        <span>🔒</span> <span>Конфіденційно • Безлімітна сесія</span>
       </span>
     </div>
 
     <!-- Center: Live Session Timer -->
     <div class="flex items-center gap-1.5 sm:gap-2 bg-black/50 border border-meet-border px-2.5 sm:px-3.5 py-1 rounded-full text-xs">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="timer-dot"></span>
       <span class="text-[10px] sm:text-xs text-gray-400 font-medium hidden sm:inline">Час:</span>
       <span id="session-countdown" class="text-xs sm:text-sm font-bold text-white font-mono tracking-wider">50:00</span>
     </div>
@@ -107,9 +107,9 @@
         <span>📝</span> <span class="hidden md:inline">Нотатки</span>
       </button>
 
-      <a href="cabinet.html" onclick="return confirmExit()" class="px-3 sm:px-4 py-1.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1">
-        <span>✕</span> <span class="hidden sm:inline">Вийти</span>
-      </a>
+      <button onclick="hangUpCall()" class="px-3 sm:px-4 py-1.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1">
+        <span>✕</span> <span class="hidden sm:inline">Завершити</span>
+      </button>
     </div>
   </header>
 
@@ -125,20 +125,20 @@
         <!-- Remote Video (HD Stream from partner - uncropped full field of view) -->
         <video id="remote-video" autoplay playsinline webkit-playsinline class="w-full h-full object-contain bg-black hidden"></video>
 
-        <!-- Waiting Placeholder (When partner not connected yet) -->
+        <!-- Waiting / Reconnecting Placeholder (Shown when alone or reconnecting) -->
         <div id="remote-placeholder" class="text-center space-y-3 sm:space-y-4 p-6 sm:p-8 max-w-sm sm:max-w-md my-auto">
-          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-brand-900/70 border border-emerald-500/40 flex items-center justify-center text-3xl sm:text-4xl mx-auto shadow-lg animate-pulse">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-brand-900/70 border border-emerald-500/40 flex items-center justify-center text-3xl sm:text-4xl mx-auto shadow-lg animate-pulse" id="placeholder-icon-box">
             🌱
           </div>
           <div class="space-y-1">
             <h2 class="text-base sm:text-xl font-bold text-white" id="waiting-title">Очікування підключення...</h2>
             <p class="text-[11px] sm:text-xs text-gray-400 leading-relaxed" id="waiting-desc">
-              Ви в захищеній відеокімнаті. Відеозв'язок почнеться автоматично, щойно співрозмовник увійде.
+              Ви в захищеній відеокімнаті. Відеозв'язок розпочнеться автоматично, щойно співрозмовник увійде.
             </p>
           </div>
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-800/50 text-emerald-300 text-[11px] font-mono">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Кімната: <strong id="room-code-badge">psy-room</strong></span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping" id="status-ping-dot"></span>
+            <span id="room-status-badge">Кімната: <strong id="room-code-badge">psy-room</strong></span>
           </div>
         </div>
 
@@ -236,13 +236,37 @@
 
   </main>
 
+  <!-- Modal: Session Ended Screen (Appears ONLY on explicit button click) -->
+  <div id="session-ended-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl hidden flex items-center justify-center p-4">
+    <div class="bg-meet-card border border-meet-border rounded-3xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
+      <div class="w-16 h-16 rounded-2xl bg-brand-900 border border-emerald-500/40 flex items-center justify-center text-3xl mx-auto shadow-md">
+        🌿
+      </div>
+      <div class="space-y-2">
+        <h2 class="font-serif-luxury font-bold text-2xl text-white">Консультацію завершено</h2>
+        <p class="text-xs text-gray-400 leading-relaxed" id="session-ended-desc">
+          Сесія була успішно завершена. Усі ваші нотатки надійно збережено в системі.
+        </p>
+      </div>
+      <div class="pt-2">
+        <a href="cabinet.html" class="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-lg transition-all">
+          <span>← Повернутися до кабінету</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <script>
     let localStream = null;
     let peer = null;
     let currentCall = null;
+    let dataConnection = null;
     let isAudioMuted = false;
     let isVideoMuted = false;
     let isScreenSharing = false;
+    let isSessionExplicitlyEnded = false;
+    let isConnectedWithPeer = false;
+    let autoReconnectInterval = null;
     let currentFacingMode = 'user'; // 'user' or 'environment'
     let timerInterval = null;
     let timeLeft = 50 * 60; // 50 minutes in seconds
@@ -257,7 +281,6 @@
       document.getElementById('room-code-badge').textContent = roomParam;
       document.getElementById('local-user-label').textContent = currentUser.name ? currentUser.name.split(' ')[0] : (isOwnerRole ? 'Юлія' : 'Ви');
       
-      // On desktop, change flip button to screen share
       if (!isMobileDevice) {
         document.getElementById('flip-icon').textContent = '🖥️';
         document.getElementById('flip-label').textContent = 'Екран';
@@ -279,7 +302,6 @@
           localStream.getTracks().forEach(t => t.stop());
         }
 
-        // Natural HD video constraints without artificial cropping
         const constraints = {
           audio: {
             echoCancellation: true,
@@ -306,7 +328,6 @@
         const localVid = document.getElementById('local-video');
         localVid.srcObject = localStream;
         
-        // Mirror front camera, unmirror back camera
         if (facingMode === 'user') {
           localVid.classList.add('video-mirror');
         } else {
@@ -327,6 +348,7 @@
     }
 
     function setupPeerConnection() {
+      // Deterministic Host ID for therapist, client ID for client
       const peerId = isOwnerRole ? `${roomParam}-host` : `${roomParam}-client-${Math.floor(Math.random()*1000)}`;
       
       peer = new Peer(peerId, {
@@ -340,37 +362,82 @@
       });
 
       peer.on('open', (id) => {
+        console.log('Peer connected with ID:', id);
+
         if (!isOwnerRole) {
           connectToHost();
+          startAutoReconnectHeartbeat();
         }
       });
 
+      // Handle Incoming Call
       peer.on('call', (call) => {
+        console.log('Incoming call received, answering with stream');
         currentCall = call;
         call.answer(localStream);
         handleStream(call);
       });
 
+      // Handle Data Channel for explicit session termination
+      peer.on('connection', (conn) => {
+        setupDataChannel(conn);
+      });
+
       peer.on('error', (err) => {
-        console.log('Peer status:', err.type);
+        console.log('Peer connection status:', err.type);
         if (err.type === 'peer-unavailable' && !isOwnerRole) {
-          setTimeout(connectToHost, 3000);
+          // If therapist refreshed or not in room yet, keep waiting and retry
+          showWaitingOrReconnectingState(false);
+        }
+      });
+    }
+
+    function setupDataChannel(conn) {
+      dataConnection = conn;
+      dataConnection.on('data', (data) => {
+        if (data && data.type === 'SESSION_TERMINATED') {
+          isSessionExplicitlyEnded = true;
+          showSessionEndedScreen(data.by);
         }
       });
     }
 
     function connectToHost() {
-      if (!peer || peer.destroyed) return;
+      if (!peer || peer.destroyed || isSessionExplicitlyEnded) return;
+      if (isConnectedWithPeer) return; // Already connected
+
       const hostPeerId = `${roomParam}-host`;
-      const call = peer.call(hostPeerId, localStream);
-      if (call) {
-        currentCall = call;
-        handleStream(call);
+      
+      // Connect Data Channel
+      try {
+        const conn = peer.connect(hostPeerId);
+        if (conn) setupDataChannel(conn);
+      } catch(e) {}
+
+      // Call Host
+      if (localStream) {
+        const call = peer.call(hostPeerId, localStream);
+        if (call) {
+          currentCall = call;
+          handleStream(call);
+        }
       }
+    }
+
+    function startAutoReconnectHeartbeat() {
+      clearInterval(autoReconnectInterval);
+      autoReconnectInterval = setInterval(() => {
+        if (!isSessionExplicitlyEnded && !isConnectedWithPeer) {
+          connectToHost();
+        }
+      }, 2000);
     }
 
     function handleStream(call) {
       call.on('stream', (remoteStream) => {
+        console.log('Remote video stream attached!');
+        isConnectedWithPeer = true;
+
         const remoteVideo = document.getElementById('remote-video');
         const placeholder = document.getElementById('remote-placeholder');
         
@@ -380,10 +447,38 @@
       });
 
       call.on('close', () => {
-        document.getElementById('remote-video').classList.add('hidden');
-        document.getElementById('remote-placeholder').classList.remove('hidden');
-        document.getElementById('waiting-title').textContent = 'Співрозмовник завершив дзвінок';
+        console.log('Call stream closed');
+        isConnectedWithPeer = false;
+
+        if (!isSessionExplicitlyEnded) {
+          // Network glitch or page reload: show friendly reconnecting state
+          showWaitingOrReconnectingState(true);
+          if (!isOwnerRole) {
+            connectToHost();
+          }
+        }
       });
+    }
+
+    function showWaitingOrReconnectingState(isReconnect = false) {
+      const remoteVideo = document.getElementById('remote-video');
+      const placeholder = document.getElementById('remote-placeholder');
+      const title = document.getElementById('waiting-title');
+      const desc = document.getElementById('waiting-desc');
+      const badge = document.getElementById('room-status-badge');
+
+      remoteVideo.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+
+      if (isReconnect) {
+        title.textContent = "📡 Відновлення зв'язку...";
+        desc.textContent = "Тимчасове перепідключення або оновлення сторінки співрозмовником. Сесія автоматично продовжиться.";
+        badge.innerHTML = `<span class="text-amber-300">Перепідключення...</span>`;
+      } else {
+        title.textContent = "Очікування співрозмовника...";
+        desc.textContent = "Ви в захищеній відеокімнаті. Відеозв'язок розпочнеться автоматично, щойно співрозмовник увійде.";
+        badge.innerHTML = `Кімната: <strong id="room-code-badge">${roomParam}</strong>`;
+      }
     }
 
     function toggleAudio() {
@@ -396,12 +491,12 @@
       const label = document.getElementById('mic-label');
 
       if (isAudioMuted) {
-        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-rose-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95';
+        iconBox.className = 'w-12 h-12 sm:w-12 sm:h-12 rounded-2xl sm:rounded-full bg-rose-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95';
         icon.textContent = '🔇';
         label.textContent = 'Вимкнено';
         label.className = 'text-[9px] sm:text-[10px] font-semibold text-rose-400';
       } else {
-        iconBox.className = 'w-12 h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95';
+        iconBox.className = 'w-12 h-12 sm:w-12 sm:h-12 rounded-2xl sm:rounded-full bg-emerald-600 text-white flex items-center justify-center text-xl sm:text-lg transition-all shadow-md active:scale-95';
         icon.textContent = '🎤';
         label.textContent = 'Мікр';
         label.className = 'text-[9px] sm:text-[10px] font-semibold text-gray-300';
@@ -432,11 +527,9 @@
 
     async function handleFlipOrScreen() {
       if (isMobileDevice) {
-        // Toggle front / back camera on mobile
         currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
         await startCameraStream(currentFacingMode);
       } else {
-        // Desktop Screen share
         toggleScreenShare();
       }
     }
@@ -535,14 +628,51 @@
     }
 
     function hangUpCall() {
-      if (confirm('Ви дійсно бажаєте завершити консультацію та вийти?')) {
-        if (localStream) {
-          localStream.getTracks().forEach(t => t.stop());
+      if (confirm('Ви дійсно бажаєте завершити онлайн-консультацію?')) {
+        isSessionExplicitlyEnded = true;
+        clearInterval(autoReconnectInterval);
+
+        // Notify partner via data channel
+        if (dataConnection && dataConnection.open) {
+          try {
+            dataConnection.send({
+              type: 'SESSION_TERMINATED',
+              by: isOwnerRole ? 'Юлія Олефіренко' : (currentUser.name || 'Клієнт')
+            });
+          } catch(e) {}
         }
-        if (peer) {
-          peer.destroy();
-        }
-        window.location.href = 'cabinet.html';
+
+        closeMedia();
+        showSessionEndedScreen('Ви');
+      }
+    }
+
+    function showSessionEndedScreen(endedByName) {
+      clearInterval(autoReconnectInterval);
+      clearInterval(timerInterval);
+      closeMedia();
+
+      const modal = document.getElementById('session-ended-modal');
+      const desc = document.getElementById('session-ended-desc');
+      
+      if (endedByName && endedByName !== 'Ви') {
+        desc.textContent = `Консультація була завершена співрозмовником (${endedByName}). Усі нотатки сесії збережено.`;
+      } else {
+        desc.textContent = `Консультацію успішно завершено. Усі нотатки сесії збережено.`;
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeMedia() {
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+      }
+      if (currentCall) {
+        try { currentCall.close(); } catch(e) {}
+      }
+      if (peer) {
+        try { peer.destroy(); } catch(e) {}
       }
     }
 
