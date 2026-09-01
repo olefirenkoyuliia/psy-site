@@ -472,6 +472,19 @@
 
       <form id="schedule-form" onsubmit="saveNewAppointment(event)" class="space-y-4">
         
+        <!-- Mode Switcher: Single Session vs Course / Multi-Sessions -->
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-warm-text">Тип запису:</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="setScheduleMode('single')" id="sched-mode-single-btn" class="py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5">
+              <span>1️⃣ Разова сесія</span>
+            </button>
+            <button type="button" onclick="setScheduleMode('course')" id="sched-mode-course-btn" class="py-2.5 px-3 rounded-2xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5">
+              <span>📚 Курс (4, 8, 10+ сесій)</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Select Client -->
         <div class="space-y-1">
           <label class="block text-xs font-bold text-warm-text">Виберіть клієнта:</label>
@@ -480,20 +493,56 @@
           </select>
         </div>
 
-        <!-- Date & Time -->
+        <!-- Date & Time (Start date of course or single session) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div class="space-y-1">
-            <label class="block text-xs font-bold text-warm-text">Дата зустрічі:</label>
-            <input type="date" id="schedule-date" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+            <label class="block text-xs font-bold text-warm-text" id="schedule-date-label">Дата зустрічі (або 1-ї сесії):</label>
+            <input type="date" id="schedule-date" onchange="updateCourseSchedulePreview()" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
           </div>
           <div class="space-y-1">
             <label class="block text-xs font-bold text-warm-text">Час (Київ):</label>
-            <input type="time" id="schedule-time" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+            <input type="time" id="schedule-time" onchange="updateCourseSchedulePreview()" required class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
+          </div>
+        </div>
+
+        <!-- Course / Multi-Session Options Box (Shown when Course mode is active) -->
+        <div id="course-options-box" class="hidden space-y-3 p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200">
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-emerald-950">Кількість сесій у пакеті / курсі:</label>
+            <div class="grid grid-cols-4 gap-1.5">
+              <button type="button" onclick="setCourseCount(4)" id="course-pill-4" class="course-count-pill py-2 rounded-xl border border-warm-border bg-white text-xs font-semibold hover:border-brand-500 transition-all">4 сесії</button>
+              <button type="button" onclick="setCourseCount(8)" id="course-pill-8" class="course-count-pill py-2 rounded-xl border border-warm-border bg-white text-xs font-semibold hover:border-brand-500 transition-all">8 сесій</button>
+              <button type="button" onclick="setCourseCount(10)" id="course-pill-10" class="course-count-pill py-2 rounded-xl border border-emerald-600 bg-emerald-600 text-white text-xs font-bold shadow-sm transition-all">10 сесій</button>
+              <button type="button" onclick="setCourseCount('custom')" id="course-pill-custom" class="course-count-pill py-2 rounded-xl border border-warm-border bg-white text-xs font-semibold hover:border-brand-500 transition-all">Своя</button>
+            </div>
+            <div id="custom-course-count-box" class="hidden pt-1">
+              <input type="number" id="schedule-course-count-input" value="10" min="2" max="50" oninput="updateCourseSchedulePreview()" placeholder="Введіть кількість зустрічей (напр. 12)" class="w-full px-3.5 py-2 rounded-xl border border-warm-border text-xs font-medium bg-white">
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <label class="block text-xs font-bold text-emerald-950">Періодичність сесій:</label>
+            <select id="schedule-course-interval" onchange="updateCourseSchedulePreview()" class="w-full px-3 py-2 rounded-xl border border-warm-border text-xs font-medium bg-white">
+              <option value="weekly">Щотижня (1 раз на тиждень у цей же день і час)</option>
+              <option value="twice_weekly">Двічі на тиждень (+3 дні / +4 дні)</option>
+              <option value="biweekly">Кожні 2 тижні</option>
+            </select>
+          </div>
+
+          <!-- Schedule Preview List -->
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-emerald-950">Графік запланованих сесій:</span>
+              <span class="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded-full" id="course-preview-count-badge">10 сесій</span>
+            </div>
+            <div id="course-schedule-preview-list" class="max-h-36 overflow-y-auto space-y-1 p-2 rounded-xl bg-white border border-warm-border text-[11px] font-mono">
+              <!-- Dynamically populated -->
+            </div>
           </div>
         </div>
 
         <div class="space-y-1">
-          <label class="block text-xs font-bold text-warm-text">Тривалість сесії:</label>
+          <label class="block text-xs font-bold text-warm-text">Тривалість кожної сесії:</label>
           <select id="schedule-duration" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
             <option value="50">50 хвилин (Стандартна сесія)</option>
             <option value="80">80 хвилин (Поглиблена сесія)</option>
@@ -502,9 +551,6 @@
 
         <!-- Meeting Format (Google Meet) -->
         <input type="hidden" name="schedule_meet_format" value="google_meet">
-        <!-- Preserved WebRTC format selector for future re-activation:
-        <input type="radio" name="schedule_meet_format" value="webrtc">
-        -->
 
         <!-- Google Meet URL Field -->
         <div id="schedule-gmeet-url-box" class="space-y-1">
@@ -513,20 +559,31 @@
             <span class="text-[10px] text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">🌐 Google Meet</span>
           </label>
           <input type="url" id="schedule-gmeet-url" placeholder="https://meet.google.com/xxx-yyyy-zzz" value="https://meet.google.com/new" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs font-medium">
-          <p class="text-[10px] text-warm-muted">Вкажіть посилання на кімнату Google Meet (або залиште посилання швидкого старту).</p>
+          <p class="text-[10px] text-warm-muted">Вкажіть посилання на кімнату Google Meet (або залиште швидкий старт).</p>
         </div>
 
         <div class="space-y-1">
-          <label class="block text-xs font-bold text-warm-text">Терапевтична нотатка до зустрічі (опціонально):</label>
-          <textarea id="schedule-notes" rows="2" placeholder="Фокус роботи на цю зустріч..." class="w-full p-3 rounded-xl border border-warm-border text-xs leading-relaxed"></textarea>
+          <label class="block text-xs font-bold text-warm-text">Терапевтична нотатка (опціонально):</label>
+          <textarea id="schedule-notes" rows="2" placeholder="Фокус роботи або запит клієнта..." class="w-full p-3 rounded-xl border border-warm-border text-xs leading-relaxed"></textarea>
+        </div>
+
+        <!-- Google Calendar Privacy Guarantee Box -->
+        <div class="p-3 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs text-warm-text flex items-start gap-2.5">
+          <span class="text-base leading-none">🔒</span>
+          <div class="space-y-0.5">
+            <div class="font-bold text-amber-900 text-xs">Приватність Google Календаря (Private)</div>
+            <p class="text-[11px] text-amber-800/90 leading-relaxed">
+              Події створюються як <strong>Private / Приватні</strong> із прямим запрошенням клієнта. Інші люди з доступом до календаря бачать лише «Зайнято», без імен та деталей.
+            </p>
+          </div>
         </div>
 
         <div class="pt-2 flex items-center justify-end gap-2">
           <button type="button" onclick="closeScheduleModal()" class="px-4 py-2.5 rounded-xl border border-warm-border text-warm-text font-semibold text-xs">
             Скасувати
           </button>
-          <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5">
-            <span>✨ Створити сесію</span>
+          <button type="submit" id="schedule-submit-btn" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all">
+            <span>✨ Створити зустріч</span>
           </button>
         </div>
 
@@ -1195,23 +1252,17 @@
         
         const isGmeet = (app.meet_format === 'google_meet') || (app.meet_url && app.meet_url.includes('meet.google.com')) || (!app.meet_format && !app.meet_url?.includes('meet.html'));
         const gmeetLink = app.google_meet_url || (app.meet_url?.includes('meet.google.com') ? app.meet_url : 'https://meet.google.com/new');
-        const platformRoomCode = app.room_code || `psy-meet-${app.id || Date.now()}`;
-        const platformMeetUrl = `https://olefirenko.pp.ua/meet.html?room=${platformRoomCode}`;
-
         const gcalUrl = buildGoogleCalendarLink(
-          `Сесія психотерапії: ${app.client_name} & Юлія Олефіренко`,
-          `Індивідуальна сесія психотерапії (${app.duration_minutes || 50} хв).\n\n` +
-          (isGmeet ? `🌐 Google Meet (Основний): ${gmeetLink}\n🌿 Відеокімната на сайті: ${platformMeetUrl}` : `🌿 Відеокімната на сайті (Основний): ${platformMeetUrl}\n🌐 Google Meet: ${gmeetLink}`),
-          isGmeet ? gmeetLink : platformMeetUrl,
+          `Сесія психотерапії: ${app.client_name}`,
+          `Індивідуальна консультація психотерапії (${app.duration_minutes || 50} хв).\nПряме посилання на Google Meet: ${gmeetLink}`,
+          gmeetLink,
           app.session_date,
           app.session_time,
-          app.duration_minutes
+          app.duration_minutes,
+          app.client_email
         );
 
-        const tgText = isGmeet
-          ? `Вітаю, ${app.client_name.split(' ')[0]}! Наша сесія психотерапії призначена на ${app.session_date} о ${app.session_time}.\n\n🌐 Посилання Google Meet: ${gmeetLink}\n🌿 Або через кабінет на сайті: https://olefirenko.pp.ua/cabinet.html`
-          : `Вітаю, ${app.client_name.split(' ')[0]}! Наша сесія психотерапії призначена на ${app.session_date} о ${app.session_time}.\n\n🌿 Посилання на відеокімнату: ${platformMeetUrl}\n🌐 Google Meet (резерв): ${gmeetLink}`;
-
+        const tgText = `Вітаю, ${app.client_name.split(' ')[0]}! Наша сесія психотерапії призначена на ${app.session_date} о ${app.session_time}.\n\n🌐 Посилання Google Meet: ${gmeetLink}\n🌿 Або через ваш кабінет: https://olefirenko.pp.ua/cabinet.html`;
         const tgDraftText = encodeURIComponent(tgText);
 
         card.innerHTML = `
@@ -1247,12 +1298,15 @@
               <span>🌐 Відкрити Google Meet</span>
             </a>
 
-            <div class="grid grid-cols-2 gap-2 text-xs pt-1">
-              <a href="${gcalUrl}" target="_blank" class="py-2 px-3 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-center transition-colors flex items-center justify-center gap-1">
-                <span>📅 Google Календар</span>
+            <div class="grid grid-cols-3 gap-1.5 text-xs pt-1">
+              <a href="${gcalUrl}" target="_blank" class="py-2 px-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-center transition-colors flex items-center justify-center gap-1 text-[11px]" title="Додати в Google Календар (Private)">
+                <span>📅 Календар</span>
               </a>
-              <a href="https://t.me/share/url?url=${encodeURIComponent(gmeetLink)}&text=${tgDraftText}" target="_blank" class="py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-semibold text-center transition-colors flex items-center justify-center gap-1">
-                <span>💬 Лінк клієнту</span>
+              <button onclick="downloadPrivateIcsFile('Сесія психотерапії: ${escapeHtml(app.client_name)}', 'Індивідуальна сесія психотерапії (${app.duration_minutes || 50} хв).\\nПосилання Google Meet: ${gmeetLink}', '${gmeetLink}', '${app.session_date}', '${app.session_time}', ${app.duration_minutes || 50}, '${app.client_email}', '${escapeHtml(app.client_name)}')" class="py-2 px-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-center transition-colors flex items-center justify-center gap-1 text-[11px]" title="Завантажити приватний файл .ics">
+                <span>📥 .ics</span>
+              </button>
+              <a href="https://t.me/share/url?url=${encodeURIComponent(gmeetLink)}&text=${tgDraftText}" target="_blank" class="py-2 px-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-800 font-semibold text-center transition-colors flex items-center justify-center gap-1 text-[11px]" title="Надіслати лінк клієнту в Telegram">
+                <span>💬 Telegram</span>
               </a>
             </div>
 
@@ -1303,33 +1357,205 @@
       } catch(e) {}
     }
 
-    function buildGoogleCalendarLink(title, details, location, startDate, startTime, durationMins = 50) {
+    let currentScheduleMode = 'single';
+    let currentCourseCount = 10;
+
+    const UKRAINIAN_DAYS = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+    const UKRAINIAN_DAYS_FULL = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П' + 'ятниця', 'Субота'];
+
+    function setScheduleMode(mode) {
+      currentScheduleMode = mode;
+      const singleBtn = document.getElementById('sched-mode-single-btn');
+      const courseBtn = document.getElementById('sched-mode-course-btn');
+      const courseBox = document.getElementById('course-options-box');
+      const dateLabel = document.getElementById('schedule-date-label');
+      const submitBtn = document.getElementById('schedule-submit-btn');
+
+      if (mode === 'course') {
+        singleBtn.className = 'py-2.5 px-3 rounded-2xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5';
+        courseBtn.className = 'py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5';
+        courseBox.classList.remove('hidden');
+        dateLabel.textContent = 'Дата 1-ї сесії курсу:';
+        const count = getSelectedCourseCount();
+        submitBtn.innerHTML = `<span>✨ Створити курс із ${count} сесій</span>`;
+        updateCourseSchedulePreview();
+      } else {
+        singleBtn.className = 'py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5';
+        courseBtn.className = 'py-2.5 px-3 rounded-2xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5';
+        courseBox.classList.add('hidden');
+        dateLabel.textContent = 'Дата зустрічі:';
+        submitBtn.innerHTML = `<span>✨ Створити зустріч</span>`;
+      }
+    }
+
+    function getSelectedCourseCount() {
+      const customBox = document.getElementById('custom-course-count-box');
+      if (!customBox.classList.contains('hidden')) {
+        const val = parseInt(document.getElementById('schedule-course-count-input').value);
+        return isNaN(val) || val < 1 ? 10 : val;
+      }
+      return currentCourseCount;
+    }
+
+    function setCourseCount(count) {
+      const pills = [4, 8, 10, 'custom'];
+      pills.forEach(p => {
+        const pill = document.getElementById(`course-pill-${p}`);
+        if (pill) {
+          if (p === count) {
+            pill.className = 'course-count-pill py-2 rounded-xl border border-emerald-600 bg-emerald-600 text-white text-xs font-bold shadow-sm transition-all';
+          } else {
+            pill.className = 'course-count-pill py-2 rounded-xl border border-warm-border bg-white text-xs font-semibold hover:border-brand-500 transition-all text-warm-text';
+          }
+        }
+      });
+
+      const customBox = document.getElementById('custom-course-count-box');
+      if (count === 'custom') {
+        customBox.classList.remove('hidden');
+        currentCourseCount = parseInt(document.getElementById('schedule-course-count-input').value) || 10;
+      } else {
+        customBox.classList.add('hidden');
+        currentCourseCount = count;
+      }
+
+      const total = getSelectedCourseCount();
+      document.getElementById('schedule-submit-btn').innerHTML = `<span>✨ Створити курс із ${total} сесій</span>`;
+      updateCourseSchedulePreview();
+    }
+
+    function generateCourseDates(startDateStr, startTimeStr, count, interval) {
+      if (!startDateStr) return [];
+      const [year, month, day] = startDateStr.split('-').map(Number);
+      let curr = new Date(year, month - 1, day);
+      
+      const dates = [];
+      for (let i = 0; i < count; i++) {
+        const y = curr.getFullYear();
+        const m = String(curr.getMonth() + 1).padStart(2, '0');
+        const d = String(curr.getDate()).padStart(2, '0');
+        const dayOfWeek = UKRAINIAN_DAYS[curr.getDay()];
+        
+        dates.push({
+          index: i + 1,
+          dateStr: `${y}-${m}-${d}`,
+          timeStr: startTimeStr,
+          dayOfWeek: dayOfWeek,
+          fullDateDisplay: `${d}.${m}.${y} (${dayOfWeek}) о ${startTimeStr}`
+        });
+
+        if (interval === 'twice_weekly') {
+          // alternate +3 and +4 days
+          const addDays = (i % 2 === 0) ? 3 : 4;
+          curr.setDate(curr.getDate() + addDays);
+        } else if (interval === 'biweekly') {
+          curr.setDate(curr.getDate() + 14);
+        } else {
+          // weekly (+7 days)
+          curr.setDate(curr.getDate() + 7);
+        }
+      }
+      return dates;
+    }
+
+    function updateCourseSchedulePreview() {
+      if (currentScheduleMode !== 'course') return;
+      const startDateStr = document.getElementById('schedule-date').value;
+      const startTimeStr = document.getElementById('schedule-time').value || '18:00';
+      const count = getSelectedCourseCount();
+      const interval = document.getElementById('schedule-course-interval').value || 'weekly';
+
+      const previewList = document.getElementById('course-schedule-preview-list');
+      const countBadge = document.getElementById('course-preview-count-badge');
+      if (!previewList) return;
+
+      if (!startDateStr) {
+        previewList.innerHTML = '<div class="text-warm-muted text-center p-2">Оберіть дату першої зустрічі для перегляду розкладу.</div>';
+        return;
+      }
+
+      const courseDates = generateCourseDates(startDateStr, startTimeStr, count, interval);
+      countBadge.textContent = `${courseDates.length} сесій`;
+
+      previewList.innerHTML = courseDates.map(item => `
+        <div class="flex items-center justify-between py-1 px-2 rounded-lg bg-gray-50/80 hover:bg-emerald-50/60 border border-gray-100 transition-colors">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center">${item.index}</span>
+            <span class="font-semibold text-warm-text">${item.fullDateDisplay}</span>
+          </div>
+          <span class="text-[10px] text-emerald-700 font-bold">50 хв</span>
+        </div>
+      `).join('');
+    }
+
+    function buildGoogleCalendarLink(title, details, location, startDate, startTime, durationMins = 50, clientEmail = '', recurrenceCount = 0) {
       if (!startDate || !startTime) return '#';
       try {
         const start = new Date(`${startDate}T${startTime}:00`);
         const end = new Date(start.getTime() + (durationMins || 50) * 60000);
         const formatIso = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, '');
         const dates = `${formatIso(start)}/${formatIso(end)}`;
-        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${dates}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+        
+        let url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${dates}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}&visibility=private`;
+        
+        if (clientEmail && clientEmail.includes('@')) {
+          url += `&add=${encodeURIComponent(clientEmail + ',olefirenkou@gmail.com')}`;
+        }
+
+        if (recurrenceCount > 1) {
+          url += `&recur=RRULE:FREQ=WEEKLY;COUNT=${recurrenceCount}`;
+        }
+
+        return url;
       } catch(e) {
         return '#';
       }
     }
 
-    function toggleScheduleMeetFormat() {
-      const isGmeet = document.querySelector('input[name="schedule_meet_format"]:checked').value === 'google_meet';
-      const labelGmeet = document.getElementById('format-label-gmeet');
-      const labelWebrtc = document.getElementById('format-label-webrtc');
-      const gmeetBox = document.getElementById('schedule-gmeet-url-box');
+    function downloadPrivateIcsFile(title, details, location, startDate, startTime, durationMins = 50, clientEmail = '', clientName = '', recurrenceCount = 1) {
+      if (!startDate || !startTime) return;
+      try {
+        const start = new Date(`${startDate}T${startTime}:00`);
+        const end = new Date(start.getTime() + (durationMins || 50) * 60000);
+        const formatIcsDate = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, '');
+        
+        const uid = `psy-${Date.now()}-${Math.random().toString(36).substring(2, 7)}@olefirenko.pp.ua`;
+        const rruleLine = recurrenceCount > 1 ? `RRULE:FREQ=WEEKLY;COUNT=${recurrenceCount}\r\n` : '';
+        const attendeeLine = clientEmail ? `ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=${clientName || 'Клієнт'}:mailto:${clientEmail}\r\n` : '';
 
-      if (isGmeet) {
-        labelGmeet.className = 'flex items-center gap-2.5 p-3 rounded-2xl border border-emerald-500/60 bg-emerald-50/60 cursor-pointer text-xs font-bold text-brand-900 transition-all';
-        labelWebrtc.className = 'flex items-center gap-2.5 p-3 rounded-2xl border border-warm-border bg-white cursor-pointer text-xs font-semibold text-warm-text hover:bg-warm-bg transition-all';
-        gmeetBox.classList.remove('hidden');
-      } else {
-        labelGmeet.className = 'flex items-center gap-2.5 p-3 rounded-2xl border border-warm-border bg-white cursor-pointer text-xs font-semibold text-warm-text hover:bg-warm-bg transition-all';
-        labelWebrtc.className = 'flex items-center gap-2.5 p-3 rounded-2xl border border-emerald-500/60 bg-emerald-50/60 cursor-pointer text-xs font-bold text-brand-900 transition-all';
-        gmeetBox.classList.add('hidden');
+        const icsContent = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'PRODID:-//Yuliia Olefirenko//Psychotherapy Practice//UK',
+          'CALSCALE:GREGORIAN',
+          'METHOD:REQUEST',
+          'BEGIN:VEVENT',
+          `UID:${uid}`,
+          `DTSTAMP:${formatIcsDate(new Date())}`,
+          `DTSTART:${formatIcsDate(start)}`,
+          `DTEND:${formatIcsDate(end)}`,
+          `SUMMARY:${title}`,
+          `DESCRIPTION:${details.replace(/\n/g, '\\n')}`,
+          `LOCATION:${location}`,
+          'CLASS:PRIVATE',
+          'STATUS:CONFIRMED',
+          'TRANSP:OPAQUE',
+          'ORGANIZER;CN=Юлія Олефіренко:mailto:olefirenkou@gmail.com',
+          attendeeLine.trim(),
+          rruleLine.trim(),
+          'END:VEVENT',
+          'END:VCALENDAR'
+        ].filter(Boolean).join('\r\n');
+
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.setAttribute('download', `session_private_${startDate}.ics`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch(e) {
+        alert('Помилка створення файлу календаря: ' + e.message);
       }
     }
 
@@ -1350,10 +1576,9 @@
       document.getElementById('schedule-date').value = tomorrow.toISOString().substring(0, 10);
       document.getElementById('schedule-time').value = "18:00";
 
-      // Reset to Google Meet by default
-      const radioGmeet = document.querySelector('input[name="schedule_meet_format"][value="google_meet"]');
-      if (radioGmeet) radioGmeet.checked = true;
-      toggleScheduleMeetFormat();
+      // Reset to single mode
+      setScheduleMode('single');
+      setCourseCount(10);
 
       openModal('schedule-modal');
     }
@@ -1363,22 +1588,7 @@
     }
 
     function onScheduleClientChanged() {
-      const raw = document.getElementById('schedule-client-select').value;
-      if (!raw) return;
-      try {
-        const client = JSON.parse(raw);
-        const pref = (client.preferred_format || '').toLowerCase();
-        const isWebrtc = pref.includes('платформа') || pref.includes('webrtc') || pref.includes('відеокімната');
-        
-        const radioGmeet = document.querySelector('input[name="schedule_meet_format"][value="google_meet"]');
-        const radioWebrtc = document.querySelector('input[name="schedule_meet_format"][value="webrtc"]');
-        
-        if (radioGmeet && radioWebrtc) {
-          if (isWebrtc) radioWebrtc.checked = true;
-          else radioGmeet.checked = true;
-          toggleScheduleMeetFormat();
-        }
-      } catch(e) {}
+      updateCourseSchedulePreview();
     }
 
     async function saveNewAppointment(e) {
@@ -1390,55 +1600,134 @@
       }
 
       const client = JSON.parse(rawClient);
-      const meetFormat = document.querySelector('input[name="schedule_meet_format"]:checked')?.value || 'google_meet';
       let customGmeetUrl = document.getElementById('schedule-gmeet-url').value.trim();
-      if (meetFormat === 'google_meet' && !customGmeetUrl) {
+      if (!customGmeetUrl) {
         customGmeetUrl = 'https://meet.google.com/new';
       }
 
-      const payload = {
-        client_id: client.id,
-        client_name: client.name,
-        client_email: client.email,
-        session_date: document.getElementById('schedule-date').value,
-        session_time: document.getElementById('schedule-time').value,
-        duration_minutes: parseInt(document.getElementById('schedule-duration').value),
-        meet_format: meetFormat,
-        google_meet_url: customGmeetUrl,
-        therapist_notes: document.getElementById('schedule-notes').value.trim()
-      };
+      const durationMinutes = parseInt(document.getElementById('schedule-duration').value) || 50;
+      const notes = document.getElementById('schedule-notes').value.trim();
+      const startDate = document.getElementById('schedule-date').value;
+      const startTime = document.getElementById('schedule-time').value;
 
-      try {
-        const res = await fetch('/api/appointments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          const data = await res.json();
-          cachedAppointments.unshift(data.appointment);
-        } else {
+      if (currentScheduleMode === 'course') {
+        const count = getSelectedCourseCount();
+        const interval = document.getElementById('schedule-course-interval').value || 'weekly';
+        const courseDates = generateCourseDates(startDate, startTime, count, interval);
+
+        const appointmentsPayload = courseDates.map((item, idx) => ({
+          client_id: client.id,
+          client_name: client.name,
+          client_email: client.email,
+          session_date: item.dateStr,
+          session_time: item.timeStr,
+          duration_minutes: durationMinutes,
+          meet_format: 'google_meet',
+          google_meet_url: customGmeetUrl,
+          therapist_notes: notes ? `${notes} (Сесія ${idx + 1}/${count})` : `Курс терапії (Сесія ${idx + 1}/${count})`
+        }));
+
+        try {
+          const res = await fetch('/api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ appointments: appointmentsPayload })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const created = data.appointments || [];
+            created.forEach(app => cachedAppointments.unshift(app));
+          } else {
+            appointmentsPayload.forEach((p, idx) => {
+              cachedAppointments.unshift({
+                ...p,
+                id: Date.now() + idx,
+                room_code: `psy-${Date.now() + idx}`,
+                meet_url: customGmeetUrl,
+                status: 'scheduled'
+              });
+            });
+          }
+        } catch(err) {
+          appointmentsPayload.forEach((p, idx) => {
+            cachedAppointments.unshift({
+              ...p,
+              id: Date.now() + idx,
+              room_code: `psy-${Date.now() + idx}`,
+              meet_url: customGmeetUrl,
+              status: 'scheduled'
+            });
+          });
+        }
+
+        renderAppointmentsList(cachedAppointments);
+        closeScheduleModal();
+        
+        // Build private recurring Google Calendar link for the whole course
+        const fullGcalUrl = buildGoogleCalendarLink(
+          `Курс психотерапії: ${client.name} & Юлія Олефіренко`,
+          `Індивідуальний курс психотерапії (${count} сесій по 50 хв).\nПряме посилання Google Meet: ${customGmeetUrl}`,
+          customGmeetUrl,
+          startDate,
+          startTime,
+          durationMinutes,
+          client.email,
+          count
+        );
+
+        showToast(`🎉 Успішно призначено курс із ${count} зустрічей!`);
+        
+        // Open Google Calendar or trigger ICS download for user convenience
+        if (confirm(`Курс із ${count} зустрічей призначено!\n\nБажаєте відкрити Google Календар прямо зараз, щоб зберегти всю приватну серію (${count} сесій) в один клік?`)) {
+          window.open(fullGcalUrl, '_blank');
+        }
+
+      } else {
+        // Single session creation
+        const payload = {
+          client_id: client.id,
+          client_name: client.name,
+          client_email: client.email,
+          session_date: startDate,
+          session_time: startTime,
+          duration_minutes: durationMinutes,
+          meet_format: 'google_meet',
+          google_meet_url: customGmeetUrl,
+          therapist_notes: notes
+        };
+
+        try {
+          const res = await fetch('/api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            const data = await res.json();
+            cachedAppointments.unshift(data.appointment);
+          } else {
+            cachedAppointments.unshift({
+              ...payload,
+              id: Date.now(),
+              room_code: `psy-${Date.now()}`,
+              meet_url: customGmeetUrl,
+              status: 'scheduled'
+            });
+          }
+        } catch(err) {
           cachedAppointments.unshift({
             ...payload,
             id: Date.now(),
             room_code: `psy-${Date.now()}`,
-            meet_url: meetFormat === 'google_meet' ? customGmeetUrl : `/meet.html?room=psy-${Date.now()}`,
+            meet_url: customGmeetUrl,
             status: 'scheduled'
           });
         }
-      } catch(err) {
-        cachedAppointments.unshift({
-          ...payload,
-          id: Date.now(),
-          room_code: `psy-${Date.now()}`,
-          meet_url: meetFormat === 'google_meet' ? customGmeetUrl : `/meet.html?room=psy-${Date.now()}`,
-          status: 'scheduled'
-        });
-      }
 
-      renderAppointmentsList(cachedAppointments);
-      closeScheduleModal();
-      showToast('Зустріч успішно призначено!');
+        renderAppointmentsList(cachedAppointments);
+        closeScheduleModal();
+        showToast('Зустріч успішно призначено!');
+      }
     }
 
     async function deleteAppointment(id) {

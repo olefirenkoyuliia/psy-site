@@ -58,33 +58,32 @@ export async function onRequestPost(context) {
 
   try {
     const data = await request.json();
-    const clientId = data.client_id || 0;
-    const clientName = (data.client_name || '').trim();
-    const clientEmail = (data.client_email || '').toLowerCase().trim();
-    const sessionDate = (data.session_date || '').trim();
-    const sessionTime = (data.session_time || '').trim();
-    const durationMinutes = data.duration_minutes || 50;
-    const therapistNotes = (data.therapist_notes || '').trim();
     
-    // Generate clean unique room code (e.g. psy-meet-xyz789)
-    const randomHex = Math.random().toString(36).substring(2, 8);
-    const roomCode = data.room_code || `psy-olefirenko-${randomHex}`;
-    const meetFormat = data.meet_format || 'google_meet';
-    const googleMeetUrl = (data.google_meet_url || 'https://meet.google.com/new').trim();
-    const meetUrl = meetFormat === 'google_meet' ? googleMeetUrl : `/meet.html?room=${roomCode}`;
+    // Support single appointment or array of multiple sessions (e.g. course of 10 meetings)
+    const items = Array.isArray(data.appointments) ? data.appointments : [data];
+    const createdList = [];
 
-    if (!clientName || !sessionDate || !sessionTime) {
-      return new Response(JSON.stringify({ error: 'Client name, session date and time are required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
-    }
+    for (const item of items) {
+      const clientId = item.client_id || 0;
+      const clientName = (item.client_name || '').trim();
+      const clientEmail = (item.client_email || '').toLowerCase().trim();
+      const sessionDate = (item.session_date || '').trim();
+      const sessionTime = (item.session_time || '').trim();
+      const durationMinutes = item.duration_minutes || 50;
+      const therapistNotes = (item.therapist_notes || '').trim();
+      
+      // Generate clean unique room code
+      const randomHex = Math.random().toString(36).substring(2, 8);
+      const roomCode = item.room_code || `psy-olefirenko-${randomHex}`;
+      const meetFormat = item.meet_format || 'google_meet';
+      const googleMeetUrl = (item.google_meet_url || 'https://meet.google.com/new').trim();
+      const meetUrl = meetFormat === 'google_meet' ? googleMeetUrl : `/meet.html?room=${roomCode}`;
 
-    if (!env.DB) {
-      return new Response(JSON.stringify({
-        success: true,
-        appointment: {
-          id: Date.now(),
+      if (!clientName || !sessionDate || !sessionTime) continue;
+
+      if (!env.DB) {
+        createdList.push({
+          id: Date.now() + Math.floor(Math.random() * 1000),
           client_id: clientId,
           client_name: clientName,
           client_email: clientEmail,
@@ -97,39 +96,46 @@ export async function onRequestPost(context) {
           meet_url: meetUrl,
           therapist_notes: therapistNotes,
           status: 'scheduled'
-        },
-        message: 'Зустріч призначено локально'
-      }), {
+        });
+      } else {
+        const insertRes = await env.DB.prepare(
+          "INSERT INTO appointments (client_id, client_name, client_email, session_date, session_time, duration_minutes, room_code, meet_url, therapist_notes, status) " +
+          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'scheduled')"
+        ).bind(
+          clientId,
+          clientName,
+          clientEmail,
+          sessionDate,
+          sessionTime,
+          durationMinutes,
+          roomCode,
+          meetUrl,
+          therapistNotes
+        ).run();
+
+        const newId = insertRes.meta?.last_row_id || 1;
+        const appRow = await env.DB.prepare("SELECT * FROM appointments WHERE id = ?").bind(newId).first();
+        createdList.push({
+          ...appRow,
+          meet_format: meetFormat,
+          google_meet_url: googleMeetUrl
+        });
+      }
+    }
+
+    if (createdList.length === 0) {
+      return new Response(JSON.stringify({ error: 'Client name, session date and time are required' }), {
+        status: 400,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
 
-    const insertRes = await env.DB.prepare(
-      "INSERT INTO appointments (client_id, client_name, client_email, session_date, session_time, duration_minutes, room_code, meet_url, therapist_notes, status) " +
-      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'scheduled')"
-    ).bind(
-      clientId,
-      clientName,
-      clientEmail,
-      sessionDate,
-      sessionTime,
-      durationMinutes,
-      roomCode,
-      meetUrl,
-      therapistNotes
-    ).run();
-
-    const newId = insertRes.meta?.last_row_id || 1;
-    const appointment = await env.DB.prepare("SELECT * FROM appointments WHERE id = ?").bind(newId).first();
-
     return new Response(JSON.stringify({
       success: true,
-      appointment: {
-        ...appointment,
-        meet_format: meetFormat,
-        google_meet_url: googleMeetUrl
-      },
-      message: 'Сесію успішно призначено та додано до розкладу'
+      appointment: createdList[0] || null,
+      appointments: createdList,
+      count: createdList.length,
+      message: createdList.length > 1 ? `Успішно призначено курс із ${createdList.length} сесій` : 'Сесію успішно призначено та додано до розкладу'
     }), {
       headers: {
         'Content-Type': 'application/json',
