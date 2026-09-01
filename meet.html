@@ -122,7 +122,7 @@
   <!-- ======================================================== -->
   <!-- 2. OVERLAID FLOATING TOP HEADER BAR                      -->
   <!-- ======================================================== -->
-  <header class="absolute top-0 left-0 right-0 z-40 safe-top-p px-3 sm:px-6 flex items-center justify-between pointer-events-none">
+  <header id="top-floating-header" class="absolute top-0 left-0 right-0 z-40 safe-top-p px-3 sm:px-6 flex items-center justify-between pointer-events-none transition-all duration-300 ease-out transform translate-y-0 opacity-100">
     
     <!-- Left: Brand / Psychologist Tag -->
     <div class="pointer-events-auto flex items-center gap-2 bg-black/60 backdrop-blur-xl border border-white/10 px-3 py-1.5 rounded-full shadow-lg">
@@ -164,7 +164,7 @@
   <!-- ======================================================== -->
   <!-- 3. OVERLAID FLOATING BOTTOM CONTROLS DOCK                -->
   <!-- ======================================================== -->
-  <div class="absolute bottom-0 left-0 right-0 z-40 safe-bottom-p px-3 flex justify-center pointer-events-none">
+  <div id="bottom-floating-dock" class="absolute bottom-0 left-0 right-0 z-40 safe-bottom-p px-3 flex justify-center pointer-events-none transition-all duration-300 ease-out transform translate-y-0 opacity-100">
     <div class="pointer-events-auto w-[94%] max-w-sm sm:max-w-md bg-black/75 backdrop-blur-2xl border border-white/15 px-3 sm:px-6 py-2.5 sm:py-3.5 rounded-3xl sm:rounded-full shadow-2xl flex items-center justify-around sm:justify-center sm:gap-4">
       
       <!-- Mic Toggle -->
@@ -289,6 +289,9 @@
     const currentUser = JSON.parse(localStorage.getItem('psy_client_user') || '{}');
     const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 640;
 
+    let controlsTimeout = null;
+    let areControlsVisible = true;
+
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('room-code-badge').textContent = roomParam;
       document.getElementById('local-user-label').textContent = currentUser.name ? currentUser.name.split(' ')[0] : (isOwnerRole ? 'Юлія' : 'Ви');
@@ -301,7 +304,83 @@
       initWebRTC();
       startSessionTimer();
       loadExistingNotes();
+      initAutoHideControls();
     });
+
+    let lastWakeTime = Date.now();
+
+    function initAutoHideControls() {
+      // Activity listeners to show controls and reset timer
+      const events = ['mousemove', 'mousedown', 'touchstart', 'touchmove', 'pointerdown', 'keydown'];
+      events.forEach(evt => {
+        window.addEventListener(evt, () => {
+          showControls();
+        }, { passive: true });
+      });
+
+      // Tap on the video background toggles controls only if already awake for a moment
+      document.getElementById('video-stage').addEventListener('click', (e) => {
+        if (e.target.closest('button') || e.target.closest('#local-video-container') || e.target.closest('#session-notes-sidebar')) return;
+        
+        if (Date.now() - lastWakeTime < 400) {
+          // Just awakened by touchstart, keep visible
+          showControls();
+        } else if (areControlsVisible) {
+          hideControls();
+        } else {
+          showControls();
+        }
+      });
+
+      // Start initial timer
+      resetControlsTimer();
+    }
+
+    function showControls() {
+      lastWakeTime = Date.now();
+      const topHeader = document.getElementById('top-floating-header');
+      const bottomDock = document.getElementById('bottom-floating-dock');
+      
+      if (topHeader) {
+        topHeader.classList.remove('opacity-0', '-translate-y-6', 'pointer-events-none');
+        topHeader.classList.add('opacity-100', 'translate-y-0');
+      }
+      if (bottomDock) {
+        bottomDock.classList.remove('opacity-0', 'translate-y-8', 'pointer-events-none');
+        bottomDock.classList.add('opacity-100', 'translate-y-0');
+      }
+      
+      areControlsVisible = true;
+      resetControlsTimer();
+    }
+
+    function hideControls() {
+      const notesSidebar = document.getElementById('session-notes-sidebar');
+      if (notesSidebar && !notesSidebar.classList.contains('hidden')) {
+        return; // Don't hide if user has notes open
+      }
+      
+      const topHeader = document.getElementById('top-floating-header');
+      const bottomDock = document.getElementById('bottom-floating-dock');
+      
+      if (topHeader) {
+        topHeader.classList.remove('opacity-100', 'translate-y-0');
+        topHeader.classList.add('opacity-0', '-translate-y-6', 'pointer-events-none');
+      }
+      if (bottomDock) {
+        bottomDock.classList.remove('opacity-100', 'translate-y-0');
+        bottomDock.classList.add('opacity-0', 'translate-y-8', 'pointer-events-none');
+      }
+      
+      areControlsVisible = false;
+    }
+
+    function resetControlsTimer() {
+      clearTimeout(controlsTimeout);
+      controlsTimeout = setTimeout(() => {
+        hideControls();
+      }, 2800); // Hide after 2.8 seconds of inactivity
+    }
 
     // Auto-fullscreen on first user tap if supported
     document.addEventListener('click', () => {
