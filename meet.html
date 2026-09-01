@@ -122,8 +122,8 @@
       <!-- Video Screen Area -->
       <div class="relative w-full h-full flex items-center justify-center bg-black overflow-hidden">
         
-        <!-- Remote Video (HD Stream from partner) -->
-        <video id="remote-video" autoplay playsinline webkit-playsinline class="w-full h-full object-cover sm:object-contain hidden"></video>
+        <!-- Remote Video (HD Stream from partner - uncropped full field of view) -->
+        <video id="remote-video" autoplay playsinline webkit-playsinline class="w-full h-full object-contain bg-black hidden"></video>
 
         <!-- Waiting Placeholder (When partner not connected yet) -->
         <div id="remote-placeholder" class="text-center space-y-3 sm:space-y-4 p-6 sm:p-8 max-w-sm sm:max-w-md my-auto">
@@ -279,7 +279,7 @@
           localStream.getTracks().forEach(t => t.stop());
         }
 
-        // High quality HD video constraints optimized for mobile & desktop
+        // Natural HD video constraints without artificial cropping
         const constraints = {
           audio: {
             echoCancellation: true,
@@ -288,16 +288,15 @@
           },
           video: {
             facingMode: { ideal: facingMode },
-            width: { ideal: isMobileDevice ? 1080 : 1920, min: 640 },
-            height: { ideal: isMobileDevice ? 1920 : 1080, min: 480 },
-            frameRate: { ideal: 30, max: 30 }
+            width: { ideal: 1280, max: 1920 },
+            height: { ideal: 720, max: 1080 },
+            frameRate: { ideal: 30 }
           }
         };
 
         try {
           localStream = await navigator.mediaDevices.getUserMedia(constraints);
         } catch(e) {
-          // Fallback to simple media constraints if advanced failed on older phone
           localStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: facingMode },
             audio: true
