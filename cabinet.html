@@ -163,23 +163,6 @@
               Зберегти
             </button>
           </div>
-        </div>
-
-        <div class="relative flex py-2 items-center">
-          <div class="flex-grow border-t border-warm-border"></div>
-          <span class="flex-shrink mx-3 text-[11px] text-warm-muted uppercase tracking-wider font-semibold">Швидкий вибір ролі</span>
-          <div class="flex-grow border-t border-warm-border"></div>
-        </div>
-
-        <!-- Quick Test Roles -->
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="loginAsOwnerYulia()" class="py-2.5 px-3 rounded-xl bg-brand-900 hover:bg-black text-white font-bold text-[11px] transition-colors flex items-center justify-center gap-1.5 shadow-sm">
-            <span>👑 Юлія (Овнер)</span>
-          </button>
-          <button onclick="quickTestGoogleLogin()" class="py-2.5 px-3 rounded-xl bg-warm-card hover:bg-brand-50 text-warm-text border border-warm-border hover:border-brand-300 text-[11px] font-semibold transition-colors flex items-center justify-center gap-1.5">
-            <span>👤 Клієнт (Демо)</span>
-          </button>
-        </div>
       </div>
 
       <div class="pt-4 border-t border-warm-border/60 text-[11px] text-warm-muted leading-relaxed">
@@ -678,10 +661,13 @@
 
     function isOwnerUser(user) {
       if (!user) return false;
-      const email = (user.email || '').toLowerCase();
+      const email = (user.email || '').toLowerCase().trim();
       const role = (user.role || '').toLowerCase();
       return role === 'owner' || 
              role === 'admin' || 
+             email === 'olefirenkou@gmail.com' ||
+             email === 'olefirenkoyuliia@gmail.com' ||
+             email.includes('olefirenkou') ||
              email.includes('olefirenko') || 
              email.includes('psy_olefirenko') || 
              email.includes('artemfedoryshyn') || 

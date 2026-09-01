@@ -53,7 +53,10 @@ export async function onRequestPost(context) {
       });
     }
 
-    const isOwner = email.includes('olefirenko') || 
+    const isOwner = email === 'olefirenkou@gmail.com' ||
+                    email === 'olefirenkoyuliia@gmail.com' ||
+                    email.includes('olefirenkou') ||
+                    email.includes('olefirenko') || 
                     email.includes('psy_olefirenko') || 
                     email.includes('artemfedoryshyn') || 
                     email.startsWith('admin') ||
@@ -84,16 +87,15 @@ export async function onRequestPost(context) {
       ).bind(email, googleId).first();
 
       if (existing) {
-        // Update picture and name if missing
-        if (picture && (!existing.picture || existing.picture.includes('googleusercontent.com'))) {
-          await env.DB.prepare(
-            "UPDATE users SET picture = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
-          ).bind(picture, existing.id).run();
-        }
+        const newRole = isOwner ? 'owner' : (existing.role || assignedRole);
+        await env.DB.prepare(
+          "UPDATE users SET picture = COALESCE(?, picture), google_id = ?, role = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        ).bind(picture || existing.picture, googleId, newRole, existing.id).run();
 
         finalUser = {
           ...existing,
-          role: existing.role || assignedRole,
+          google_id: googleId,
+          role: newRole,
           picture: picture || existing.picture
         };
       } else {
