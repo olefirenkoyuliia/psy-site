@@ -345,13 +345,13 @@
       <!-- Desktop Navigation -->
       <nav class="hidden md:flex items-center gap-4 lg:gap-5 text-[13px] lg:text-sm font-medium text-warm-muted whitespace-nowrap">
         <a href="#about" class="hover:text-brand-700 transition-colors whitespace-nowrap">Про мене</a>
+        <a href="#pricing" class="hover:text-brand-700 transition-colors whitespace-nowrap">Формати</a>
         <a href="#booking-widget" class="hover:text-brand-700 transition-colors whitespace-nowrap">Підбір часу</a>
         <a href="#topics" class="hover:text-brand-700 transition-colors whitespace-nowrap">Запити</a>
         <a href="#ask-psychologist" class="text-brand-700 hover:text-brand-800 font-bold transition-colors whitespace-nowrap flex items-center gap-1 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
           <span>💬</span> <span>Запитати онлайн</span>
         </a>
         <a href="#method" class="hover:text-brand-700 transition-colors whitespace-nowrap">Підхід</a>
-        <a href="#pricing" class="hover:text-brand-700 transition-colors whitespace-nowrap">Ціни</a>
         <a href="#diplomas" class="hover:text-brand-700 transition-colors whitespace-nowrap">Освіта</a>
         <a href="#faq" class="hover:text-brand-700 transition-colors whitespace-nowrap">FAQ</a>
         <a href="https://www.instagram.com/psy_olefirenkoyulia" target="_blank" rel="noopener noreferrer" class="hover:text-pink-600 transition-colors flex items-center gap-1 font-semibold text-gray-700 whitespace-nowrap" data-bind-instagram>
@@ -516,6 +516,125 @@
         </div>
 
       </div>
+    </div>
+  </section>
+
+  <!-- Section: Pricing & Formats (Оберіть зручний формат роботи) -->
+  <section id="pricing" class="py-20 bg-warm-bg relative z-10 border-t border-warm-border">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-2xl mx-auto mb-14 space-y-3">
+        <span class="text-xs font-bold tracking-widest text-brand-600 uppercase">Формати співпраці</span>
+        <h2 class="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-warm-text">
+          Оберіть зручний формат роботи
+        </h2>
+        <p class="text-warm-muted text-base">
+          Оберіть відповідний формат — і перейдіть до вибору зручного дня та часу:
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        
+        <!-- Option 1: Consulting -->
+        <div class="tilt-card bg-white p-8 rounded-3xl border border-warm-border shadow-card flex flex-col justify-between">
+          <div class="space-y-5">
+            <div class="inline-block px-3.5 py-1 rounded-full bg-warm-card text-warm-text text-xs font-bold uppercase tracking-wider">
+              Короткострокова робота
+            </div>
+            <div class="flex items-baseline justify-between">
+              <h3 class="font-serif-luxury text-3xl font-bold text-warm-text">
+                Консультування
+              </h3>
+              <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</span>
+            </div>
+            <p class="text-sm text-warm-muted leading-relaxed">
+              Підходить, якщо є певна конкретна ситуація або питання, які хочеться розібрати та знайти рішення.
+            </p>
+            <div class="space-y-2.5 pt-3 border-t border-warm-border text-sm text-warm-text">
+              <div class="flex items-center gap-2.5">
+                <span class="text-brand-600 font-bold">•</span>
+                <span>Формат: 1–10 зустрічей</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="text-brand-600 font-bold">•</span>
+                <span>Онлайн: Google Meet</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="text-brand-600 font-bold">•</span>
+                <span>Тривалість: <span data-bind="pricing.duration">50 хвилин</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-8">
+            <button type="button" onclick="selectFormatAndScroll('consulting')" class="w-full inline-flex items-center justify-center py-3.5 px-6 rounded-full bg-warm-card hover:bg-brand-600 hover:text-white text-warm-text font-bold text-sm transition-all duration-300 gap-2 group shadow-xs">
+              <span>Обрати консультування</span>
+              <span class="group-hover:translate-x-1 transition-transform font-mono">➔</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Option 2: Therapy (Featured) -->
+        <div class="tilt-card relative bg-white p-8 rounded-3xl border-2 border-brand-500 shadow-hover flex flex-col justify-between">
+          <div class="absolute -top-3.5 right-6 bg-brand-600 text-white text-[11px] font-bold px-3.5 py-1 rounded-full tracking-wider uppercase">
+            Глибокі зміни
+          </div>
+
+          <div class="space-y-5">
+            <div class="inline-block px-3.5 py-1 rounded-full bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider">
+              Довготривала робота
+            </div>
+            <div class="flex items-baseline justify-between">
+              <h3 class="font-serif-luxury text-3xl font-bold text-warm-text">
+                Терапія
+              </h3>
+              <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</span>
+            </div>
+            <p class="text-sm text-warm-muted leading-relaxed">
+              Поступове занурення у ваш запит. Для глибоких внутрішніх змін, кращого розуміння себе та внутрішнього відновлення.
+            </p>
+            <div class="space-y-2.5 pt-3 border-t border-warm-border text-sm text-warm-text">
+              <div class="flex items-center gap-2.5">
+                <span class="text-brand-600 font-bold">•</span>
+                <span>Регулярні щотижневі зустрічі</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="text-brand-600 font-bold">•</span>
+                <span>Онлайн: Google Meet</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="text-brand-600 font-bold">•</span>
+                <span>Тривалість: <span data-bind="pricing.duration">50 хвилин</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-8">
+            <button type="button" onclick="selectFormatAndScroll('therapy')" class="w-full inline-flex items-center justify-center py-3.5 px-6 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-soft transition-all duration-300 gap-2 group">
+              <span>Обрати терапію</span>
+              <span class="group-hover:translate-x-1 transition-transform font-mono">➔</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pricing Summary Card -->
+      <div class="max-w-4xl mx-auto mt-8 bg-white p-6 sm:p-8 rounded-3xl border border-warm-border shadow-card flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="space-y-1.5 text-center sm:text-left">
+          <h4 class="font-serif-luxury text-xl sm:text-2xl font-bold text-warm-text">Вартість консультацій</h4>
+          <p class="text-xs text-warm-muted" data-bind="pricing.paymentDetails">Оплата здійснюється на розрахунковий рахунок ФОП (ПриватБанк)</p>
+          <p class="text-xs text-warm-muted">Єдина прозора вартість для будь-якого формату співпраці.</p>
+        </div>
+        <div class="flex items-center justify-center">
+          <div class="text-center px-5 py-3 bg-brand-50/70 rounded-2xl border border-brand-200/80 min-w-[170px]">
+            <div class="text-[11px] text-brand-800 uppercase tracking-wider font-bold mb-0.5">Вартість 1 сесії</div>
+            <div class="font-serif-luxury text-2xl sm:text-3xl font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</div>
+            <div class="text-[11px] text-warm-muted font-medium">50 хвилин</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -945,123 +1064,6 @@
           </div>
         </div>
 
-      </div>
-
-    </div>
-  </section>
-
-  <!-- Section: Pricing & Formats -->
-  <section id="pricing" class="py-20 bg-warm-bg relative z-10">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
-        <span class="text-xs font-bold tracking-widest text-brand-600 uppercase">Формати співпраці</span>
-        <h2 class="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-warm-text">
-          Оберіть зручний формат роботи
-        </h2>
-        <p class="text-warm-muted text-base">
-          Ритм і формат роботи ми разом обговорюємо на першій зустрічі.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-        
-        <!-- Option 1: Consulting -->
-        <div class="tilt-card bg-white p-8 rounded-3xl border border-warm-border shadow-card flex flex-col justify-between">
-          <div class="space-y-5">
-            <div class="inline-block px-3.5 py-1 rounded-full bg-warm-card text-warm-text text-xs font-bold uppercase tracking-wider">
-              Короткострокова робота
-            </div>
-            <div class="flex items-baseline justify-between">
-              <h3 class="font-serif-luxury text-3xl font-bold text-warm-text">
-                Консультування
-              </h3>
-              <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</span>
-            </div>
-            <p class="text-sm text-warm-muted leading-relaxed">
-              Підходить, якщо є певна конкретна ситуація або питання, які хочеться розібрати та знайти рішення.
-            </p>
-            <div class="space-y-2.5 pt-3 border-t border-warm-border text-sm text-warm-text">
-              <div class="flex items-center gap-2.5">
-                <span class="text-brand-600 font-bold">•</span>
-                <span>Формат: 1–10 зустрічей</span>
-              </div>
-              <div class="flex items-center gap-2.5">
-                <span class="text-brand-600 font-bold">•</span>
-                <span>Онлайн: Google Meet</span>
-              </div>
-              <div class="flex items-center gap-2.5">
-                <span class="text-brand-600 font-bold">•</span>
-                <span>Тривалість: <span data-bind="pricing.duration">50 хвилин</span></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-8">
-            <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center py-3.5 px-6 rounded-full bg-warm-card hover:bg-brand-600 hover:text-white text-warm-text font-bold text-sm transition-all duration-300" data-bind-telegram>
-              Обрати консультування
-            </a>
-          </div>
-        </div>
-
-        <!-- Option 2: Therapy (Featured) -->
-        <div class="tilt-card relative bg-white p-8 rounded-3xl border-2 border-brand-500 shadow-hover flex flex-col justify-between">
-          <div class="absolute -top-3.5 right-6 bg-brand-600 text-white text-[11px] font-bold px-3.5 py-1 rounded-full tracking-wider uppercase">
-            Глибокі зміни
-          </div>
-
-          <div class="space-y-5">
-            <div class="inline-block px-3.5 py-1 rounded-full bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider">
-              Довготривала робота
-            </div>
-            <div class="flex items-baseline justify-between">
-              <h3 class="font-serif-luxury text-3xl font-bold text-warm-text">
-                Терапія
-              </h3>
-              <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</span>
-            </div>
-            <p class="text-sm text-warm-muted leading-relaxed">
-              Поступове занурення у ваш запит. Для глибоких внутрішніх змін, кращого розуміння себе та внутрішнього відновлення.
-            </p>
-            <div class="space-y-2.5 pt-3 border-t border-warm-border text-sm text-warm-text">
-              <div class="flex items-center gap-2.5">
-                <span class="text-brand-600 font-bold">•</span>
-                <span>Регулярні щотижневі зустрічі</span>
-              </div>
-              <div class="flex items-center gap-2.5">
-                <span class="text-brand-600 font-bold">•</span>
-                <span>Онлайн: Google Meet</span>
-              </div>
-              <div class="flex items-center gap-2.5">
-                <span class="text-brand-600 font-bold">•</span>
-                <span>Тривалість: <span data-bind="pricing.duration">50 хвилин</span></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-8">
-            <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center py-3.5 px-6 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-soft transition-all duration-300" data-bind-telegram>
-              Обрати терапію
-            </a>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Pricing Summary Card -->
-      <div class="max-w-6xl mx-auto mt-10 bg-white p-8 sm:p-10 rounded-3xl border border-warm-border shadow-card flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div class="space-y-2 text-center sm:text-left">
-          <h4 class="font-serif-luxury text-2xl sm:text-3xl font-bold text-warm-text">Вартість консультацій</h4>
-          <p class="text-sm text-warm-muted" data-bind="pricing.paymentDetails">Оплата здійснюється на розрахунковий рахунок ФОП (ПриватБанк)</p>
-          <p class="text-xs text-warm-muted">Єдина прозора вартість для будь-якого формату співпраці. Можна закріпити постійний зручний час.</p>
-        </div>
-        <div class="flex items-center justify-center">
-          <div class="text-center px-6 py-4 bg-brand-50/70 rounded-2xl border border-brand-200/80 min-w-[200px]">
-            <div class="text-xs text-brand-800 uppercase tracking-wider font-bold mb-1">Вартість 1 сесії</div>
-            <div class="font-serif-luxury text-3xl sm:text-4xl font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</div>
-            <div class="text-xs text-warm-muted font-medium mt-1">Тривалість: <span data-bind="pricing.duration">50 хвилин</span></div>
-          </div>
-        </div>
       </div>
 
     </div>
@@ -1718,6 +1720,24 @@
       btn.classList.add('border-2', 'border-brand-600', 'bg-brand-50', 'text-brand-900');
 
       updateBookingSummary();
+    }
+
+    function selectFormatAndScroll(formatType) {
+      const formatBtns = document.querySelectorAll('.format-btn');
+      if (formatType === 'consulting') {
+        if (formatBtns[0]) {
+          selectSlot('format', 'Консультування (до 10 зустрічей)', formatBtns[0]);
+        }
+      } else if (formatType === 'therapy') {
+        if (formatBtns[1]) {
+          selectSlot('format', 'Психотерапія (глибинна робота)', formatBtns[1]);
+        }
+      }
+
+      const widget = document.getElementById('booking-widget');
+      if (widget) {
+        widget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     function updateBookingSummary() {
