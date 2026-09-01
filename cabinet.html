@@ -2689,31 +2689,30 @@
 
             cardsList.innerHTML = clientCurrentSessions.map((app, idx) => {
               const gmeetLink = app.google_meet_url || (app.meet_url?.includes('meet.google.com') ? app.meet_url : 'https://meet.google.com/new');
-              const isDiscovery = app.session_type === 'discovery_15' || app.duration_minutes === 15;
               const gcalUrl = buildGoogleCalendarLink(
-                isDiscovery ? `Сесія-знайомство: Юлія Олефіренко` : `Консультація психотерапії: Юлія Олефіренко`,
-                isDiscovery ? `Безкоштовна 15-хв сесія-знайомство.\nПряме посилання Google Meet: ${gmeetLink}` : `Індивідуальна сесія (${app.duration_minutes || 50} хв).\nПряме посилання Google Meet: ${gmeetLink}`,
+                `Консультація психотерапії: Юлія Олефіренко`,
+                `Індивідуальна сесія (${app.duration_minutes || 50} хв).\nПряме посилання Google Meet: ${gmeetLink}`,
                 gmeetLink,
                 app.session_date,
                 app.session_time,
-                app.duration_minutes || (isDiscovery ? 15 : 50),
+                app.duration_minutes || 50,
                 app.client_email
               );
 
               return `
-                <div class="p-5 rounded-2xl bg-white border ${isDiscovery ? 'border-purple-300 ring-2 ring-purple-100' : 'border-warm-border'} shadow-soft flex flex-col justify-between space-y-4 hover:border-brand-300 transition-all">
+                <div class="p-5 rounded-2xl bg-white border border-warm-border shadow-soft flex flex-col justify-between space-y-4 hover:border-brand-300 transition-all">
                   <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-bold">
-                      <span class="px-2.5 py-0.5 rounded-full ${isDiscovery ? 'bg-purple-100 text-purple-900 border border-purple-200' : 'bg-emerald-100 text-emerald-900'} text-[10px]">
-                        ${isDiscovery ? '🎁 Знайомство (15 хв)' : `Сесія ${idx + 1}/${clientCurrentSessions.length}`}
+                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px]">
+                        Сесія ${idx + 1}/${clientCurrentSessions.length}
                       </span>
-                      <span class="text-warm-muted font-mono">${app.duration_minutes || (isDiscovery ? 15 : 50)} хв</span>
+                      <span class="text-warm-muted font-mono">${app.duration_minutes || 50} хв</span>
                     </div>
                     <div class="text-base font-bold text-warm-text">
                       ${app.session_date} о ${app.session_time}
                     </div>
                     <p class="text-xs text-warm-muted leading-relaxed">
-                      ${app.therapist_notes || (isDiscovery ? 'Безоплатна 15-хвилинна зустріч-знайомство для обговорення вашого запиту.' : 'Індивідуальна онлайн-сесія психотерапії')}
+                      ${app.therapist_notes || 'Індивідуальна онлайн-сесія психотерапії'}
                     </p>
                   </div>
 
