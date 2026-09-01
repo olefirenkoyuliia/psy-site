@@ -193,7 +193,7 @@
         </div>
       </div>
 
-      <!-- CLIENT'S UPCOMING SESSIONS LIST & CALENDAR SYNC HUB -->
+      <!-- CLIENT'S UPCOMING SESSIONS LIST -->
       <div id="client-upcoming-sessions-container" class="hidden space-y-4">
         <div class="p-6 rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-900 text-white shadow-card border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -204,16 +204,7 @@
             <h2 class="font-serif-luxury font-bold text-xl text-white">
               Заплановані консультації (<span id="client-sessions-count">0</span>)
             </h2>
-            <p class="text-xs text-emerald-200">Психотерапія з Юлією Олефіренко • Google Meet</p>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-2">
-            <button onclick="downloadClientIcsFile()" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-bold transition-all flex items-center gap-1.5">
-              <span>📥 Завантажити .ics</span>
-            </button>
-            <button onclick="openClientSyncModal()" class="px-4 py-2.5 rounded-xl bg-white text-brand-900 hover:bg-emerald-50 text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
-              <span>🔗 Автосинхронізація</span>
-            </button>
+            <p class="text-xs text-emerald-200">Індивідуальні сесії психотерапії з Юлією Олефіренко</p>
           </div>
         </div>
 
@@ -1506,11 +1497,11 @@
         welcomeName.textContent = user.first_name || user.name.split(' ')[0] || 'Клієнте';
         welcomeSubtitle.textContent = 'Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та підготуватися до зустрічі з Юлією Олефіренко.';
         heroActions.innerHTML = `
-          <a href="https://meet.google.com/" target="_blank" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
-            <span>🌐 Відкрити Google Meet</span>
-          </a>
-          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
+          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
             <span>💬 Написати Юлії</span>
+          </a>
+          <a href="/#pricing" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
+            <span>📅 Записатися на сесію</span>
           </a>
         `;
         ownerTabsNav.classList.add('hidden');
@@ -2716,15 +2707,10 @@
                     </p>
                   </div>
 
-                  <div class="space-y-2 pt-1 border-t border-warm-border/50">
-                    <a href="${gmeetLink}" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5">
-                      <span>📹 Увійти в Google Meet</span>
+                  <div class="pt-2 border-t border-warm-border/50">
+                    <a href="${gmeetLink}" target="_blank" class="w-full py-2.5 px-3 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5">
+                      <span>📹 Увійти на сесію (Google Meet)</span>
                     </a>
-                    <div class="flex items-center gap-1.5">
-                      <a href="${gcalUrl}" target="_blank" class="flex-1 py-2 px-2 rounded-xl bg-warm-bg hover:bg-emerald-50 text-emerald-950 font-semibold text-[11px] border border-warm-border text-center transition-all flex items-center justify-center gap-1">
-                        <span>📅 Google Календар</span>
-                      </a>
-                    </div>
                   </div>
                 </div>
               `;
