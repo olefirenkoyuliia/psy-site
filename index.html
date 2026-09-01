@@ -537,14 +537,18 @@
           <label class="block text-xs font-bold uppercase tracking-wider text-brand-800">
             1. Оберіть формат:
           </label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="book-formats">
-            <button type="button" onclick="selectSlot('format', 'Консультування (до 10 зустрічей)', this)" class="slot-btn format-btn active p-4 rounded-2xl border-2 border-brand-600 bg-brand-50 text-left font-bold text-sm text-brand-900 transition-all flex items-center justify-between">
-              <span>💬 Консультування (1–10 сесій)</span>
-              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-brand-200" data-bind="pricing.regularSessionPrice">1 200 грн</span>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="book-formats">
+            <button type="button" onclick="selectSlot('format', 'Знайомство (15 хв безкоштовно)', this)" class="slot-btn format-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/30 text-left font-bold text-sm text-warm-text transition-all flex flex-col justify-between gap-2 hover:border-brand-400">
+              <span class="flex items-center gap-1.5 text-brand-700"><span>🎁</span> Знайомство (15 хв)</span>
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full w-fit">0 ₴ • Безкоштовно</span>
             </button>
-            <button type="button" onclick="selectSlot('format', 'Психотерапія (глибинна робота)', this)" class="slot-btn format-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/30 text-left font-bold text-sm text-warm-text transition-all flex items-center justify-between hover:border-brand-400">
-              <span>🌊 Психотерапія (глибинний метод)</span>
-              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-warm-border" data-bind="pricing.regularSessionPrice">1 200 грн</span>
+            <button type="button" onclick="selectSlot('format', 'Консультування (до 10 зустрічей)', this)" class="slot-btn format-btn active p-4 rounded-2xl border-2 border-brand-600 bg-brand-50 text-left font-bold text-sm text-brand-900 transition-all flex flex-col justify-between gap-2">
+              <span>💬 Консультування (1–10)</span>
+              <span class="text-xs font-semibold bg-white px-2.5 py-0.5 rounded-full border border-brand-200 w-fit" data-bind="pricing.regularSessionPrice">1 200 грн</span>
+            </button>
+            <button type="button" onclick="selectSlot('format', 'Психотерапія (глибинна робота)', this)" class="slot-btn format-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/30 text-left font-bold text-sm text-warm-text transition-all flex flex-col justify-between gap-2 hover:border-brand-400">
+              <span>🌊 Психотерапія (глибинна)</span>
+              <span class="text-xs font-semibold bg-white px-2.5 py-0.5 rounded-full border border-warm-border w-fit" data-bind="pricing.regularSessionPrice">1 200 грн</span>
             </button>
           </div>
         </div>
@@ -876,83 +880,129 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
         
-        <!-- Option 1: Consulting -->
-        <div class="tilt-card bg-white p-8 rounded-3xl border border-warm-border shadow-card flex flex-col justify-between">
-          <div class="space-y-5">
-            <div class="inline-block px-3.5 py-1 rounded-full bg-warm-card text-warm-text text-xs font-bold uppercase tracking-wider">
+        <!-- Option 1: Discovery Session (0 UAH) -->
+        <div class="tilt-card bg-white p-7 rounded-3xl border-2 border-emerald-500/80 shadow-soft flex flex-col justify-between relative bg-gradient-to-b from-emerald-50/40 to-white">
+          <div class="absolute -top-3.5 right-6 bg-emerald-700 text-white text-[10px] font-bold px-3 py-1 rounded-full tracking-wider uppercase">
+            Перший крок
+          </div>
+
+          <div class="space-y-4">
+            <div class="inline-block px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[11px] font-bold uppercase tracking-wider">
+              Безкоштовно
+            </div>
+            <div class="flex items-baseline justify-between">
+              <h3 class="font-serif-luxury text-2xl font-bold text-warm-text">
+                Знайомство
+              </h3>
+              <span class="text-2xl font-serif-luxury font-bold text-emerald-700">0 грн</span>
+            </div>
+            <p class="text-xs text-warm-muted leading-relaxed">
+              15-хвилинна онлайн-зустріч для знайомства, обговорення вашого запиту та визначення плану допомоги.
+            </p>
+            <div class="space-y-2 pt-3 border-t border-warm-border text-xs text-warm-text">
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-700 font-bold">•</span>
+                <span>Формат: 1 зустріч-знайомство</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-700 font-bold">•</span>
+                <span>Онлайн: Google Meet</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-700 font-bold">•</span>
+                <span>Тривалість: <strong>15 хвилин</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-700 font-bold">•</span>
+                <span>Без жодних зобов'язань</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-6">
+            <a href="https://t.me/psy_olefirenkoyuliia?text=%D0%9F%D1%80%D0%B8%D0%B2%D1%96%D1%82!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D0%B8%D1%81%D1%8F%20%D0%BD%D0%B0%20%D0%B1%D0%B5%D0%B7%D0%BE%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%83%2015-%D1%85%D0%B2%D0%B8%D0%BB%D0%B8%D0%BD%D0%BD%D1%83%20%D1%81%D0%B5%D1%81%D1%96%D1%8E-%D0%B7%D0%BD%D0%B0%D0%B9%D0%BE%D0%BC%D1%81%D1%82%D0%B2%D0%BE." target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center py-3.5 px-4 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-soft transition-all duration-300">
+              Забронювати знайомство (0 ₴)
+            </a>
+          </div>
+        </div>
+
+        <!-- Option 2: Consulting -->
+        <div class="tilt-card bg-white p-7 rounded-3xl border border-warm-border shadow-card flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="inline-block px-3 py-0.5 rounded-full bg-warm-card text-warm-text text-[11px] font-bold uppercase tracking-wider">
               Короткострокова робота
             </div>
             <div class="flex items-baseline justify-between">
-              <h3 class="font-serif-luxury text-3xl font-bold text-warm-text">
+              <h3 class="font-serif-luxury text-2xl font-bold text-warm-text">
                 Консультування
               </h3>
               <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</span>
             </div>
-            <p class="text-sm text-warm-muted leading-relaxed">
+            <p class="text-xs text-warm-muted leading-relaxed">
               Підходить, якщо є певна конкретна ситуація або питання, які хочеться розібрати та знайти рішення.
             </p>
-            <div class="space-y-2.5 pt-3 border-t border-warm-border text-sm text-warm-text">
-              <div class="flex items-center gap-2.5">
+            <div class="space-y-2 pt-3 border-t border-warm-border text-xs text-warm-text">
+              <div class="flex items-center gap-2">
                 <span class="text-brand-600 font-bold">•</span>
                 <span>Формат: 1–10 зустрічей</span>
               </div>
-              <div class="flex items-center gap-2.5">
+              <div class="flex items-center gap-2">
                 <span class="text-brand-600 font-bold">•</span>
                 <span>Онлайн: Google Meet</span>
               </div>
-              <div class="flex items-center gap-2.5">
+              <div class="flex items-center gap-2">
                 <span class="text-brand-600 font-bold">•</span>
                 <span>Тривалість: <span data-bind="pricing.duration">50 хвилин</span></span>
               </div>
             </div>
           </div>
 
-          <div class="pt-8">
-            <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center py-3.5 px-6 rounded-full bg-warm-card hover:bg-brand-600 hover:text-white text-warm-text font-bold text-sm transition-all duration-300" data-bind-telegram>
+          <div class="pt-6">
+            <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center py-3.5 px-4 rounded-full bg-warm-card hover:bg-brand-600 hover:text-white text-warm-text font-bold text-xs transition-all duration-300" data-bind-telegram>
               Обрати консультування
             </a>
           </div>
         </div>
 
-        <!-- Option 2: Therapy (Featured) -->
-        <div class="tilt-card relative bg-white p-8 rounded-3xl border-2 border-brand-500 shadow-hover flex flex-col justify-between">
-          <div class="absolute -top-3.5 right-6 bg-brand-600 text-white text-[11px] font-bold px-3.5 py-1 rounded-full tracking-wider uppercase">
+        <!-- Option 3: Therapy (Featured) -->
+        <div class="tilt-card relative bg-white p-7 rounded-3xl border-2 border-brand-500 shadow-hover flex flex-col justify-between">
+          <div class="absolute -top-3.5 right-6 bg-brand-600 text-white text-[10px] font-bold px-3 py-1 rounded-full tracking-wider uppercase">
             Глибокі зміни
           </div>
 
-          <div class="space-y-5">
-            <div class="inline-block px-3.5 py-1 rounded-full bg-brand-100 text-brand-800 text-xs font-bold uppercase tracking-wider">
+          <div class="space-y-4">
+            <div class="inline-block px-3 py-0.5 rounded-full bg-brand-100 text-brand-800 text-[11px] font-bold uppercase tracking-wider">
               Довготривала робота
             </div>
             <div class="flex items-baseline justify-between">
-              <h3 class="font-serif-luxury text-3xl font-bold text-warm-text">
+              <h3 class="font-serif-luxury text-2xl font-bold text-warm-text">
                 Терапія
               </h3>
               <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</span>
             </div>
-            <p class="text-sm text-warm-muted leading-relaxed">
-              Поступове занурення у ваш запит. Для глибоких внутрішніх змін, кращого розуміння себе та внутрішнього відновлення.
+            <p class="text-xs text-warm-muted leading-relaxed">
+              Поступове занурення у ваш запит для глибоких внутрішніх змін, кращого розуміння себе та відновлення.
             </p>
-            <div class="space-y-2.5 pt-3 border-t border-warm-border text-sm text-warm-text">
-              <div class="flex items-center gap-2.5">
+            <div class="space-y-2 pt-3 border-t border-warm-border text-xs text-warm-text">
+              <div class="flex items-center gap-2">
                 <span class="text-brand-600 font-bold">•</span>
                 <span>Регулярні щотижневі зустрічі</span>
               </div>
-              <div class="flex items-center gap-2.5">
+              <div class="flex items-center gap-2">
                 <span class="text-brand-600 font-bold">•</span>
                 <span>Онлайн: Google Meet</span>
               </div>
-              <div class="flex items-center gap-2.5">
+              <div class="flex items-center gap-2">
                 <span class="text-brand-600 font-bold">•</span>
                 <span>Тривалість: <span data-bind="pricing.duration">50 хвилин</span></span>
               </div>
             </div>
           </div>
 
-          <div class="pt-8">
-            <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center py-3.5 px-6 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm shadow-soft transition-all duration-300" data-bind-telegram>
+          <div class="pt-6">
+            <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center py-3.5 px-4 rounded-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-soft transition-all duration-300" data-bind-telegram>
               Обрати терапію
             </a>
           </div>
@@ -961,7 +1011,7 @@
       </div>
 
       <!-- Pricing Summary Card -->
-      <div class="max-w-4xl mx-auto mt-10 bg-white p-8 sm:p-10 rounded-3xl border border-warm-border shadow-card flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="max-w-6xl mx-auto mt-10 bg-white p-8 sm:p-10 rounded-3xl border border-warm-border shadow-card flex flex-col sm:flex-row items-center justify-between gap-6">
         <div class="space-y-2 text-center sm:text-left">
           <h4 class="font-serif-luxury text-2xl sm:text-3xl font-bold text-warm-text">Вартість консультацій</h4>
           <p class="text-sm text-warm-muted" data-bind="pricing.paymentDetails">Оплата здійснюється на розрахунковий рахунок ФОП (ПриватБанк)</p>
@@ -1036,6 +1086,91 @@
 
       </div>
 
+    </div>
+  </section>
+
+  <!-- Section: Ask Psychologist Online (Анонімне запитання психологу) -->
+  <section id="ask-psychologist" class="py-20 bg-gradient-to-br from-brand-900 via-emerald-950 to-brand-900 text-white relative z-10 overflow-hidden border-t border-brand-800">
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-brand-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-2xl mx-auto mb-10 space-y-3">
+        <span class="text-xs font-bold tracking-widest text-emerald-300 uppercase px-3.5 py-1 rounded-full bg-emerald-900/80 border border-emerald-700/60 inline-block shadow-xs">
+          💬 Безкоштовний перший крок
+        </span>
+        <h2 class="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+          Запитайте психолога онлайн
+        </h2>
+        <p class="text-emerald-100/90 text-sm sm:text-base leading-relaxed">
+          Сумніваєтесь, чи допоможе терапія у вашій ситуації? Опишіть ваше запитання — Юлія особисто відповість вам конфіденційно прямо у вашому особистому кабінеті.
+        </p>
+      </div>
+
+      <div class="bg-white text-warm-text p-6 sm:p-10 rounded-[2.5rem] shadow-2xl border border-emerald-800/40 space-y-6">
+        <!-- Topic Selection -->
+        <div class="space-y-2.5">
+          <label class="block text-xs font-bold uppercase tracking-wider text-warm-muted">
+            1. Оберіть тему вашого питання:
+          </label>
+          <div class="flex flex-wrap gap-2" id="inquiry-topic-chips">
+            <button type="button" onclick="selectInquiryTopic('Тривога та стрес', this)" class="inquiry-chip active px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-700 text-white transition-all">
+              🌿 Тривога та стрес
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Стосунки та розрив', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              💞 Стосунки та розрив
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Вигорання та робота', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              🔋 Вигорання та робота
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Самооцінка та межі', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              🛡️ Самооцінка та межі
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Втрата або криза', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              💔 Втрата або криза
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Інше запитання', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              ✨ Інше
+            </button>
+          </div>
+        </div>
+
+        <!-- Question Input -->
+        <div class="space-y-2">
+          <label for="inquiry-question-text" class="block text-xs font-bold uppercase tracking-wider text-warm-muted">
+            2. Опишіть вашу ситуацію або питання:
+          </label>
+          <textarea id="inquiry-question-text" rows="4" placeholder="Наприклад: Останнім часом відчуваю постійну фонову тривогу, важко приймати рішення на роботі. Чи підійде мені короткострокова терапія і з чого краще почати?.." class="w-full p-4 rounded-2xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none"></textarea>
+        </div>
+
+        <!-- Contact Input -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="inquiry-client-name" class="block text-xs font-bold uppercase tracking-wider text-warm-muted mb-1">
+              Ваше ім'я (або псевдонім):
+            </label>
+            <input type="text" id="inquiry-client-name" placeholder="Наприклад: Олена" class="w-full p-3.5 rounded-xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+          </div>
+          <div>
+            <label for="inquiry-client-email" class="block text-xs font-bold uppercase tracking-wider text-warm-muted mb-1">
+              Ваш Email (для сповіщення про відповідь):
+            </label>
+            <input type="email" id="inquiry-client-email" placeholder="olena@example.com" class="w-full p-3.5 rounded-xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+          </div>
+        </div>
+
+        <!-- Privacy & Submit Button -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-warm-border/60">
+          <div class="flex items-center gap-2 text-xs text-warm-muted">
+            <span class="text-emerald-700 font-bold">🔒 100% Конфіденційно</span>
+            <span>• Відповідь з'явиться у вашому кабінеті</span>
+          </div>
+          <button type="button" onclick="submitClientInquiry()" id="btn-submit-inquiry" class="w-full sm:w-auto px-8 py-4 rounded-full bg-brand-700 hover:bg-brand-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+            <span>✉️ Надіслати запитання Юлії</span>
+            <span>➔</span>
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -1635,15 +1770,96 @@
     function updateBookingSummary() {
       const summaryEl = document.getElementById('summary-text');
       const btn = document.getElementById('booking-tg-btn');
+      const priceHint = document.getElementById('booking-price-hint');
       
-      const shortFormat = bookingState.format.includes('Консультування') ? 'Консультування' : 'Психотерапія';
+      const isDiscovery = bookingState.format.includes('Знайомство');
+      const shortFormat = isDiscovery ? 'Знайомство (15 хв)' : (bookingState.format.includes('Консультування') ? 'Консультування' : 'Психотерапія');
 
       summaryEl.textContent = `${shortFormat} • ${bookingState.day} • ${bookingState.time}`;
+
+      if (priceHint) {
+        if (isDiscovery) {
+          priceHint.innerHTML = '<span class="text-emerald-300 font-bold">Вартість: 0 ₴ (Безкоштовно, 15 хв)</span>';
+        } else {
+          priceHint.innerHTML = 'Вартість сесії: <span data-bind="pricing.regularSessionPrice">1 200 грн</span> (<span data-bind="pricing.duration">50 хвилин</span>)';
+        }
+      }
 
       const msg = `Привіт, Юліє! Хочу записатися на ${shortFormat}. Мені зручно: ${bookingState.day}, час: ${bookingState.time}.`;
       btn.href = `https://t.me/psy_olefirenkoyuliia?text=${encodeURIComponent(msg)}`;
     }
     updateBookingSummary();
+
+    let selectedInquiryTopicVal = 'Тривога та стрес';
+
+    function selectInquiryTopic(topic, btn) {
+      selectedInquiryTopicVal = topic;
+      document.querySelectorAll('.inquiry-chip').forEach(b => {
+        b.className = 'inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all';
+      });
+      btn.className = 'inquiry-chip active px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-700 text-white transition-all';
+    }
+
+    async function submitClientInquiry() {
+      const questionEl = document.getElementById('inquiry-question-text');
+      const nameEl = document.getElementById('inquiry-client-name');
+      const emailEl = document.getElementById('inquiry-client-email');
+      const btn = document.getElementById('btn-submit-inquiry');
+
+      const question = (questionEl?.value || '').trim();
+      const clientName = (nameEl?.value || 'Користувач').trim();
+      const clientEmail = (emailEl?.value || '').trim().toLowerCase();
+
+      if (!question) {
+        alert('Будь ласка, опишіть ваше запитання.');
+        questionEl?.focus();
+        return;
+      }
+
+      if (!clientEmail || !clientEmail.includes('@')) {
+        alert('Будь ласка, вкажіть коректний Email, щоб отримати відповідь від Юлії.');
+        emailEl?.focus();
+        return;
+      }
+
+      const origBtnText = btn.innerHTML;
+      btn.innerHTML = '<span>⏳ Надсилаємо...</span>';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/inquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_name: clientName,
+            client_email: clientEmail,
+            topic: selectedInquiryTopicVal,
+            question: question
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          alert('Помилка: ' + (data.error || 'Не вдалося надіслати запитання'));
+          return;
+        }
+
+        // Store user email in localStorage for cabinet auto-linking
+        localStorage.setItem('psy_client_email', clientEmail);
+        localStorage.setItem('psy_client_name', clientName);
+
+        if (questionEl) questionEl.value = '';
+        
+        alert(`🌿 Дякуємо, ${clientName}!\n\nВаше запитання успішно передано Юлії. Відповідь з'явиться у вашому Особистому кабінеті.\n\nНатисніть «ОК», щоб відкрити кабінет.`);
+        window.location.href = '/cabinet.html';
+
+      } catch(err) {
+        alert('Помилка з\'єднання з сервером. Спробуйте ще раз.');
+      } finally {
+        btn.innerHTML = origBtnText;
+        btn.disabled = false;
+      }
+    }
 
     // 5. Approach Tabs Switcher
     function switchTab(tabName, btn) {

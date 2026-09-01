@@ -222,12 +222,39 @@
         </div>
       </div>
 
+      <!-- CLIENT'S INQUIRIES & PSYCHOLOGIST REPLIES -->
+      <div id="client-inquiries-container" class="hidden space-y-4">
+        <div class="p-6 rounded-3xl bg-white border border-warm-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold mb-1 border border-emerald-200">
+              <span>💬</span> <span>Ваш приватний діалог з психологом</span>
+            </div>
+            <h2 class="font-serif-luxury font-bold text-xl text-warm-text">
+              Мої запитання та відповіді Юлії (<span id="client-inquiries-count">0</span>)
+            </h2>
+            <p class="text-xs text-warm-muted">Тут зберігаються ваші онлайн-запитання та детальні коментарі психолога</p>
+          </div>
+
+          <a href="/#ask-psychologist" class="px-4 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-1.5 shrink-0">
+            <span>➕ Задати нове питання</span>
+          </a>
+        </div>
+
+        <div id="client-inquiries-cards-list" class="space-y-4">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
       <!-- OWNER TABS SWITCHER (Visible ONLY for Julia / Owner) -->
       <div id="owner-tabs-nav" class="hidden">
-        <div class="inline-flex p-1.5 bg-white rounded-2xl border border-warm-border shadow-soft text-xs font-bold text-warm-muted">
+        <div class="inline-flex p-1.5 bg-white rounded-2xl border border-warm-border shadow-soft text-xs font-bold text-warm-muted flex-wrap gap-1">
           <button type="button" id="tab-btn-schedule" onclick="switchOwnerView('schedule')" class="px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2">
             <span>📅 Розклад та сесії</span>
             <span id="owner-appointments-badge" class="px-2 py-0.5 rounded-full bg-brand-800 text-emerald-200 text-[10px]">0</span>
+          </button>
+          <button type="button" id="tab-btn-inquiries" onclick="switchOwnerView('inquiries')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
+            <span>💬 Запитання з сайту</span>
+            <span id="owner-inquiries-badge" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px]">0</span>
           </button>
           <button type="button" id="tab-btn-clients" onclick="switchOwnerView('clients')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
             <span>👥 База клієнтів</span>
@@ -427,6 +454,37 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 4: OWNER INQUIRIES / QUESTIONS FROM SITE            -->
+      <!-- ======================================================== -->
+      <div id="owner-inquiries-view" class="hidden space-y-6">
+        <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-bold text-warm-text text-lg flex items-center gap-2">
+              <span>💬</span> <span>Запитання користувачів з сайту</span>
+            </h2>
+            <p class="text-xs text-warm-muted">Відповідайте на звернення потенційних клієнтів — відповіді миттєво з'являються в їхніх особистих кабінетах</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="loadOwnerInquiriesList()" class="px-3.5 py-2 rounded-xl bg-warm-card hover:bg-brand-50 text-brand-800 border border-warm-border text-xs font-bold transition-colors flex items-center gap-1.5">
+              <span>🔄 Оновити</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter tabs for inquiries -->
+        <div class="flex flex-wrap items-center gap-2 px-1 text-xs">
+          <button type="button" onclick="filterOwnerInquiries('all')" id="inq-filter-all" class="px-3.5 py-1.5 rounded-xl bg-brand-700 text-white font-bold transition-all">Усі (<span id="inq-count-all">0</span>)</button>
+          <button type="button" onclick="filterOwnerInquiries('pending')" id="inq-filter-pending" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">⏳ Очікують відповіді (<span id="inq-count-pending">0</span>)</button>
+          <button type="button" onclick="filterOwnerInquiries('answered')" id="inq-filter-answered" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">✅ Відповіджено (<span id="inq-count-answered">0</span>)</button>
+        </div>
+
+        <div id="owner-inquiries-list" class="space-y-4">
+          <!-- Populated dynamically -->
+        </div>
       </div>
 
       <!-- ======================================================== -->
@@ -1442,6 +1500,7 @@
         switchOwnerView('schedule');
         loadAppointmentsList();
         loadOwnerClientsList();
+        loadOwnerInquiriesList();
       } else {
         roleBadge.innerHTML = '<span>🟢</span> <span>Особистий простір клієнта</span>';
         welcomeName.textContent = user.first_name || user.name.split(' ')[0] || 'Клієнте';
@@ -1456,9 +1515,11 @@
         `;
         ownerTabsNav.classList.add('hidden');
         document.getElementById('owner-schedule-view').classList.add('hidden');
+        document.getElementById('owner-inquiries-view').classList.add('hidden');
         document.getElementById('owner-clients-view').classList.add('hidden');
         document.getElementById('personal-profile-view').classList.remove('hidden');
         loadClientUpcomingSession(user.email);
+        loadClientInquiries(user.email);
       }
 
       // Profile Card
@@ -1472,23 +1533,258 @@
 
     function switchOwnerView(view) {
       const btnSchedule = document.getElementById('tab-btn-schedule');
+      const btnInquiries = document.getElementById('tab-btn-inquiries');
       const btnClients = document.getElementById('tab-btn-clients');
       const btnProfile = document.getElementById('tab-btn-profile');
       
       const viewSchedule = document.getElementById('owner-schedule-view');
+      const viewInquiries = document.getElementById('owner-inquiries-view');
       const viewClients = document.getElementById('owner-clients-view');
       const viewProfile = document.getElementById('personal-profile-view');
 
       const activeCls = 'px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2';
       const inactiveCls = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
 
-      btnSchedule.className = view === 'schedule' ? activeCls : inactiveCls;
-      btnClients.className = view === 'clients' ? activeCls : inactiveCls;
-      btnProfile.className = view === 'profile' ? activeCls : inactiveCls;
+      if (btnSchedule) btnSchedule.className = view === 'schedule' ? activeCls : inactiveCls;
+      if (btnInquiries) btnInquiries.className = view === 'inquiries' ? activeCls : inactiveCls;
+      if (btnClients) btnClients.className = view === 'clients' ? activeCls : inactiveCls;
+      if (btnProfile) btnProfile.className = view === 'profile' ? activeCls : inactiveCls;
 
-      viewSchedule.classList.toggle('hidden', view !== 'schedule');
-      viewClients.classList.toggle('hidden', view !== 'clients');
-      viewProfile.classList.toggle('hidden', view !== 'profile');
+      if (viewSchedule) viewSchedule.classList.toggle('hidden', view !== 'schedule');
+      if (viewInquiries) viewInquiries.classList.toggle('hidden', view !== 'inquiries');
+      if (viewClients) viewClients.classList.toggle('hidden', view !== 'clients');
+      if (viewProfile) viewProfile.classList.toggle('hidden', view !== 'profile');
+
+      if (view === 'inquiries') {
+        loadOwnerInquiriesList();
+      }
+    }
+
+    // =======================================================
+    // CLIENT INQUIRIES & QUESTIONS HUB
+    // =======================================================
+    let cachedOwnerInquiries = [];
+    let currentInquiriesFilter = 'all';
+
+    async function loadOwnerInquiriesList() {
+      const listEl = document.getElementById('owner-inquiries-list');
+      const badgeEl = document.getElementById('owner-inquiries-badge');
+      if (!listEl) return;
+
+      try {
+        const res = await fetch('/api/inquiries?isOwner=true');
+        if (res.ok) {
+          const data = await res.json();
+          cachedOwnerInquiries = data.inquiries || [];
+        }
+      } catch(err) {
+        console.error('Error loading owner inquiries:', err);
+      }
+
+      const pendingCount = cachedOwnerInquiries.filter(i => i.status === 'pending').length;
+      if (badgeEl) {
+        badgeEl.textContent = pendingCount;
+        badgeEl.className = pendingCount > 0 
+          ? 'px-2 py-0.5 rounded-full bg-rose-500 text-white font-bold text-[10px] animate-pulse' 
+          : 'px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 text-[10px]';
+      }
+
+      const countAll = document.getElementById('inq-count-all');
+      const countPending = document.getElementById('inq-count-pending');
+      const countAnswered = document.getElementById('inq-count-answered');
+
+      if (countAll) countAll.textContent = cachedOwnerInquiries.length;
+      if (countPending) countPending.textContent = pendingCount;
+      if (countAnswered) countAnswered.textContent = cachedOwnerInquiries.filter(i => i.status === 'answered').length;
+
+      renderOwnerInquiries();
+    }
+
+    function filterOwnerInquiries(status) {
+      currentInquiriesFilter = status;
+      ['all', 'pending', 'answered'].forEach(s => {
+        const b = document.getElementById(`inq-filter-${s}`);
+        if (b) {
+          b.className = s === status 
+            ? 'px-3.5 py-1.5 rounded-xl bg-brand-700 text-white font-bold transition-all'
+            : 'px-3.5 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all';
+        }
+      });
+      renderOwnerInquiries();
+    }
+
+    function renderOwnerInquiries() {
+      const listEl = document.getElementById('owner-inquiries-list');
+      if (!listEl) return;
+
+      let list = cachedOwnerInquiries;
+      if (currentInquiriesFilter !== 'all') {
+        list = list.filter(i => i.status === currentInquiriesFilter);
+      }
+
+      if (list.length === 0) {
+        listEl.innerHTML = `
+          <div class="p-10 text-center bg-white rounded-3xl border border-warm-border text-warm-muted text-xs">
+            Запитань не знайдено для цього фільтру.
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = list.map(inq => {
+        const isPending = inq.status === 'pending';
+        const dateStr = inq.created_at ? new Date(inq.created_at).toLocaleString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+
+        return `
+          <div class="p-6 rounded-3xl bg-white border ${isPending ? 'border-amber-300 ring-2 ring-amber-200/50' : 'border-warm-border'} shadow-soft space-y-4 transition-all">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-warm-border/60 pb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isPending ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}">
+                  ${isPending ? '⏳ Очікує відповіді' : '✅ Відповіджено'}
+                </span>
+                <span class="px-2.5 py-1 rounded-full bg-warm-bg text-warm-text border border-warm-border text-xs font-semibold">
+                  📌 ${escapeHtml(inq.topic || 'Загальне')}
+                </span>
+              </div>
+              <div class="text-[11px] text-warm-muted font-mono">
+                📅 ${dateStr}
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-2 text-xs">
+                <strong class="text-warm-text font-bold">${escapeHtml(inq.client_name || 'Користувач')}</strong>
+                <span class="text-warm-muted">(${escapeHtml(inq.client_email)})</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-warm-bg/40 border border-warm-border/60 text-sm text-warm-text font-medium leading-relaxed">
+                «${escapeHtml(inq.question)}»
+              </div>
+            </div>
+
+            ${inq.answer ? `
+              <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs text-warm-text space-y-2">
+                <div class="flex items-center justify-between font-bold text-emerald-900 text-[11px]">
+                  <span>🌿 Ваша відповідь клієнту:</span>
+                  <span class="text-[10px] font-normal text-emerald-700 font-mono">${inq.answered_at ? new Date(inq.answered_at).toLocaleDateString('uk-UA') : ''}</span>
+                </div>
+                <div class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(inq.answer)}</div>
+              </div>
+            ` : ''}
+
+            <!-- Reply Box -->
+            <div class="pt-2">
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-warm-muted mb-1.5">
+                ${inq.answer ? 'Змінити відповідь:' : 'Написати професійну відповідь:'}
+              </label>
+              <textarea id="reply-inq-${inq.id}" rows="3" placeholder="Шановний(-а) ${escapeHtml(inq.client_name || '')}, дякую за ваше запитання. У вашій ситуації..." class="w-full p-3.5 rounded-2xl border border-warm-border bg-warm-bg/20 text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none">${inq.answer ? escapeHtml(inq.answer) : ''}</textarea>
+              <div class="flex justify-end pt-2">
+                <button type="button" onclick="submitOwnerInquiryAnswer(${inq.id})" class="px-5 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5">
+                  <span>✉️ Надіслати відповідь клієнту</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function submitOwnerInquiryAnswer(inquiryId) {
+      const textarea = document.getElementById(`reply-inq-${inquiryId}`);
+      const answer = (textarea?.value || '').trim();
+      if (!answer) {
+        alert('Введіть текст відповіді.');
+        textarea?.focus();
+        return;
+      }
+
+      showToast('⏳ Зберігаємо відповідь...');
+
+      try {
+        const res = await fetch('/api/inquiries', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: inquiryId, answer: answer })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast('✅ Відповідь збережено та надіслано клієнту!');
+          loadOwnerInquiriesList();
+        } else {
+          alert('Помилка: ' + (data.error || 'Не вдалося зберегти відповідь'));
+        }
+      } catch(err) {
+        alert('Помилка з\'єднання з сервером');
+      }
+    }
+
+    async function loadClientInquiries(clientEmail) {
+      const container = document.getElementById('client-inquiries-container');
+      const listEl = document.getElementById('client-inquiries-cards-list');
+      const countEl = document.getElementById('client-inquiries-count');
+      if (!container || !listEl || !clientEmail) return;
+
+      try {
+        const res = await fetch(`/api/inquiries?email=${encodeURIComponent(clientEmail)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const inquiries = data.inquiries || [];
+
+        if (inquiries.length === 0) {
+          container.classList.add('hidden');
+          return;
+        }
+
+        container.classList.remove('hidden');
+        if (countEl) countEl.textContent = inquiries.length;
+
+        listEl.innerHTML = inquiries.map(inq => {
+          const isAnswered = inq.status === 'answered' && inq.answer;
+          const dateStr = inq.created_at ? new Date(inq.created_at).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
+          return `
+            <div class="p-6 rounded-3xl bg-white border border-warm-border shadow-soft space-y-4">
+              <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
+                <span class="px-3 py-1 rounded-full text-xs font-bold ${isAnswered ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">
+                  ${isAnswered ? '🌿 Отримано відповідь Юлії' : '⏳ На розгляді у психолога'}
+                </span>
+                <span class="text-xs text-warm-muted">Тема: <strong>${escapeHtml(inq.topic || 'Загальне')}</strong> • ${dateStr}</span>
+              </div>
+
+              <div class="space-y-1">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-warm-muted">Ваше запитання:</div>
+                <p class="text-xs text-warm-text italic bg-warm-bg/40 p-3 rounded-xl border border-warm-border/50">
+                  «${escapeHtml(inq.question)}»
+                </p>
+              </div>
+
+              ${isAnswered ? `
+                <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50/80 to-brand-50/60 border border-emerald-200 text-xs text-warm-text space-y-3">
+                  <div class="flex items-center justify-between font-bold text-emerald-900 text-xs">
+                    <span class="flex items-center gap-1.5"><span>👩‍⚕️</span> <strong>Юлія Олефіренко (Психолог):</strong></span>
+                  </div>
+                  <div class="text-xs leading-relaxed whitespace-pre-wrap text-warm-text font-normal">
+                    ${escapeHtml(inq.answer)}
+                  </div>
+                  <div class="pt-2 border-t border-emerald-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <span class="text-[11px] text-emerald-800 font-semibold">Бажаєте розібрати цю тему детально на консультації?</span>
+                    <a href="/#pricing" class="px-4 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-xs text-center">
+                      📅 Записатися на сесію
+                    </a>
+                  </div>
+                </div>
+              ` : `
+                <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-900 flex items-center gap-2">
+                  <span>⏳</span>
+                  <span>Юлія переглядає ваше запитання. Відповідь з'явиться тут найближчим часом.</span>
+                </div>
+              `}
+            </div>
+          `;
+        }).join('');
+
+      } catch(err) {
+        console.error('Error loading client inquiries:', err);
+      }
     }
 
     // =======================================================
@@ -2393,28 +2689,31 @@
 
             cardsList.innerHTML = clientCurrentSessions.map((app, idx) => {
               const gmeetLink = app.google_meet_url || (app.meet_url?.includes('meet.google.com') ? app.meet_url : 'https://meet.google.com/new');
+              const isDiscovery = app.session_type === 'discovery_15' || app.duration_minutes === 15;
               const gcalUrl = buildGoogleCalendarLink(
-                `Консультація психотерапії: Юлія Олефіренко`,
-                `Індивідуальна сесія (${app.duration_minutes || 50} хв).\nПряме посилання Google Meet: ${gmeetLink}`,
+                isDiscovery ? `Сесія-знайомство: Юлія Олефіренко` : `Консультація психотерапії: Юлія Олефіренко`,
+                isDiscovery ? `Безкоштовна 15-хв сесія-знайомство.\nПряме посилання Google Meet: ${gmeetLink}` : `Індивідуальна сесія (${app.duration_minutes || 50} хв).\nПряме посилання Google Meet: ${gmeetLink}`,
                 gmeetLink,
                 app.session_date,
                 app.session_time,
-                app.duration_minutes || 50,
+                app.duration_minutes || (isDiscovery ? 15 : 50),
                 app.client_email
               );
 
               return `
-                <div class="p-5 rounded-2xl bg-white border border-warm-border shadow-soft flex flex-col justify-between space-y-4 hover:border-brand-300 transition-all">
+                <div class="p-5 rounded-2xl bg-white border ${isDiscovery ? 'border-purple-300 ring-2 ring-purple-100' : 'border-warm-border'} shadow-soft flex flex-col justify-between space-y-4 hover:border-brand-300 transition-all">
                   <div class="space-y-1.5">
                     <div class="flex items-center justify-between text-xs font-bold">
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px]">Сесія ${idx + 1}/${clientCurrentSessions.length}</span>
-                      <span class="text-warm-muted font-mono">${app.duration_minutes || 50} хв</span>
+                      <span class="px-2.5 py-0.5 rounded-full ${isDiscovery ? 'bg-purple-100 text-purple-900 border border-purple-200' : 'bg-emerald-100 text-emerald-900'} text-[10px]">
+                        ${isDiscovery ? '🎁 Знайомство (15 хв)' : `Сесія ${idx + 1}/${clientCurrentSessions.length}`}
+                      </span>
+                      <span class="text-warm-muted font-mono">${app.duration_minutes || (isDiscovery ? 15 : 50)} хв</span>
                     </div>
                     <div class="text-base font-bold text-warm-text">
                       ${app.session_date} о ${app.session_time}
                     </div>
                     <p class="text-xs text-warm-muted leading-relaxed">
-                      ${app.therapist_notes || 'Індивідуальна онлайн-сесія психотерапії'}
+                      ${app.therapist_notes || (isDiscovery ? 'Безоплатна 15-хвилинна зустріч-знайомство для обговорення вашого запиту.' : 'Індивідуальна онлайн-сесія психотерапії')}
                     </p>
                   </div>
 

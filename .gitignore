@@ -2,4 +2,7 @@ node_modules/
 .wrangler/
 scratch/
 *.log
+*.sql
+.env*
 .DS_Store
+

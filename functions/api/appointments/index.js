@@ -79,6 +79,8 @@ export async function onRequestPost(context) {
       const googleMeetUrl = (item.google_meet_url || 'https://meet.google.com/new').trim();
       const meetUrl = meetFormat === 'google_meet' ? googleMeetUrl : `/meet.html?room=${roomCode}`;
 
+      const sessionType = item.session_type || (durationMinutes === 15 ? 'discovery_15' : 'standard');
+
       if (!clientName || !sessionDate || !sessionTime) continue;
 
       if (env.DB && !data.allow_conflict) {
@@ -108,6 +110,7 @@ export async function onRequestPost(context) {
           session_date: sessionDate,
           session_time: sessionTime,
           duration_minutes: durationMinutes,
+          session_type: sessionType,
           meet_format: meetFormat,
           google_meet_url: googleMeetUrl,
           room_code: roomCode,
@@ -117,8 +120,8 @@ export async function onRequestPost(context) {
         });
       } else {
         const insertRes = await env.DB.prepare(
-          "INSERT INTO appointments (client_id, client_name, client_email, session_date, session_time, duration_minutes, room_code, meet_url, therapist_notes, status) " +
-          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'scheduled')"
+          "INSERT INTO appointments (client_id, client_name, client_email, session_date, session_time, duration_minutes, session_type, room_code, meet_url, therapist_notes, status) " +
+          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'scheduled')"
         ).bind(
           clientId,
           clientName,
@@ -126,6 +129,7 @@ export async function onRequestPost(context) {
           sessionDate,
           sessionTime,
           durationMinutes,
+          sessionType,
           roomCode,
           meetUrl,
           therapistNotes
@@ -135,6 +139,7 @@ export async function onRequestPost(context) {
         const appRow = await env.DB.prepare("SELECT * FROM appointments WHERE id = ?").bind(newId).first();
         createdList.push({
           ...appRow,
+          session_type: sessionType,
           meet_format: meetFormat,
           google_meet_url: googleMeetUrl
         });
@@ -196,6 +201,7 @@ export async function onRequestPut(context) {
         "session_date = COALESCE(NULLIF(?, ''), session_date), " +
         "session_time = COALESCE(NULLIF(?, ''), session_time), " +
         "duration_minutes = COALESCE(NULLIF(?, 0), duration_minutes), " +
+        "session_type = COALESCE(NULLIF(?, ''), session_type), " +
         "status = COALESCE(NULLIF(?, ''), status), " +
         "therapist_notes = COALESCE(NULLIF(?, ''), therapist_notes), " +
         "google_event_id = COALESCE(NULLIF(?, ''), google_event_id), " +
@@ -204,6 +210,7 @@ export async function onRequestPut(context) {
         data.session_date || '',
         data.session_time || '',
         data.duration_minutes || 0,
+        data.session_type || '',
         data.status || '',
         data.therapist_notes || '',
         data.google_event_id || '',
