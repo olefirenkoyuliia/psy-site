@@ -465,7 +465,7 @@
   </main>
 
   <!-- Modal: Schedule New Session (For Owner Julia) -->
-  <div id="schedule-modal" onclick="if(event.target === this) closeScheduleModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+  <div id="schedule-modal" onclick="if(event.target === this) closeScheduleModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-warm-border shadow-2xl space-y-5 relative my-auto">
       
       <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
@@ -527,8 +527,10 @@
 
       </form>
     </div>
+  </div>
+
   <!-- Modal: Direct User Registration / Sign-In -->
-  <div id="register-client-modal" onclick="if(event.target === this) closeRegisterModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+  <div id="register-client-modal" onclick="if(event.target === this) closeRegisterModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-warm-border shadow-2xl space-y-5 relative my-auto">
       
       <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
@@ -575,7 +577,7 @@
   </div>
 
   <!-- Modal: Edit Client Details & Therapist Notes (For Owner Julia) -->
-  <div id="owner-client-modal" onclick="if(event.target === this) closeClientModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+  <div id="owner-client-modal" onclick="if(event.target === this) closeClientModal()" class="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
     <div onclick="event.stopPropagation()" class="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full border border-warm-border shadow-2xl space-y-5 relative my-auto">
       
       <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
@@ -714,12 +716,28 @@
       }
     }
 
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+      }
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('flex');
+        el.classList.add('hidden');
+      }
+    }
+
     function openRegisterModal() {
-      document.getElementById('register-client-modal').classList.remove('hidden');
+      openModal('register-client-modal');
     }
 
     function closeRegisterModal() {
-      document.getElementById('register-client-modal').classList.add('hidden');
+      closeModal('register-client-modal');
     }
 
     async function submitRegisterModal(e) {
@@ -786,19 +804,7 @@
     }
 
     function triggerGoogleLogin() {
-      if (window.google && window.google.accounts && window.google.accounts.id) {
-        try {
-          google.accounts.id.prompt((notification) => {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-              openRegisterModal();
-            }
-          });
-        } catch(e) {
-          openRegisterModal();
-        }
-      } else {
-        openRegisterModal();
-      }
+      openRegisterModal();
     }
 
     async function handleGoogleCredentialResponse(response) {
@@ -1233,11 +1239,11 @@
       document.getElementById('schedule-date').value = tomorrow.toISOString().substring(0, 10);
       document.getElementById('schedule-time').value = "18:00";
 
-      document.getElementById('schedule-modal').classList.remove('hidden');
+      openModal('schedule-modal');
     }
 
     function closeScheduleModal() {
-      document.getElementById('schedule-modal').classList.add('hidden');
+      closeModal('schedule-modal');
     }
 
     function onScheduleClientChanged() {}
@@ -1462,11 +1468,11 @@
       document.getElementById('modal-client-goal').value = client.therapy_goal || '';
       document.getElementById('modal-client-admin-notes').value = client.admin_notes || '';
 
-      document.getElementById('owner-client-modal').classList.remove('hidden');
+      openModal('owner-client-modal');
     }
 
     function closeClientModal() {
-      document.getElementById('owner-client-modal').classList.add('hidden');
+      closeModal('owner-client-modal');
     }
 
     async function saveOwnerClientModal(e) {
