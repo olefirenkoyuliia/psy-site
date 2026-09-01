@@ -1721,15 +1721,29 @@
 
             if (bookedApp) {
               return `
-                <td class="p-1.5 border-r last:border-r-0 border-warm-border/60 align-top">
-                  <div onclick="openRescheduleModal(${bookedApp.id})" class="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-950 shadow-xs cursor-pointer transition-all space-y-0.5">
+                <td 
+                  class="p-1.5 border-r last:border-r-0 border-warm-border/60 align-top transition-colors drop-cell"
+                  data-date="${wd.dateStr}"
+                  data-time="${hour}"
+                  ondragover="handleCalDragOver(event)"
+                  ondragleave="handleCalDragLeave(event)"
+                  ondrop="handleCalDrop(event, '${wd.dateStr}', '${hour}')"
+                >
+                  <div 
+                    draggable="true"
+                    ondragstart="handleCalDragStart(event, ${bookedApp.id})"
+                    ondragend="handleCalDragEnd(event)"
+                    onclick="openRescheduleModal(${bookedApp.id})" 
+                    class="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-950 shadow-xs cursor-grab active:cursor-grabbing hover:shadow-md transition-all space-y-0.5 select-none relative group"
+                    title="Натисніть для редагування або перетягніть мишкою на інший слот"
+                  >
                     <div class="flex items-center justify-between text-[10px] font-bold text-amber-900">
-                      <span>🔒 Зайнято</span>
+                      <span class="flex items-center gap-1">🔒 Зайнято</span>
                       <span>${bookedApp.session_time}</span>
                     </div>
                     <div class="font-bold truncate text-[11px]">${escapeHtml(bookedApp.client_name)}</div>
-                    <div class="text-[9px] text-amber-800/80 flex items-center justify-between">
-                      <span>50 хв</span>
+                    <div class="text-[9px] text-amber-800/80 flex items-center justify-between pt-0.5">
+                      <span class="bg-amber-200/60 px-1 py-0.2 rounded font-mono">✋ Перетягніть</span>
                       <span class="text-[10px]">🌐 Meet</span>
                     </div>
                   </div>
@@ -1739,7 +1753,14 @@
 
             if (isSelected) {
               return `
-                <td class="p-1.5 border-r last:border-r-0 border-warm-border/60 align-top">
+                <td 
+                  class="p-1.5 border-r last:border-r-0 border-warm-border/60 align-top transition-colors drop-cell"
+                  data-date="${wd.dateStr}"
+                  data-time="${hour}"
+                  ondragover="handleCalDragOver(event)"
+                  ondragleave="handleCalDragLeave(event)"
+                  ondrop="handleCalDrop(event, '${wd.dateStr}', '${hour}')"
+                >
                   <div onclick="toggleCalendarSlotSelection('${wd.dateStr}', '${hour}')" class="p-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white shadow-md cursor-pointer transition-all space-y-0.5 animate-fade-in">
                     <div class="flex items-center justify-between text-[10px] font-bold text-emerald-200">
                       <span>✓ Обрано</span>
@@ -1753,7 +1774,14 @@
             }
 
             return `
-              <td class="p-1.5 border-r last:border-r-0 border-warm-border/60 align-top">
+              <td 
+                class="p-1.5 border-r last:border-r-0 border-warm-border/60 align-top transition-colors drop-cell"
+                data-date="${wd.dateStr}"
+                data-time="${hour}"
+                ondragover="handleCalDragOver(event)"
+                ondragleave="handleCalDragLeave(event)"
+                ondrop="handleCalDrop(event, '${wd.dateStr}', '${hour}')"
+              >
                 <button type="button" onclick="toggleCalendarSlotSelection('${wd.dateStr}', '${hour}')" class="w-full h-full min-h-[52px] p-2 rounded-xl border border-dashed border-warm-border/80 hover:border-emerald-500 hover:bg-emerald-50/70 transition-all text-left flex flex-col justify-between group bg-white/40">
                   <span class="text-[10px] text-warm-muted group-hover:text-emerald-800 font-mono font-bold">${hour}</span>
                   <span class="text-[9px] text-emerald-700 opacity-0 group-hover:opacity-100 font-bold transition-opacity">+ Обрати</span>
@@ -1763,6 +1791,136 @@
           }).join('')}
         </tr>
       `).join('');
+    }
+
+    let draggedAppointmentId = null;
+
+    function handleCalDragStart(e, appointmentId) {
+      draggedAppointmentId = appointmentId;
+      e.dataTransfer.setData('text/plain', String(appointmentId));
+      e.dataTransfer.effectAllowed = 'move';
+      
+      const card = e.currentTarget;
+      if (card) {
+        setTimeout(() => {
+          card.classList.add('opacity-40', 'scale-95', 'ring-2', 'ring-brand-500');
+        }, 0);
+      }
+    }
+
+    function handleCalDragEnd(e) {
+      draggedAppointmentId = null;
+      if (e.target) {
+        e.target.classList.remove('opacity-40', 'scale-95', 'ring-2', 'ring-brand-500');
+      }
+      document.querySelectorAll('.cal-drop-hover').forEach(el => {
+        el.classList.remove('cal-drop-hover', 'bg-emerald-100', 'ring-2', 'ring-emerald-400');
+      });
+    }
+
+    function handleCalDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const cell = e.currentTarget;
+      if (cell && !cell.classList.contains('cal-drop-hover')) {
+        cell.classList.add('cal-drop-hover', 'bg-emerald-100', 'ring-2', 'ring-emerald-400');
+      }
+    }
+
+    function handleCalDragLeave(e) {
+      const cell = e.currentTarget;
+      if (cell) {
+        cell.classList.remove('cal-drop-hover', 'bg-emerald-100', 'ring-2', 'ring-emerald-400');
+      }
+    }
+
+    async function handleCalDrop(e, targetDateStr, targetHourStr) {
+      e.preventDefault();
+      const cell = e.currentTarget;
+      if (cell) {
+        cell.classList.remove('cal-drop-hover', 'bg-emerald-100', 'ring-2', 'ring-emerald-400');
+      }
+
+      const id = draggedAppointmentId || parseInt(e.dataTransfer.getData('text/plain'));
+      if (!id) return;
+
+      const app = cachedAppointments.find(a => a.id === id);
+      if (!app) return;
+
+      if (app.session_date === targetDateStr && app.session_time === targetHourStr) {
+        return; // Dropped on the same slot
+      }
+
+      // Anti-collision check
+      const existingConflict = cachedAppointments.find(a => a.id !== id && a.session_date === targetDateStr && a.session_time === targetHourStr && a.status === 'scheduled');
+      if (existingConflict) {
+        alert(`⚠️ Слот ${targetDateStr} о ${targetHourStr} вже зайнятий зустріччю з клієнтом: ${existingConflict.client_name}`);
+        return;
+      }
+
+      const oldDate = app.session_date;
+      const oldTime = app.session_time;
+      const clientName = app.client_name;
+
+      // Update state locally immediately for instant feedback
+      app.session_date = targetDateStr;
+      app.session_time = targetHourStr;
+      renderCalendarGridView();
+      renderAppointmentsList(cachedAppointments);
+
+      showToast(`🔄 Переносимо: ${clientName} ➔ ${targetDateStr} о ${targetHourStr}...`);
+
+      // 1. Update Database
+      try {
+        await fetch('/api/appointments', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: app.id,
+            session_date: targetDateStr,
+            session_time: targetHourStr
+          })
+        });
+      } catch(err) {
+        console.error('Error updating appointment via DnD:', err);
+      }
+
+      // 2. Sync to Google Calendar in background (atomic PATCH or delete+create)
+      if (googleCalendarToken || localStorage.getItem('psy_google_cal_token')) {
+        if (!googleCalendarToken) googleCalendarToken = localStorage.getItem('psy_google_cal_token');
+
+        let patched = false;
+        if (app.google_event_id) {
+          try {
+            const startDateTime = `${targetDateStr}T${targetHourStr}:00`;
+            const startDate = new Date(startDateTime);
+            const duration = app.duration_minutes || 50;
+            const endDate = new Date(startDate.getTime() + duration * 60000);
+            const pad = (n) => String(n).padStart(2, '0');
+            const formatRfc3339 = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}+03:00`;
+
+            const patchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${app.google_event_id}?sendUpdates=all`, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': `Bearer ${googleCalendarToken}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                start: { dateTime: formatRfc3339(startDate), timeZone: 'Europe/Kyiv' },
+                end: { dateTime: formatRfc3339(endDate), timeZone: 'Europe/Kyiv' }
+              })
+            });
+            if (patchRes.ok) patched = true;
+          } catch(e) {}
+        }
+
+        if (!patched) {
+          await deleteGoogleCalendarEvent({ ...app, session_date: oldDate }, oldDate);
+          await syncSessionsToGoogleCalendarDirectly([app]);
+        }
+      }
+
+      showToast(`🎉 Зустріч (${clientName}) перенесено на ${targetDateStr} о ${targetHourStr} та оновлено в Google Календарі!`);
     }
 
     let selectedAppointmentIds = new Set();
