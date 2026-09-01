@@ -2015,8 +2015,8 @@
         };
 
         // Sync date/time change to Google Calendar if connected
-        if (googleCalendarToken) {
-          updateGoogleCalendarEvent(cachedAppointments[idx], newDate, newTime, duration);
+        if (googleCalendarToken || localStorage.getItem('psy_google_cal_token')) {
+          updateGoogleCalendarEvent(cachedAppointments[idx], oldApp.session_date, newDate, newTime, duration);
         }
       }
 
@@ -2034,25 +2034,32 @@
       }
     }
 
-    async function deleteGoogleCalendarEvent(app) {
-      if (!app || !googleCalendarToken) return;
+    async function deleteGoogleCalendarEvent(app, oldDate) {
+      if (!app) return;
+      if (!googleCalendarToken) {
+        googleCalendarToken = localStorage.getItem('psy_google_cal_token') || null;
+      }
+      if (!googleCalendarToken) return;
+
       try {
         let eventId = app.google_event_id;
 
-        // If no saved google_event_id, search primary calendar around that date
-        if (!eventId && app.session_date) {
-          const minTime = `${app.session_date}T00:00:00+03:00`;
-          const maxTime = `${app.session_date}T23:59:59+03:00`;
+        // If no saved google_event_id, search primary calendar by client name or email
+        if (!eventId && (app.client_name || app.client_email)) {
           const query = encodeURIComponent(app.client_name || app.client_email || '');
-          const searchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(minTime)}&timeMax=${encodeURIComponent(maxTime)}&q=${query}`, {
+          const searchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?q=${query}&maxResults=25`, {
             headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
           });
           if (searchRes.ok) {
             const data = await searchRes.json();
-            const matching = (data.items || []).find(item => {
-              const itemStart = item.start?.dateTime || '';
-              return itemStart.includes(app.session_date) && (itemStart.includes(app.session_time) || item.summary?.includes(app.client_name));
-            });
+            const items = data.items || [];
+            const matching = items.find(item => {
+              const itemStart = item.start?.dateTime || item.start?.date || '';
+              return (app.session_date && itemStart.includes(app.session_date)) || 
+                     (oldDate && itemStart.includes(oldDate)) ||
+                     (app.session_time && itemStart.includes(app.session_time));
+            }) || items[0];
+
             if (matching) {
               eventId = matching.id;
             }
@@ -2060,35 +2067,50 @@
         }
 
         if (eventId) {
-          await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}?sendUpdates=all`, {
+          const delRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}?sendUpdates=all`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
           });
-          console.log(`Deleted Google Calendar event: ${eventId}`);
+          console.log(`Deleted Google Calendar event: ${eventId}, status: ${delRes.status}`);
         }
       } catch(err) {
         console.warn('Error deleting Google Calendar event:', err);
       }
     }
 
-    async function updateGoogleCalendarEvent(app, newDate, newTime, durationMins = 50) {
-      if (!app || !googleCalendarToken) return;
+    async function updateGoogleCalendarEvent(app, oldDate, newDate, newTime, durationMins = 50) {
+      if (!app) return;
+      if (!googleCalendarToken) {
+        googleCalendarToken = localStorage.getItem('psy_google_cal_token') || null;
+      }
+      if (!googleCalendarToken) return;
+
       try {
         let eventId = app.google_event_id;
-        if (!eventId && app.session_date) {
-          const minTime = `${app.session_date}T00:00:00+03:00`;
-          const maxTime = `${app.session_date}T23:59:59+03:00`;
+        if (!eventId && (app.client_name || app.client_email)) {
           const query = encodeURIComponent(app.client_name || app.client_email || '');
-          const searchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${encodeURIComponent(minTime)}&timeMax=${encodeURIComponent(maxTime)}&q=${query}`, {
+          const searchRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?q=${query}&maxResults=25`, {
             headers: { 'Authorization': `Bearer ${googleCalendarToken}` }
           });
           if (searchRes.ok) {
             const data = await searchRes.json();
-            const matching = (data.items || []).find(item => {
-              const itemStart = item.start?.dateTime || '';
-              return itemStart.includes(app.session_date) || item.summary?.includes(app.client_name);
-            });
-            if (matching) eventId = matching.id;
+            const items = data.items || [];
+            const matching = items.find(item => {
+              const itemStart = item.start?.dateTime || item.start?.date || '';
+              return (oldDate && itemStart.includes(oldDate)) || 
+                     (app.session_date && itemStart.includes(app.session_date));
+            }) || items[0];
+            if (matching) {
+              eventId = matching.id;
+              app.google_event_id = eventId;
+              if (app.id) {
+                fetch('/api/appointments', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id: app.id, google_event_id: eventId })
+                }).catch(() => {});
+              }
+            }
           }
         }
 
@@ -2110,6 +2132,7 @@
               end: { dateTime: formatRfc3339(endDate), timeZone: 'Europe/Kyiv' }
             })
           });
+          console.log(`Updated Google Calendar event ${eventId} to ${newDate} ${newTime}`);
         }
       } catch(err) {
         console.warn('Error updating Google Calendar event:', err);
