@@ -541,7 +541,9 @@
         </div>
 
         <!-- Course / Multi-Session Options Box (Shown when Course mode is active) -->
-        <div id="course-options-box" class="hidden space-y-3 p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200">
+        <div id="course-options-box" class="hidden space-y-4 p-4 rounded-3xl bg-emerald-50/70 border border-emerald-200">
+          
+          <!-- Package Count Selection -->
           <div class="space-y-1.5">
             <label class="block text-xs font-bold text-emerald-950">Кількість сесій у пакеті / курсі:</label>
             <div class="grid grid-cols-4 gap-1.5">
@@ -551,27 +553,50 @@
               <button type="button" onclick="setCourseCount('custom')" id="course-pill-custom" class="course-count-pill py-2 rounded-xl border border-warm-border bg-white text-xs font-semibold hover:border-brand-500 transition-all">Своя</button>
             </div>
             <div id="custom-course-count-box" class="hidden pt-1">
-              <input type="number" id="schedule-course-count-input" value="10" min="2" max="50" oninput="updateCourseSchedulePreview()" placeholder="Введіть кількість зустрічей (напр. 12)" class="w-full px-3.5 py-2 rounded-xl border border-warm-border text-xs font-medium bg-white">
+              <input type="number" id="schedule-course-count-input" value="10" min="1" max="50" oninput="recalculateCourseSessions()" placeholder="Введіть кількість зустрічей" class="w-full px-3.5 py-2 rounded-xl border border-warm-border text-xs font-medium bg-white">
             </div>
           </div>
 
-          <div class="space-y-1">
-            <label class="block text-xs font-bold text-emerald-950">Періодичність сесій:</label>
-            <select id="schedule-course-interval" onchange="updateCourseSchedulePreview()" class="w-full px-3 py-2 rounded-xl border border-warm-border text-xs font-medium bg-white">
-              <option value="weekly">Щотижня (1 раз на тиждень у цей же день і час)</option>
-              <option value="twice_weekly">Двічі на тиждень (+3 дні / +4 дні)</option>
-              <option value="biweekly">Кожні 2 тижні</option>
-            </select>
+          <!-- Weekdays Selection with Custom Time for Each Day -->
+          <div class="space-y-2 pt-1 border-t border-emerald-200/60">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-emerald-950">Оберіть дні тижня та час проведення:</label>
+              <span class="text-[10px] text-emerald-800 font-semibold bg-emerald-100 px-2 py-0.5 rounded-full">Клікніть дні</span>
+            </div>
+            
+            <div class="grid grid-cols-7 gap-1" id="course-weekdays-grid">
+              <button type="button" onclick="toggleCourseWeekday(1)" id="wd-chip-1" class="weekday-chip py-2 rounded-xl border border-warm-border bg-white text-xs font-bold text-warm-text hover:border-emerald-500 transition-all text-center">Пн</button>
+              <button type="button" onclick="toggleCourseWeekday(2)" id="wd-chip-2" class="weekday-chip py-2 rounded-xl border border-emerald-600 bg-emerald-600 text-xs font-bold text-white shadow-sm transition-all text-center">Вт</button>
+              <button type="button" onclick="toggleCourseWeekday(3)" id="wd-chip-3" class="weekday-chip py-2 rounded-xl border border-warm-border bg-white text-xs font-bold text-warm-text hover:border-emerald-500 transition-all text-center">Ср</button>
+              <button type="button" onclick="toggleCourseWeekday(4)" id="wd-chip-4" class="weekday-chip py-2 rounded-xl border border-emerald-600 bg-emerald-600 text-xs font-bold text-white shadow-sm transition-all text-center">Чт</button>
+              <button type="button" onclick="toggleCourseWeekday(5)" id="wd-chip-5" class="weekday-chip py-2 rounded-xl border border-warm-border bg-white text-xs font-bold text-warm-text hover:border-emerald-500 transition-all text-center">Пт</button>
+              <button type="button" onclick="toggleCourseWeekday(6)" id="wd-chip-6" class="weekday-chip py-2 rounded-xl border border-warm-border bg-white text-xs font-bold text-warm-text hover:border-emerald-500 transition-all text-center">Сб</button>
+              <button type="button" onclick="toggleCourseWeekday(0)" id="wd-chip-0" class="weekday-chip py-2 rounded-xl border border-warm-border bg-white text-xs font-bold text-warm-text hover:border-emerald-500 transition-all text-center">Нд</button>
+            </div>
+
+            <!-- Dynamic Weekday Time Pickers Container -->
+            <div id="course-weekday-times-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              <!-- Dynamically populated time inputs for active days -->
+            </div>
           </div>
 
-          <!-- Schedule Preview List -->
-          <div class="space-y-1.5 pt-1">
+          <!-- Interactive Schedule List with Direct Date & Time Editing for Each Session -->
+          <div class="space-y-2 pt-2 border-t border-emerald-200/60">
             <div class="flex items-center justify-between text-xs">
-              <span class="font-bold text-emerald-950">Графік запланованих сесій:</span>
+              <span class="font-bold text-emerald-950">Покроковий розклад сесій (налаштуйте кожну дату та час):</span>
               <span class="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded-full" id="course-preview-count-badge">10 сесій</span>
             </div>
-            <div id="course-schedule-preview-list" class="max-h-36 overflow-y-auto space-y-1 p-2 rounded-xl bg-white border border-warm-border text-[11px] font-mono">
-              <!-- Dynamically populated -->
+            
+            <!-- List of editable rows -->
+            <div id="course-schedule-preview-list" class="max-h-52 overflow-y-auto space-y-1.5 p-2 rounded-2xl bg-white border border-warm-border">
+              <!-- Dynamically populated rows with date, time inputs and delete button -->
+            </div>
+
+            <!-- Add Extra Session Button -->
+            <div class="flex justify-end pt-1">
+              <button type="button" onclick="addExtraCourseSession()" class="px-3 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 text-xs font-bold transition-colors flex items-center gap-1">
+                <span>➕ Додати зустріч</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1717,6 +1742,17 @@
 
     let currentScheduleMode = 'single';
     let currentCourseCount = 10;
+    let selectedCourseWeekdays = new Set([2, 4]); // Default: Вівторок (2) і Четвер (4)
+    let weekdayTimes = {
+      0: '18:00', // Неділя
+      1: '18:00', // Понеділок
+      2: '18:00', // Вівторок
+      3: '18:00', // Середа
+      4: '18:00', // Четвер
+      5: '18:00', // П'ятниця
+      6: '18:00'  // Субота
+    };
+    let coursePlannedSessions = [];
 
     const UKRAINIAN_DAYS = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
     const UKRAINIAN_DAYS_FULL = ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П' + 'ятниця', 'Субота'];
@@ -1733,10 +1769,10 @@
         singleBtn.className = 'py-2.5 px-3 rounded-2xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5';
         courseBtn.className = 'py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5';
         courseBox.classList.remove('hidden');
-        dateLabel.textContent = 'Дата 1-ї сесії курсу:';
-        const count = getSelectedCourseCount();
-        submitBtn.innerHTML = `<span>✨ Створити курс із ${count} сесій</span>`;
-        updateCourseSchedulePreview();
+        dateLabel.textContent = 'Дата старту курсу:';
+        renderCourseWeekdayChips();
+        renderWeekdayTimePickers();
+        recalculateCourseSessions();
       } else {
         singleBtn.className = 'py-2.5 px-3 rounded-2xl bg-brand-700 text-white font-bold text-xs shadow-sm transition-all text-center flex items-center justify-center gap-1.5';
         courseBtn.className = 'py-2.5 px-3 rounded-2xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5';
@@ -1777,73 +1813,188 @@
         currentCourseCount = count;
       }
 
-      const total = getSelectedCourseCount();
-      document.getElementById('schedule-submit-btn').innerHTML = `<span>✨ Створити курс із ${total} сесій</span>`;
-      updateCourseSchedulePreview();
+      recalculateCourseSessions();
     }
 
-    function generateCourseDates(startDateStr, startTimeStr, count, interval) {
-      if (!startDateStr) return [];
+    function toggleCourseWeekday(dayNum) {
+      if (selectedCourseWeekdays.has(dayNum)) {
+        if (selectedCourseWeekdays.size > 1) {
+          selectedCourseWeekdays.delete(dayNum);
+        } else {
+          showToast('Потрібно залишити хоча б один день тижня');
+          return;
+        }
+      } else {
+        selectedCourseWeekdays.add(dayNum);
+      }
+      renderCourseWeekdayChips();
+      renderWeekdayTimePickers();
+      recalculateCourseSessions();
+    }
+
+    function renderCourseWeekdayChips() {
+      for (let i = 0; i <= 6; i++) {
+        const chip = document.getElementById(`wd-chip-${i}`);
+        if (chip) {
+          if (selectedCourseWeekdays.has(i)) {
+            chip.className = 'weekday-chip py-2 rounded-xl border border-emerald-600 bg-emerald-600 text-xs font-bold text-white shadow-sm transition-all text-center';
+          } else {
+            chip.className = 'weekday-chip py-2 rounded-xl border border-warm-border bg-white text-xs font-bold text-warm-text hover:border-emerald-500 transition-all text-center';
+          }
+        }
+      }
+    }
+
+    function renderWeekdayTimePickers() {
+      const container = document.getElementById('course-weekday-times-container');
+      if (!container) return;
+
+      const sortedDays = Array.from(selectedCourseWeekdays).sort((a, b) => {
+        const orderA = a === 0 ? 7 : a;
+        const orderB = b === 0 ? 7 : b;
+        return orderA - orderB;
+      });
+
+      container.innerHTML = sortedDays.map(dayNum => `
+        <div class="flex items-center justify-between p-2 rounded-xl bg-white border border-warm-border/80 shadow-xs">
+          <div class="flex items-center gap-1.5">
+            <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-900 font-bold text-xs flex items-center justify-center">${UKRAINIAN_DAYS[dayNum]}</span>
+            <span class="text-xs font-semibold text-warm-text">${UKRAINIAN_DAYS_FULL[dayNum]}:</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="text-[11px] text-warm-muted">⏰</span>
+            <input type="time" value="${weekdayTimes[dayNum] || '18:00'}" onchange="updateWeekdayTime(${dayNum}, this.value)" class="px-2 py-1 rounded-lg border border-warm-border text-xs font-bold bg-warm-bg text-warm-text outline-none focus:ring-1 focus:ring-emerald-500">
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateWeekdayTime(dayNum, newTime) {
+      weekdayTimes[dayNum] = newTime;
+      recalculateCourseSessions();
+    }
+
+    function recalculateCourseSessions() {
+      if (currentScheduleMode !== 'course') return;
+      const startDateStr = document.getElementById('schedule-date').value;
+      const defaultStartTime = document.getElementById('schedule-time').value || '18:00';
+      const count = getSelectedCourseCount();
+      if (!startDateStr) return;
+
       const [year, month, day] = startDateStr.split('-').map(Number);
       let curr = new Date(year, month - 1, day);
       
-      const dates = [];
-      for (let i = 0; i < count; i++) {
-        const y = curr.getFullYear();
-        const m = String(curr.getMonth() + 1).padStart(2, '0');
-        const d = String(curr.getDate()).padStart(2, '0');
-        const dayOfWeek = UKRAINIAN_DAYS[curr.getDay()];
-        
-        dates.push({
-          index: i + 1,
-          dateStr: `${y}-${m}-${d}`,
-          timeStr: startTimeStr,
-          dayOfWeek: dayOfWeek,
-          fullDateDisplay: `${d}.${m}.${y} (${dayOfWeek}) о ${startTimeStr}`
-        });
+      const newSessions = [];
+      let iterations = 0;
 
-        if (interval === 'twice_weekly') {
-          // alternate +3 and +4 days
-          const addDays = (i % 2 === 0) ? 3 : 4;
-          curr.setDate(curr.getDate() + addDays);
-        } else if (interval === 'biweekly') {
-          curr.setDate(curr.getDate() + 14);
-        } else {
-          // weekly (+7 days)
-          curr.setDate(curr.getDate() + 7);
+      while (newSessions.length < count && iterations < 365) {
+        const dayOfWeek = curr.getDay();
+        if (selectedCourseWeekdays.has(dayOfWeek)) {
+          const y = curr.getFullYear();
+          const m = String(curr.getMonth() + 1).padStart(2, '0');
+          const d = String(curr.getDate()).padStart(2, '0');
+          const assignedTime = weekdayTimes[dayOfWeek] || defaultStartTime;
+          
+          newSessions.push({
+            dateStr: `${y}-${m}-${d}`,
+            timeStr: assignedTime,
+            dayOfWeekName: UKRAINIAN_DAYS[dayOfWeek]
+          });
         }
+        curr.setDate(curr.getDate() + 1);
+        iterations++;
       }
-      return dates;
+
+      coursePlannedSessions = newSessions;
+      renderCourseSchedulePreviewList();
     }
 
-    function updateCourseSchedulePreview() {
-      if (currentScheduleMode !== 'course') return;
-      const startDateStr = document.getElementById('schedule-date').value;
-      const startTimeStr = document.getElementById('schedule-time').value || '18:00';
-      const count = getSelectedCourseCount();
-      const interval = document.getElementById('schedule-course-interval').value || 'weekly';
-
+    function renderCourseSchedulePreviewList() {
       const previewList = document.getElementById('course-schedule-preview-list');
       const countBadge = document.getElementById('course-preview-count-badge');
+      const submitBtn = document.getElementById('schedule-submit-btn');
+
       if (!previewList) return;
 
-      if (!startDateStr) {
-        previewList.innerHTML = '<div class="text-warm-muted text-center p-2">Оберіть дату першої зустрічі для перегляду розкладу.</div>';
+      if (countBadge) countBadge.textContent = `${coursePlannedSessions.length} сесій`;
+      if (submitBtn && currentScheduleMode === 'course') {
+        submitBtn.innerHTML = `<span>✨ Створити курс із ${coursePlannedSessions.length} сесій</span>`;
+      }
+
+      if (coursePlannedSessions.length === 0) {
+        previewList.innerHTML = '<div class="text-warm-muted text-center p-3 text-xs">Не обрано жодної дати. Оберіть дні тижня вище.</div>';
         return;
       }
 
-      const courseDates = generateCourseDates(startDateStr, startTimeStr, count, interval);
-      countBadge.textContent = `${courseDates.length} сесій`;
+      previewList.innerHTML = coursePlannedSessions.map((session, idx) => {
+        const [y, m, d] = session.dateStr.split('-');
+        const dateObj = new Date(Number(y), Number(m) - 1, Number(d));
+        const dayName = UKRAINIAN_DAYS[dateObj.getDay()] || '';
 
-      previewList.innerHTML = courseDates.map(item => `
-        <div class="flex items-center justify-between py-1 px-2 rounded-lg bg-gray-50/80 hover:bg-emerald-50/60 border border-gray-100 transition-colors">
-          <div class="flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center justify-center">${item.index}</span>
-            <span class="font-semibold text-warm-text">${item.fullDateDisplay}</span>
+        return `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2 rounded-xl bg-gray-50/80 hover:bg-emerald-50/50 border border-gray-100 transition-colors">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold flex items-center justify-center shrink-0">${idx + 1}</span>
+              <span class="text-xs font-bold text-emerald-900 w-6">${dayName}</span>
+              <input type="date" value="${session.dateStr}" onchange="updateIndividualSessionDate(${idx}, this.value)" class="px-2 py-1 rounded-lg border border-warm-border text-xs bg-white font-medium text-warm-text">
+            </div>
+            
+            <div class="flex items-center justify-end gap-2">
+              <div class="flex items-center gap-1">
+                <span class="text-[10px] text-warm-muted font-mono">⏰</span>
+                <input type="time" value="${session.timeStr}" onchange="updateIndividualSessionTime(${idx}, this.value)" class="px-2 py-1 rounded-lg border border-warm-border text-xs bg-white font-bold text-warm-text">
+              </div>
+              <span class="text-[10px] text-emerald-700 font-bold hidden sm:inline">50хв</span>
+              <button type="button" onclick="removeIndividualSession(${idx})" class="w-6 h-6 rounded-lg text-rose-500 hover:bg-rose-100 hover:text-rose-700 flex items-center justify-center text-xs font-bold" title="Видалити цю дату з курсу">
+                ✕
+              </button>
+            </div>
           </div>
-          <span class="text-[10px] text-emerald-700 font-bold">50 хв</span>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+    }
+
+    function updateIndividualSessionDate(idx, newDateVal) {
+      if (coursePlannedSessions[idx]) {
+        coursePlannedSessions[idx].dateStr = newDateVal;
+        renderCourseSchedulePreviewList();
+      }
+    }
+
+    function updateIndividualSessionTime(idx, newTimeVal) {
+      if (coursePlannedSessions[idx]) {
+        coursePlannedSessions[idx].timeStr = newTimeVal;
+        renderCourseSchedulePreviewList();
+      }
+    }
+
+    function removeIndividualSession(idx) {
+      coursePlannedSessions.splice(idx, 1);
+      renderCourseSchedulePreviewList();
+    }
+
+    function addExtraCourseSession() {
+      let lastDateStr = document.getElementById('schedule-date').value;
+      let lastTimeStr = '18:00';
+      if (coursePlannedSessions.length > 0) {
+        lastDateStr = coursePlannedSessions[coursePlannedSessions.length - 1].dateStr;
+        lastTimeStr = coursePlannedSessions[coursePlannedSessions.length - 1].timeStr;
+      }
+      const [y, m, d] = lastDateStr.split('-').map(Number);
+      const nextDate = new Date(y, m - 1, d);
+      nextDate.setDate(nextDate.getDate() + 7);
+
+      const nextY = nextDate.getFullYear();
+      const nextM = String(nextDate.getMonth() + 1).padStart(2, '0');
+      const nextD = String(nextDate.getDate()).padStart(2, '0');
+
+      coursePlannedSessions.push({
+        dateStr: `${nextY}-${nextM}-${nextD}`,
+        timeStr: lastTimeStr,
+        dayOfWeekName: UKRAINIAN_DAYS[nextDate.getDay()]
+      });
+
+      renderCourseSchedulePreviewList();
     }
 
     function buildGoogleCalendarLink(title, details, location, startDate, startTime, durationMins = 50, clientEmail = '', recurrenceCount = 0) {
@@ -1934,7 +2085,13 @@
       document.getElementById('schedule-date').value = tomorrow.toISOString().substring(0, 10);
       document.getElementById('schedule-time').value = "18:00";
 
-      // Reset to single mode
+      // Set default weekday times
+      weekdayTimes = { 0: '18:00', 1: '18:00', 2: '18:00', 3: '18:00', 4: '18:00', 5: '18:00', 6: '18:00' };
+      selectedCourseWeekdays = new Set([2, 4]); // Вівторок та Четвер за замовчуванням
+
+      renderCourseWeekdayChips();
+      renderWeekdayTimePickers();
+
       setScheduleMode('single');
       setCourseCount(10);
 
@@ -1946,7 +2103,7 @@
     }
 
     function onScheduleClientChanged() {
-      updateCourseSchedulePreview();
+      recalculateCourseSessions();
     }
 
     async function saveNewAppointment(e) {
@@ -1969,11 +2126,13 @@
       const startTime = document.getElementById('schedule-time').value;
 
       if (currentScheduleMode === 'course') {
-        const count = getSelectedCourseCount();
-        const interval = document.getElementById('schedule-course-interval').value || 'weekly';
-        const courseDates = generateCourseDates(startDate, startTime, count, interval);
+        if (coursePlannedSessions.length === 0) {
+          alert('Будь ласка, оберіть хоча б одну дату для курсу');
+          return;
+        }
 
-        const appointmentsPayload = courseDates.map((item, idx) => ({
+        const count = coursePlannedSessions.length;
+        const appointmentsPayload = coursePlannedSessions.map((item, idx) => ({
           client_id: client.id,
           client_name: client.name,
           client_email: client.email,
@@ -2021,22 +2180,21 @@
         renderAppointmentsList(cachedAppointments);
         closeScheduleModal();
         
-        // Build private recurring Google Calendar link for the whole course
+        const firstSession = coursePlannedSessions[0] || { dateStr: startDate, timeStr: startTime };
         const fullGcalUrl = buildGoogleCalendarLink(
           `Курс психотерапії: ${client.name} & Юлія Олефіренко`,
           `Індивідуальний курс психотерапії (${count} сесій по 50 хв).\nПряме посилання Google Meet: ${customGmeetUrl}`,
           customGmeetUrl,
-          startDate,
-          startTime,
+          firstSession.dateStr,
+          firstSession.timeStr,
           durationMinutes,
           client.email,
           count
         );
 
-        showToast(`🎉 Успішно призначено курс із ${count} зустрічей!`);
+        showToast(`🎉 Успішно створено розклад курсу із ${count} зустрічей!`);
         
-        // Open Google Calendar or trigger ICS download for user convenience
-        if (confirm(`Курс із ${count} зустрічей призначено!\n\nБажаєте відкрити Google Календар прямо зараз, щоб зберегти всю приватну серію (${count} сесій) в один клік?`)) {
+        if (confirm(`Курс із ${count} зустрічей успішно створено за вашим розкладом!\n\nБажаєте відкрити Google Календар, щоб зберегти всю приватну серію (${count} сесій) в один клік?`)) {
           window.open(fullGcalUrl, '_blank');
         }
 
