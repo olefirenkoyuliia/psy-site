@@ -343,10 +343,13 @@
       </a>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center gap-5 lg:gap-6 text-[13px] lg:text-sm font-medium text-warm-muted whitespace-nowrap">
+      <nav class="hidden md:flex items-center gap-4 lg:gap-5 text-[13px] lg:text-sm font-medium text-warm-muted whitespace-nowrap">
         <a href="#about" class="hover:text-brand-700 transition-colors whitespace-nowrap">Про мене</a>
         <a href="#booking-widget" class="hover:text-brand-700 transition-colors whitespace-nowrap">Підбір часу</a>
         <a href="#topics" class="hover:text-brand-700 transition-colors whitespace-nowrap">Запити</a>
+        <a href="#ask-psychologist" class="text-brand-700 hover:text-brand-800 font-bold transition-colors whitespace-nowrap flex items-center gap-1 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
+          <span>💬</span> <span>Запитати онлайн</span>
+        </a>
         <a href="#method" class="hover:text-brand-700 transition-colors whitespace-nowrap">Підхід</a>
         <a href="#pricing" class="hover:text-brand-700 transition-colors whitespace-nowrap">Ціни</a>
         <a href="#diplomas" class="hover:text-brand-700 transition-colors whitespace-nowrap">Освіта</a>
@@ -738,6 +741,91 @@
     </div>
   </section>
 
+  <!-- Section: Ask Psychologist Online (Анонімне запитання психологу) -->
+  <section id="ask-psychologist" class="py-20 bg-gradient-to-br from-brand-900 via-emerald-950 to-brand-900 text-white relative z-10 overflow-hidden border-t border-brand-800">
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-brand-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="text-center max-w-2xl mx-auto mb-10 space-y-3">
+        <span class="text-xs font-bold tracking-widest text-emerald-300 uppercase px-3.5 py-1 rounded-full bg-emerald-900/80 border border-emerald-700/60 inline-block shadow-xs">
+          💬 Безкоштовний перший крок
+        </span>
+        <h2 class="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+          Запитайте психолога онлайн
+        </h2>
+        <p class="text-emerald-100/90 text-sm sm:text-base leading-relaxed">
+          Впізнали свою ситуацію або не впевнені, чи допоможе терапія? Опишіть ваше запитання — Юлія особисто надасть вам відповідь у вашому особистому кабінеті.
+        </p>
+      </div>
+
+      <div class="bg-white text-warm-text p-6 sm:p-10 rounded-[2.5rem] shadow-2xl border border-emerald-800/40 space-y-6">
+        <!-- Topic Selection -->
+        <div class="space-y-2.5">
+          <label class="block text-xs font-bold uppercase tracking-wider text-warm-muted">
+            1. Оберіть тему вашого питання:
+          </label>
+          <div class="flex flex-wrap gap-2" id="inquiry-topic-chips">
+            <button type="button" onclick="selectInquiryTopic('Тривога та стрес', this)" class="inquiry-chip active px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-700 text-white transition-all">
+              🌿 Тривога та стрес
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Стосунки та розрив', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              💞 Стосунки та розрив
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Вигорання та робота', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              🔋 Вигорання та робота
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Самооцінка та межі', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              🛡️ Самооцінка та межі
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Втрата або криза', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              💔 Втрата або криза
+            </button>
+            <button type="button" onclick="selectInquiryTopic('Інше запитання', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
+              ✨ Інше
+            </button>
+          </div>
+        </div>
+
+        <!-- Question Input -->
+        <div class="space-y-2">
+          <label for="inquiry-question-text" class="block text-xs font-bold uppercase tracking-wider text-warm-muted">
+            2. Опишіть вашу ситуацію або питання:
+          </label>
+          <textarea id="inquiry-question-text" rows="4" placeholder="Наприклад: Останнім часом відчуваю постійну фонову тривогу, важко приймати рішення на роботі. Чи підійде мені короткострокова терапія і з чого краще почати?.." class="w-full p-4 rounded-2xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none"></textarea>
+        </div>
+
+        <!-- Contact Input -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="inquiry-client-name" class="block text-xs font-bold uppercase tracking-wider text-warm-muted mb-1">
+              Ваше ім'я (або псевдонім):
+            </label>
+            <input type="text" id="inquiry-client-name" placeholder="Наприклад: Олена" class="w-full p-3.5 rounded-xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+          </div>
+          <div>
+            <label for="inquiry-client-email" class="block text-xs font-bold uppercase tracking-wider text-warm-muted mb-1">
+              Ваш Email (для сповіщення про відповідь):
+            </label>
+            <input type="email" id="inquiry-client-email" placeholder="olena@example.com" class="w-full p-3.5 rounded-xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
+          </div>
+        </div>
+
+        <!-- Privacy & Submit Button -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-warm-border/60">
+          <div class="flex items-center gap-2 text-xs text-warm-muted">
+            <span class="text-emerald-700 font-bold">🔒 100% Конфіденційно</span>
+            <span>• Відповідь з'явиться у вашому кабінеті</span>
+          </div>
+          <button type="button" onclick="submitClientInquiry()" id="btn-submit-inquiry" class="w-full sm:w-auto px-8 py-4 rounded-full bg-brand-700 hover:bg-brand-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+            <span>✉️ Надіслати запитання Юлії</span>
+            <span>➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Section: Method & Interactive Tabs -->
   <section id="method" class="py-20 bg-white border-t border-warm-border relative z-10">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1036,91 +1124,6 @@
 
       </div>
 
-    </div>
-  </section>
-
-  <!-- Section: Ask Psychologist Online (Анонімне запитання психологу) -->
-  <section id="ask-psychologist" class="py-20 bg-gradient-to-br from-brand-900 via-emerald-950 to-brand-900 text-white relative z-10 overflow-hidden border-t border-brand-800">
-    <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-brand-400/10 rounded-full blur-3xl pointer-events-none"></div>
-
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="text-center max-w-2xl mx-auto mb-10 space-y-3">
-        <span class="text-xs font-bold tracking-widest text-emerald-300 uppercase px-3.5 py-1 rounded-full bg-emerald-900/80 border border-emerald-700/60 inline-block shadow-xs">
-          💬 Безкоштовний перший крок
-        </span>
-        <h2 class="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-          Запитайте психолога онлайн
-        </h2>
-        <p class="text-emerald-100/90 text-sm sm:text-base leading-relaxed">
-          Сумніваєтесь, чи допоможе терапія у вашій ситуації? Опишіть ваше запитання — Юлія особисто відповість вам конфіденційно прямо у вашому особистому кабінеті.
-        </p>
-      </div>
-
-      <div class="bg-white text-warm-text p-6 sm:p-10 rounded-[2.5rem] shadow-2xl border border-emerald-800/40 space-y-6">
-        <!-- Topic Selection -->
-        <div class="space-y-2.5">
-          <label class="block text-xs font-bold uppercase tracking-wider text-warm-muted">
-            1. Оберіть тему вашого питання:
-          </label>
-          <div class="flex flex-wrap gap-2" id="inquiry-topic-chips">
-            <button type="button" onclick="selectInquiryTopic('Тривога та стрес', this)" class="inquiry-chip active px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-700 text-white transition-all">
-              🌿 Тривога та стрес
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Стосунки та розрив', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              💞 Стосунки та розрив
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Вигорання та робота', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              🔋 Вигорання та робота
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Самооцінка та межі', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              🛡️ Самооцінка та межі
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Втрата або криза', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              💔 Втрата або криза
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Інше запитання', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              ✨ Інше
-            </button>
-          </div>
-        </div>
-
-        <!-- Question Input -->
-        <div class="space-y-2">
-          <label for="inquiry-question-text" class="block text-xs font-bold uppercase tracking-wider text-warm-muted">
-            2. Опишіть вашу ситуацію або питання:
-          </label>
-          <textarea id="inquiry-question-text" rows="4" placeholder="Наприклад: Останнім часом відчуваю постійну фонову тривогу, важко приймати рішення на роботі. Чи підійде мені короткострокова терапія і з чого краще почати?.." class="w-full p-4 rounded-2xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none"></textarea>
-        </div>
-
-        <!-- Contact Input -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label for="inquiry-client-name" class="block text-xs font-bold uppercase tracking-wider text-warm-muted mb-1">
-              Ваше ім'я (або псевдонім):
-            </label>
-            <input type="text" id="inquiry-client-name" placeholder="Наприклад: Олена" class="w-full p-3.5 rounded-xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-          </div>
-          <div>
-            <label for="inquiry-client-email" class="block text-xs font-bold uppercase tracking-wider text-warm-muted mb-1">
-              Ваш Email (для сповіщення про відповідь):
-            </label>
-            <input type="email" id="inquiry-client-email" placeholder="olena@example.com" class="w-full p-3.5 rounded-xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-          </div>
-        </div>
-
-        <!-- Privacy & Submit Button -->
-        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-warm-border/60">
-          <div class="flex items-center gap-2 text-xs text-warm-muted">
-            <span class="text-emerald-700 font-bold">🔒 100% Конфіденційно</span>
-            <span>• Відповідь з'явиться у вашому кабінеті</span>
-          </div>
-          <button type="button" onclick="submitClientInquiry()" id="btn-submit-inquiry" class="w-full sm:w-auto px-8 py-4 rounded-full bg-brand-700 hover:bg-brand-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
-            <span>✉️ Надіслати запитання Юлії</span>
-            <span>➔</span>
-          </button>
-        </div>
-      </div>
     </div>
   </section>
 
