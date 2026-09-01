@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" async defer onload="if(typeof initGoogleSso==='function') initGoogleSso()"></script>
 
   <script>
     tailwind.config = {
@@ -1145,7 +1145,7 @@
       } catch(e) {}
 
       if (!activeGoogleClientId) {
-        activeGoogleClientId = localStorage.getItem('psy_google_client_id') || '';
+        activeGoogleClientId = localStorage.getItem('psy_google_client_id') || '645004018643-13p99c9ulnbn0rdd6ne3dbrkel6d6lhq.apps.googleusercontent.com';
       }
 
       const input = document.getElementById('input-google-client-id');
@@ -1157,7 +1157,9 @@
             client_id: activeGoogleClientId,
             callback: handleGoogleCredentialResponse,
             auto_select: false,
-            cancel_on_tap_outside: true
+            cancel_on_tap_outside: true,
+            itp_support: true,
+            use_fedcm_for_prompt: true
           });
 
           const container = document.getElementById('google-signin-btn-container');
@@ -1174,8 +1176,14 @@
             });
           }
         } catch(e) {
-          console.warn('GIS init:', e);
+          console.warn('GIS init error:', e);
         }
+      } else {
+        setTimeout(() => {
+          if (window.google && window.google.accounts && window.google.accounts.id) {
+            initGoogleSso();
+          }
+        }, 400);
       }
     }
 
@@ -1225,13 +1233,21 @@
     }
 
     function triggerGoogleLogin() {
-      // 1. Try Google Identity Services & OAuth2 popup
+      // 1. If rendered Google GSI button exists, click it directly
+      const renderedBtn = document.querySelector('#google-signin-btn-container div[role=button], #google-signin-btn-container iframe');
+      if (renderedBtn) {
+        renderedBtn.click();
+        return;
+      }
+
+      // 2. Try Google Identity Services & OAuth2 popup client
       if (activeGoogleClientId && window.google && window.google.accounts) {
         if (window.google.accounts.oauth2) {
           try {
             const client = google.accounts.oauth2.initTokenClient({
               client_id: activeGoogleClientId,
               scope: 'email profile openid',
+              prompt: 'select_account',
               callback: async (tokenResponse) => {
                 if (tokenResponse && tokenResponse.access_token) {
                   try {
@@ -1243,7 +1259,9 @@
                       await handleGoogleProfile(userInfo);
                       return;
                     }
-                  } catch(e) {}
+                  } catch(e) {
+                    console.error('Google userInfo error:', e);
+                  }
                 }
               }
             });
@@ -1255,18 +1273,13 @@
         }
 
         if (window.google.accounts.id) {
-          google.accounts.id.prompt((notification) => {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-              const redirectUri = window.location.origin + '/cabinet.html';
-              window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${activeGoogleClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=email%20profile%20openid`;
-            }
-          });
+          google.accounts.id.prompt();
           return;
         }
       }
 
-      // 2. Direct 1-click Google Email prompt if Client ID isn't linked yet (No password modal)
-      const enteredEmail = prompt('Введіть ваш Google Email для входу в кабінет (без пароля):');
+      // 3. Fast fallback if Google libraries blocked
+      const enteredEmail = prompt('Введіть ваш Google Email для швидкого входу:');
       if (enteredEmail && enteredEmail.includes('@')) {
         const namePart = enteredEmail.split('@')[0];
         const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
