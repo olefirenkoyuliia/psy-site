@@ -92,6 +92,26 @@ export async function onRequestPost(context) {
       insertedId = res.meta?.last_row_id || insertedId;
     }
 
+    // Trigger Telegram Notification asynchronously
+    try {
+      context.waitUntil(sendTelegramNotification({
+        clientName,
+        clientEmail,
+        clientPhone,
+        topic,
+        question
+      }, env));
+    } catch(e) {
+      // Fallback if waitUntil not available
+      sendTelegramNotification({
+        clientName,
+        clientEmail,
+        clientPhone,
+        topic,
+        question
+      }, env).catch(() => {});
+    }
+
     return new Response(JSON.stringify({
       success: true,
       id: insertedId,
@@ -108,6 +128,51 @@ export async function onRequestPost(context) {
       status: 500,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
+  }
+}
+
+async function sendTelegramNotification(inquiry, env) {
+  let botToken = env.TELEGRAM_BOT_TOKEN;
+  let chatId = env.TELEGRAM_CHAT_ID;
+
+  if ((!botToken || !chatId) && env.DB) {
+    try {
+      const row = await env.DB.prepare("SELECT data FROM site_data WHERE key = 'telegram_config'").first();
+      if (row && row.data) {
+        const parsed = JSON.parse(row.data);
+        if (!botToken) botToken = parsed.botToken;
+        if (!chatId) chatId = parsed.chatId;
+      }
+    } catch(e) {}
+  }
+
+  if (!botToken || !chatId) return false;
+
+  const escapeTg = (str) => String(str || '').replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');
+
+  const messageText = `🔔 *У вас нове повідомлення на сайті в чаті\\!*\n\n` +
+    `👤 *Клієнт:* ${escapeTg(inquiry.clientName || 'Користувач')}\n` +
+    `📧 *Email:* ${escapeTg(inquiry.clientEmail || 'Не вказано')}\n` +
+    (inquiry.clientPhone ? `📱 *Телефон:* ${escapeTg(inquiry.clientPhone)}\n` : '') +
+    `🎯 *Тема:* ${escapeTg(inquiry.topic || 'Загальне')}\n\n` +
+    `💬 *Повідомлення:*\n«${escapeTg(inquiry.question)}»\n\n` +
+    `🔗 [Відповісти в кабінеті](https://dev.psy-site.pages.dev/cabinet.html)`;
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: messageText,
+        parse_mode: 'MarkdownV2',
+        disable_web_page_preview: true
+      })
+    });
+    return res.ok;
+  } catch (err) {
+    console.error('Telegram notification error:', err);
+    return false;
   }
 }
 
