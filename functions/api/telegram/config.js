@@ -48,8 +48,21 @@ export async function onRequestPost(context) {
 
   try {
     const data = await request.json();
-    const botToken = (data.botToken || '').trim();
-    const chatId = (data.chatId || '').trim();
+    let botToken = (data.botToken || '').trim();
+    let chatId = (data.chatId || '').trim();
+
+    // Auto-clean token from accidental "bot" prefix, quotes, or spaces
+    if (botToken) {
+      botToken = botToken.replace(/^['"`]|['"`]$/g, '').trim();
+      if (botToken.toLowerCase().startsWith('bot')) {
+        botToken = botToken.slice(3).trim();
+      }
+    }
+
+    if (chatId) {
+      chatId = chatId.replace(/^['"`]|['"`]$/g, '').trim();
+      chatId = chatId.replace(/^(https?:\/\/)?t\.me\//i, '');
+    }
 
     if (!env.DB) {
       return new Response(JSON.stringify({ error: 'База даних недоступна' }), {

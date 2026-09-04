@@ -146,6 +146,18 @@ async function sendTelegramNotification(inquiry, env) {
     } catch(e) {}
   }
 
+  if (botToken) {
+    botToken = String(botToken).replace(/^['"`]|['"`]$/g, '').trim();
+    if (botToken.toLowerCase().startsWith('bot')) {
+      botToken = botToken.slice(3).trim();
+    }
+  }
+
+  if (chatId) {
+    chatId = String(chatId).replace(/^['"`]|['"`]$/g, '').trim();
+    chatId = chatId.replace(/^(https?:\/\/)?t\.me\//i, '');
+  }
+
   if (!botToken || !chatId) return false;
 
   const escapeTg = (str) => String(str || '').replace(/[_*[\]()~`>#+\-=|{}.!]/g, '\\$&');

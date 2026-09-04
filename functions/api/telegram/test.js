@@ -29,9 +29,31 @@ export async function onRequestPost(context) {
       } catch(e) {}
     }
 
+    // Auto-clean token from accidental "bot" prefix, quotes, or spaces
+    if (botToken) {
+      botToken = botToken.replace(/^['"`]|['"`]$/g, '').trim();
+      if (botToken.toLowerCase().startsWith('bot')) {
+        botToken = botToken.slice(3).trim();
+      }
+    }
+
+    if (chatId) {
+      chatId = chatId.replace(/^['"`]|['"`]$/g, '').trim();
+      chatId = chatId.replace(/^(https?:\/\/)?t\.me\//i, '');
+    }
+
     if (!botToken || !chatId) {
       return new Response(JSON.stringify({
         error: 'Вкажіть Telegram Bot Token та Chat ID для тестування'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+
+    if (!botToken.includes(':')) {
+      return new Response(JSON.stringify({
+        error: 'Невірний формат Bot Token. Токен повинен мати вигляд: 123456789:ABCdefGHIjklMNO (отримайте його в @BotFather)'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
