@@ -213,121 +213,24 @@
         </div>
       </div>
 
-      <!-- CLIENT TABS SWITCHER (Visible ONLY for Clients) -->
-      <div id="client-tabs-nav" class="hidden">
-        <div class="inline-flex p-1.5 bg-white rounded-2xl border border-warm-border shadow-soft text-xs font-bold text-warm-muted flex-wrap gap-1">
-          <button type="button" id="tab-btn-client-space" onclick="switchClientView('space')" class="px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2">
-            <span>📋 Мій кабінет та сесії</span>
-          </button>
-          <button type="button" id="tab-btn-client-chat" onclick="switchClientView('chat')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
-            <span>💬 Приватний діалог з психологом</span>
-            <span id="client-chat-badge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold hidden">0</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- ======================================================== -->
-      <!-- CLIENT VIEW 1: MAIN SPACE & SESSIONS (Default)          -->
-      <!-- ======================================================== -->
-      <div id="client-space-view" class="space-y-8">
-        <!-- CLIENT'S UPCOMING SESSIONS LIST -->
-        <div id="client-upcoming-sessions-container" class="hidden space-y-4">
-          <div class="p-6 rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-900 text-white shadow-card border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-xs font-bold mb-1">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                <span>Ваш розклад онлайн-консультацій</span>
-              </div>
-              <h2 class="font-serif-luxury font-bold text-xl text-white">
-                Заплановані консультації (<span id="client-sessions-count">0</span>)
-              </h2>
-              <p class="text-xs text-emerald-200">Індивідуальні сесії психотерапії з Юлією Олефіренко</p>
+      <!-- CLIENT'S UPCOMING SESSIONS LIST -->
+      <div id="client-upcoming-sessions-container" class="hidden space-y-4">
+        <div class="p-6 rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-900 text-white shadow-card border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-xs font-bold mb-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Ваш розклад онлайн-консультацій</span>
             </div>
-          </div>
-
-          <div id="client-sessions-cards-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Populated dynamically with each scheduled session -->
+            <h2 class="font-serif-luxury font-bold text-xl text-white">
+              Заплановані консультації (<span id="client-sessions-count">0</span>)
+            </h2>
+            <p class="text-xs text-emerald-200">Індивідуальні сесії психотерапії з Юлією Олефіренко</p>
           </div>
         </div>
-      </div>
 
-      <!-- ======================================================== -->
-      <!-- CLIENT VIEW 2: DEDICATED PRIVATE DIALOGUE (CHAT)        -->
-      <!-- ======================================================== -->
-      <div id="client-chat-view" class="hidden space-y-6">
-        
-        <!-- Chat Shell Container -->
-        <div class="rounded-3xl bg-white border border-warm-border shadow-soft overflow-hidden flex flex-col max-w-4xl mx-auto">
-          
-          <!-- Chat Header -->
-          <div class="p-4 sm:p-5 bg-gradient-to-r from-emerald-50/80 via-white to-warm-card border-b border-warm-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div class="flex items-center gap-3.5">
-              <div class="relative">
-                <img src="/images/IMG_5187.JPG" alt="Юлія Олефіренко" class="w-12 h-12 rounded-2xl object-cover border-2 border-brand-300 shadow-sm">
-                <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-300" title="Онлайн"></span>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="font-bold text-warm-text text-sm sm:text-base">Юлія Олефіренко</h3>
-                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Психологиня</span>
-                </div>
-                <p class="text-[11px] text-warm-muted flex items-center gap-1.5">
-                  <span>🔒 Приватний зашифрований діалог (Zero-Knowledge AES-256)</span>
-                </p>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <button type="button" onclick="refreshClientChat()" title="Оновити діалог" class="px-3.5 py-2 rounded-xl bg-warm-bg hover:bg-gray-200 text-warm-text transition-colors text-xs font-bold flex items-center gap-1.5 shadow-xs">
-                <span>🔄</span> <span>Оновити чат</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Chat Messages Scrollable Feed -->
-          <div id="client-chat-messages-container" class="p-4 sm:p-6 space-y-5 overflow-y-auto max-h-[520px] min-h-[360px] bg-warm-bg/30">
-            <!-- Messages populated dynamically -->
-          </div>
-
-          <!-- Chat Input Footer -->
-          <div class="p-4 sm:p-5 bg-white border-t border-warm-border space-y-3">
-            
-            <!-- Topic Selection Chips -->
-            <div class="space-y-1.5">
-              <div class="text-[11px] font-bold text-warm-muted flex items-center gap-1">
-                <span>🎯 Оберіть тему звернення:</span>
-              </div>
-              <div class="flex flex-wrap gap-1.5" id="chat-topic-chips">
-                <button type="button" onclick="selectChatTopic(this, 'Загальне питання')" class="chat-topic-chip active px-3 py-1 rounded-full text-xs font-bold bg-brand-700 text-white transition-all shadow-xs">Загальне питання</button>
-                <button type="button" onclick="selectChatTopic(this, 'Тривога та стрес')" class="chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all">🌿 Тривога / стрес</button>
-                <button type="button" onclick="selectChatTopic(this, 'Стосунки та конфлікти')" class="chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all">❤️ Стосунки</button>
-                <button type="button" onclick="selectChatTopic(this, 'Самооцінка та впевненість')" class="chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all">✨ Самооцінка</button>
-                <button type="button" onclick="selectChatTopic(this, 'Символдрама та сни')" class="chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all">🌙 Сни / Символдрама</button>
-              </div>
-              <input type="hidden" id="chat-selected-topic" value="Загальне питання">
-            </div>
-
-            <!-- Chat Textarea Form -->
-            <form id="client-chat-form" onsubmit="sendClientChatMessage(event)" class="space-y-2">
-              <div class="relative">
-                <textarea id="chat-message-input" rows="3" required placeholder="Напишіть ваше конфіденційне запитання або тему для Юлії..." class="w-full p-3.5 rounded-2xl border border-warm-border text-xs sm:text-sm font-normal outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white leading-relaxed resize-none text-warm-text shadow-xs"></textarea>
-              </div>
-
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                <div class="text-[11px] text-warm-muted flex items-center gap-1.5">
-                  <span>🔒</span> <span>Текст шифрується на пристрої перед відправкою (Zero-Knowledge)</span>
-                </div>
-                <button type="submit" id="btn-chat-send" class="px-6 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 shrink-0">
-                  <span>Надіслати Юлії</span>
-                  <span>✈️</span>
-                </button>
-              </div>
-            </form>
-
-          </div>
-
+        <div id="client-sessions-cards-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated dynamically with each scheduled session -->
         </div>
-
       </div>
 
       <!-- OWNER TABS SWITCHER (Visible ONLY for Julia / Owner) -->
@@ -336,10 +239,6 @@
           <button type="button" id="tab-btn-schedule" onclick="switchOwnerView('schedule')" class="px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2">
             <span>📅 Розклад та сесії</span>
             <span id="owner-appointments-badge" class="px-2 py-0.5 rounded-full bg-brand-800 text-emerald-200 text-[10px]">0</span>
-          </button>
-          <button type="button" id="tab-btn-inquiries" onclick="switchOwnerView('inquiries')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
-            <span>💬 Запитання з сайту</span>
-            <span id="owner-inquiries-badge" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px]">0</span>
           </button>
           <button type="button" id="tab-btn-clients" onclick="switchOwnerView('clients')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
             <span>👥 База клієнтів</span>
@@ -539,78 +438,6 @@
           </div>
         </div>
 
-      </div>
-
-      <!-- ======================================================== -->
-      <!-- VIEW 4: OWNER INQUIRIES / QUESTIONS FROM SITE            -->
-      <!-- ======================================================== -->
-      <div id="owner-inquiries-view" class="hidden space-y-6">
-        <div class="p-6 rounded-3xl glass-card border border-warm-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="font-bold text-warm-text text-lg flex items-center gap-2">
-              <span>💬</span> <span>Запитання користувачів з сайту</span>
-            </h2>
-            <p class="text-xs text-warm-muted">Відповідайте на звернення потенційних клієнтів — відповіді миттєво з'являються в їхніх особистих кабінетах</p>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button onclick="loadOwnerInquiriesList()" class="px-3.5 py-2 rounded-xl bg-warm-card hover:bg-brand-50 text-brand-800 border border-warm-border text-xs font-bold transition-colors flex items-center gap-1.5">
-              <span>🔄 Оновити</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Telegram Notification Config Card (Owner Only) -->
-        <div class="p-6 rounded-3xl bg-gradient-to-r from-sky-50 via-white to-sky-50/60 border border-sky-200 shadow-soft space-y-4">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-100 pb-3">
-            <div class="flex items-center gap-2.5">
-              <span class="text-2xl">🔔</span>
-              <div>
-                <h3 class="font-bold text-sky-950 text-base">Сповіщення в Telegram про нові повідомлення в чаті</h3>
-                <p class="text-xs text-sky-800">Миттєве сповіщення в Telegram при кожному новому зверненні клієнта на сайті</p>
-              </div>
-            </div>
-            <span id="tg-config-status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700 border border-gray-200 self-start sm:self-auto">
-              ⏳ Перевірка...
-            </span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div class="space-y-1.5">
-              <label class="block font-bold text-sky-950">Telegram Bot Token (від @BotFather):</label>
-              <input type="password" id="input-tg-bot-token" placeholder="123456789:ABCdefGHIjklMNO..." class="w-full px-4 py-2.5 rounded-xl border border-sky-200 focus:ring-2 focus:ring-sky-500 outline-none bg-white font-mono text-xs">
-            </div>
-            <div class="space-y-1.5">
-              <label class="block font-bold text-sky-950">Telegram Chat ID (від @userinfobot):</label>
-              <input type="text" id="input-tg-chat-id" placeholder="123456789" class="w-full px-4 py-2.5 rounded-xl border border-sky-200 focus:ring-2 focus:ring-sky-500 outline-none bg-white font-mono text-xs">
-            </div>
-          </div>
-
-          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <p class="text-[11px] text-sky-800 leading-relaxed max-w-lg">
-              💡 <em>Підказка:</em> створіть бота через <strong>@BotFather</strong>, напишіть боту <code>/start</code>, дізнайтеся ваш Chat ID у <strong>@userinfobot</strong> та натисніть «Зберегти».
-            </p>
-            <div class="flex items-center gap-2">
-              <button type="button" onclick="testTelegramNotification()" id="btn-test-tg" class="px-4 py-2.5 rounded-xl bg-white hover:bg-sky-100 border border-sky-300 text-sky-900 text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs">
-                <span>🧪 Тестувати</span>
-              </button>
-              <button type="button" onclick="saveTelegramConfig()" id="btn-save-tg" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
-                <span>💾 Зберегти</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Filter tabs for inquiries -->
-        <div class="flex flex-wrap items-center gap-2 px-1 text-xs">
-          <button type="button" onclick="filterOwnerInquiries('all')" id="inq-filter-all" class="px-3.5 py-1.5 rounded-xl bg-brand-700 text-white font-bold transition-all">Усі (<span id="inq-count-all">0</span>)</button>
-          <button type="button" onclick="filterOwnerInquiries('pending')" id="inq-filter-pending" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">⏳ Очікують відповіді (<span id="inq-count-pending">0</span>)</button>
-          <button type="button" onclick="filterOwnerInquiries('answered')" id="inq-filter-answered" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all">✅ Відповіджено (<span id="inq-count-answered">0</span>)</button>
-        </div>
-
-        <div id="owner-inquiries-list" class="space-y-4">
-          <!-- Populated dynamically -->
-        </div>
       </div>
 
       <!-- ======================================================== -->
@@ -1687,34 +1514,27 @@
             <span>🌐 Створити Google Meet</span>
           </a>
         `;
-        document.getElementById('client-tabs-nav')?.classList.add('hidden');
-        document.getElementById('client-chat-view')?.classList.add('hidden');
-        document.getElementById('client-space-view')?.classList.add('hidden');
         ownerTabsNav.classList.remove('hidden');
         switchOwnerView('schedule');
         loadAppointmentsList();
         loadOwnerClientsList();
-        loadOwnerInquiriesList();
       } else {
         roleBadge.innerHTML = '<span>🟢</span> <span>Особистий простір клієнта</span>';
         welcomeName.textContent = user.first_name || user.name.split(' ')[0] || 'Клієнте';
-        welcomeSubtitle.textContent = 'Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та вести приватний діалог з Юлією Олефіренко.';
+        welcomeSubtitle.textContent = 'Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та переглянути заплановані зустрічі.';
         heroActions.innerHTML = `
-          <button onclick="switchClientView('chat')" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
-            <span>💬 Приватний діалог з Юлією</span>
-          </button>
+          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
+            <span>💬 Написати Юлії в Telegram</span>
+          </a>
           <a href="/#pricing" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
             <span>📅 Записатися на сесію</span>
           </a>
         `;
         ownerTabsNav.classList.add('hidden');
-        document.getElementById('owner-schedule-view').classList.add('hidden');
-        document.getElementById('owner-inquiries-view').classList.add('hidden');
-        document.getElementById('owner-clients-view').classList.add('hidden');
-        document.getElementById('client-tabs-nav')?.classList.remove('hidden');
-        switchClientView('space');
+        document.getElementById('owner-schedule-view')?.classList.add('hidden');
+        document.getElementById('owner-clients-view')?.classList.add('hidden');
+        document.getElementById('personal-profile-view')?.classList.remove('hidden');
         loadClientUpcomingSession(user.email);
-        loadClientChat(user.email);
       }
 
       // Profile Card
@@ -1726,36 +1546,12 @@
       populateForm(user);
     }
 
-    function switchClientView(view) {
-      const btnSpace = document.getElementById('tab-btn-client-space');
-      const btnChat = document.getElementById('tab-btn-client-chat');
-      const spaceView = document.getElementById('client-space-view');
-      const chatView = document.getElementById('client-chat-view');
-      const profileView = document.getElementById('personal-profile-view');
-
-      const activeCls = 'px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2';
-      const inactiveCls = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
-
-      if (btnSpace) btnSpace.className = view === 'space' ? activeCls : inactiveCls;
-      if (btnChat) btnChat.className = view === 'chat' ? activeCls : inactiveCls;
-
-      if (spaceView) spaceView.classList.toggle('hidden', view !== 'space');
-      if (profileView) profileView.classList.toggle('hidden', view !== 'space');
-      if (chatView) chatView.classList.toggle('hidden', view !== 'chat');
-
-      if (view === 'chat' && currentUser && currentUser.email) {
-        loadClientChat(currentUser.email);
-      }
-    }
-
     function switchOwnerView(view) {
       const btnSchedule = document.getElementById('tab-btn-schedule');
-      const btnInquiries = document.getElementById('tab-btn-inquiries');
       const btnClients = document.getElementById('tab-btn-clients');
       const btnProfile = document.getElementById('tab-btn-profile');
       
       const viewSchedule = document.getElementById('owner-schedule-view');
-      const viewInquiries = document.getElementById('owner-inquiries-view');
       const viewClients = document.getElementById('owner-clients-view');
       const viewProfile = document.getElementById('personal-profile-view');
 
@@ -1763,468 +1559,12 @@
       const inactiveCls = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
 
       if (btnSchedule) btnSchedule.className = view === 'schedule' ? activeCls : inactiveCls;
-      if (btnInquiries) btnInquiries.className = view === 'inquiries' ? activeCls : inactiveCls;
       if (btnClients) btnClients.className = view === 'clients' ? activeCls : inactiveCls;
       if (btnProfile) btnProfile.className = view === 'profile' ? activeCls : inactiveCls;
 
       if (viewSchedule) viewSchedule.classList.toggle('hidden', view !== 'schedule');
-      if (viewInquiries) viewInquiries.classList.toggle('hidden', view !== 'inquiries');
       if (viewClients) viewClients.classList.toggle('hidden', view !== 'clients');
       if (viewProfile) viewProfile.classList.toggle('hidden', view !== 'profile');
-
-      if (view === 'inquiries') {
-        loadOwnerInquiriesList();
-      }
-    }
-
-    // =======================================================
-    // CLIENT INQUIRIES & QUESTIONS HUB
-    // =======================================================
-    let cachedOwnerInquiries = [];
-    let currentInquiriesFilter = 'all';
-
-    async function loadOwnerInquiriesList() {
-      const listEl = document.getElementById('owner-inquiries-list');
-      const badgeEl = document.getElementById('owner-inquiries-badge');
-      if (!listEl) return;
-
-      try {
-        const res = await fetch('/api/inquiries?isOwner=true');
-        if (res.ok) {
-          const data = await res.json();
-          cachedOwnerInquiries = data.inquiries || [];
-        }
-      } catch(err) {
-        console.error('Error loading owner inquiries:', err);
-      }
-
-      const pendingCount = cachedOwnerInquiries.filter(i => i.status === 'pending').length;
-      if (badgeEl) {
-        badgeEl.textContent = pendingCount;
-        badgeEl.className = pendingCount > 0 
-          ? 'px-2 py-0.5 rounded-full bg-rose-500 text-white font-bold text-[10px] animate-pulse' 
-          : 'px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 text-[10px]';
-      }
-
-      const countAll = document.getElementById('inq-count-all');
-      const countPending = document.getElementById('inq-count-pending');
-      const countAnswered = document.getElementById('inq-count-answered');
-
-      if (countAll) countAll.textContent = cachedOwnerInquiries.length;
-      if (countPending) countPending.textContent = pendingCount;
-      if (countAnswered) countAnswered.textContent = cachedOwnerInquiries.filter(i => i.status === 'answered').length;
-
-      loadTelegramConfig();
-      renderOwnerInquiries();
-    }
-
-    function filterOwnerInquiries(status) {
-      currentInquiriesFilter = status;
-      ['all', 'pending', 'answered'].forEach(s => {
-        const b = document.getElementById(`inq-filter-${s}`);
-        if (b) {
-          b.className = s === status 
-            ? 'px-3.5 py-1.5 rounded-xl bg-brand-700 text-white font-bold transition-all'
-            : 'px-3.5 py-1.5 rounded-xl bg-white hover:bg-warm-bg border border-warm-border text-warm-text font-semibold transition-all';
-        }
-      });
-      renderOwnerInquiries();
-    }
-
-    function renderOwnerInquiries() {
-      const listEl = document.getElementById('owner-inquiries-list');
-      if (!listEl) return;
-
-      let list = cachedOwnerInquiries;
-      if (currentInquiriesFilter !== 'all') {
-        list = list.filter(i => i.status === currentInquiriesFilter);
-      }
-
-      if (list.length === 0) {
-        listEl.innerHTML = `
-          <div class="p-10 text-center bg-white rounded-3xl border border-warm-border text-warm-muted text-xs">
-            Запитань не знайдено для цього фільтру.
-          </div>
-        `;
-        return;
-      }
-
-      listEl.innerHTML = list.map(inq => {
-        const isPending = inq.status === 'pending';
-        const dateStr = inq.created_at ? new Date(inq.created_at).toLocaleString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
-
-        return `
-          <div class="p-6 rounded-3xl bg-white border ${isPending ? 'border-amber-300 ring-2 ring-amber-200/50' : 'border-warm-border'} shadow-soft space-y-4 transition-all">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-warm-border/60 pb-3">
-              <div class="flex items-center gap-2.5">
-                <span class="px-2.5 py-1 rounded-full text-xs font-bold ${isPending ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'}">
-                  ${isPending ? '⏳ Очікує відповіді' : '✅ Відповіджено'}
-                </span>
-                <span class="px-2.5 py-1 rounded-full bg-warm-bg text-warm-text border border-warm-border text-xs font-semibold">
-                  📌 ${escapeHtml(inq.topic || 'Загальне')}
-                </span>
-              </div>
-              <div class="text-[11px] text-warm-muted font-mono">
-                📅 ${dateStr}
-              </div>
-            </div>
-
-            <div class="space-y-1.5">
-              <div class="flex items-center gap-2 text-xs">
-                <strong class="text-warm-text font-bold">${escapeHtml(inq.client_name || 'Користувач')}</strong>
-                <span class="text-warm-muted">(${escapeHtml(inq.client_email)})</span>
-              </div>
-              <div class="p-4 rounded-2xl bg-warm-bg/40 border border-warm-border/60 text-sm text-warm-text font-medium leading-relaxed">
-                «${escapeHtml(inq.question)}»
-              </div>
-            </div>
-
-            ${inq.answer ? `
-              <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-xs text-warm-text space-y-2">
-                <div class="flex items-center justify-between font-bold text-emerald-900 text-[11px]">
-                  <span>🌿 Ваша відповідь клієнту:</span>
-                  <span class="text-[10px] font-normal text-emerald-700 font-mono">${inq.answered_at ? new Date(inq.answered_at).toLocaleDateString('uk-UA') : ''}</span>
-                </div>
-                <div class="text-sm leading-relaxed whitespace-pre-wrap">${escapeHtml(inq.answer)}</div>
-              </div>
-            ` : ''}
-
-            <!-- Reply Box -->
-            <div class="pt-2">
-              <label class="block text-[11px] font-bold uppercase tracking-wider text-warm-muted mb-1.5">
-                ${inq.answer ? 'Змінити відповідь:' : 'Написати професійну відповідь:'}
-              </label>
-              <textarea id="reply-inq-${inq.id}" rows="3" placeholder="Шановний(-а) ${escapeHtml(inq.client_name || '')}, дякую за ваше запитання. У вашій ситуації..." class="w-full p-3.5 rounded-2xl border border-warm-border bg-warm-bg/20 text-xs focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none">${inq.answer ? escapeHtml(inq.answer) : ''}</textarea>
-              <div class="flex justify-end pt-2">
-                <button type="button" onclick="submitOwnerInquiryAnswer(${inq.id})" class="px-5 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5">
-                  <span>✉️ Надіслати відповідь клієнту</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function submitOwnerInquiryAnswer(inquiryId) {
-      const textarea = document.getElementById(`reply-inq-${inquiryId}`);
-      const answer = (textarea?.value || '').trim();
-      if (!answer) {
-        alert('Введіть текст відповіді.');
-        textarea?.focus();
-        return;
-      }
-
-      showToast('⏳ Зберігаємо відповідь...');
-
-      try {
-        const res = await fetch('/api/inquiries', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: inquiryId, answer: answer })
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showToast('✅ Відповідь збережено та надіслано клієнту!');
-          loadOwnerInquiriesList();
-        } else {
-          alert('Помилка: ' + (data.error || 'Не вдалося зберегти відповідь'));
-        }
-      } catch(err) {
-        alert('Помилка з\'єднання з сервером');
-      }
-    }
-
-    // =======================================================
-    // TELEGRAM NOTIFICATIONS CONFIG (OWNER)
-    // =======================================================
-    async function loadTelegramConfig() {
-      try {
-        const res = await fetch('/api/telegram/config');
-        if (!res.ok) return;
-        const data = await res.json();
-        const badge = document.getElementById('tg-config-status-badge');
-        const inputToken = document.getElementById('input-tg-bot-token');
-        const inputChatId = document.getElementById('input-tg-chat-id');
-
-        if (inputChatId && data.chatId) inputChatId.value = data.chatId;
-        if (inputToken && data.hasToken) inputToken.placeholder = `Встановлено (${data.maskedToken})`;
-
-        if (badge) {
-          if (data.configured) {
-            badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
-            badge.innerHTML = '<span>🟢 Активно • Сповіщення підключено</span>';
-          } else {
-            badge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200';
-            badge.innerHTML = '<span>⚠️ Не налаштовано</span>';
-          }
-        }
-      } catch(e) {}
-    }
-
-    async function saveTelegramConfig() {
-      const inputToken = document.getElementById('input-tg-bot-token');
-      const inputChatId = document.getElementById('input-tg-chat-id');
-      const btn = document.getElementById('btn-save-tg');
-
-      const botToken = (inputToken?.value || '').trim();
-      const chatId = (inputChatId?.value || '').trim();
-
-      const origText = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.innerHTML = '<span>Зберігаємо...</span>';
-        btn.disabled = true;
-      }
-
-      try {
-        const res = await fetch('/api/telegram/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ botToken, chatId })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          showToast('Налаштування Telegram збережено! ✨');
-          if (inputToken) inputToken.value = '';
-          await loadTelegramConfig();
-        } else {
-          showToast(data.error || 'Помилка збереження', '⚠️');
-        }
-      } catch(e) {
-        showToast('Помилка з\'єднання з сервером', '⚠️');
-      } finally {
-        if (btn) {
-          btn.innerHTML = origText;
-          btn.disabled = false;
-        }
-      }
-    }
-
-    async function testTelegramNotification() {
-      const inputToken = document.getElementById('input-tg-bot-token');
-      const inputChatId = document.getElementById('input-tg-chat-id');
-      const btn = document.getElementById('btn-test-tg');
-
-      const botToken = (inputToken?.value || '').trim();
-      const chatId = (inputChatId?.value || '').trim();
-
-      const origText = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.innerHTML = '<span>Відправка...</span>';
-        btn.disabled = true;
-      }
-
-      try {
-        const res = await fetch('/api/telegram/test', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ botToken, chatId })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          showToast('✅ Тестове сповіщення надіслано в Telegram!');
-          await loadTelegramConfig();
-        } else {
-          showToast(data.error || 'Помилка тесту Telegram', '⚠️');
-        }
-      } catch(e) {
-        showToast('Помилка з\'єднання з сервером', '⚠️');
-      } finally {
-        if (btn) {
-          btn.innerHTML = origText;
-          btn.disabled = false;
-        }
-      }
-    }
-
-    let cachedClientChatInquiries = [];
-
-    async function loadClientChat(clientEmail) {
-      const container = document.getElementById('client-chat-messages-container');
-      const badge = document.getElementById('client-chat-badge');
-      if (!container || !clientEmail) return;
-
-      try {
-        const res = await fetch(`/api/inquiries?email=${encodeURIComponent(clientEmail)}`);
-        if (!res.ok) return;
-        const data = await res.json();
-        const inquiries = data.inquiries || [];
-        cachedClientChatInquiries = inquiries;
-
-        if (badge) {
-          if (inquiries.length > 0) {
-            badge.textContent = inquiries.length;
-            badge.classList.remove('hidden');
-          } else {
-            badge.classList.add('hidden');
-          }
-        }
-
-        const sortedInquiries = [...inquiries].reverse();
-
-        if (sortedInquiries.length === 0) {
-          container.innerHTML = `
-            <div class="p-8 rounded-3xl bg-white border border-warm-border text-center space-y-3 max-w-md mx-auto my-auto shadow-sm">
-              <div class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-3xl mx-auto shadow-sm">
-                🌿
-              </div>
-              <h4 class="font-bold text-warm-text text-base">Ваш приватний діалог з Юлією</h4>
-              <p class="text-xs text-warm-muted leading-relaxed">
-                Тут ви можете конфіденційно запитати Юлію про ваші переживання, сновидіння, тривожні стани чи формат терапії.
-              </p>
-              <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-center gap-1.5">
-                <span>🔒</span> <span>Наскрізне шифрування AES-256 (E2EE)</span>
-              </div>
-            </div>
-          `;
-          return;
-        }
-
-        container.innerHTML = sortedInquiries.map(inq => {
-          const isAnswered = inq.status === 'answered' && inq.answer;
-          const timeStr = inq.created_at ? new Date(inq.created_at).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) : '';
-          const dateStr = inq.created_at ? new Date(inq.created_at).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' }) : '';
-
-          let bubblesHtml = `
-            <!-- Client Question Bubble (Right) -->
-            <div class="flex flex-col items-end space-y-1.5 max-w-[88%] sm:max-w-[75%] ml-auto">
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-800/10 text-brand-900 text-[10px] font-bold">
-                <span>🎯 ${escapeHtml(inq.topic || 'Загальне питання')}</span>
-              </div>
-              <div class="p-4 rounded-3xl rounded-tr-sm bg-gradient-to-r from-brand-700 to-brand-800 text-white shadow-sm text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">
-                ${escapeHtml(inq.question)}
-              </div>
-              <div class="text-[10px] text-warm-muted flex items-center gap-1.5 pr-1 font-medium">
-                <span>${dateStr} ${timeStr}</span>
-                <span>•</span>
-                <span class="${isAnswered ? 'text-emerald-700 font-bold' : 'text-amber-700 font-bold'}">
-                  ${isAnswered ? '✓ Відповідь надано' : '⏳ На розгляді у психолога'}
-                </span>
-              </div>
-            </div>
-          `;
-
-          if (isAnswered) {
-            bubblesHtml += `
-              <!-- Psychologist Answer Bubble (Left) -->
-              <div class="flex items-start gap-3 max-w-[92%] sm:max-w-[82%] mr-auto pt-2">
-                <img src="/images/IMG_5187.JPG" alt="Юлія Олефіренко" class="w-9 h-9 rounded-2xl object-cover border border-brand-200 shrink-0 mt-1 shadow-sm">
-                <div class="space-y-1.5">
-                  <div class="flex items-center gap-2">
-                    <span class="font-bold text-warm-text text-xs">Юлія Олефіренко</span>
-                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">Психологиня</span>
-                  </div>
-                  <div class="p-4 sm:p-5 rounded-3xl rounded-tl-sm bg-white border border-emerald-200 shadow-soft text-xs sm:text-sm text-warm-text leading-relaxed whitespace-pre-wrap space-y-3">
-                    <div>${escapeHtml(inq.answer)}</div>
-                    <div class="pt-2 border-t border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                      <span class="text-[11px] text-emerald-800 font-semibold">Бажаєте опрацювати цю тему на онлайн-сесії?</span>
-                      <a href="/#pricing" class="px-3.5 py-1.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-xs text-center shrink-0 transition-colors">
-                        📅 Записатися на сесію
-                      </a>
-                    </div>
-                  </div>
-                  <div class="text-[10px] text-warm-muted pl-1">
-                    <span>Відповідь психологині</span>
-                  </div>
-                </div>
-              </div>
-            `;
-          } else {
-            bubblesHtml += `
-              <!-- Waiting Status Bubble (Left) -->
-              <div class="flex items-start gap-2.5 max-w-[85%] mr-auto pl-1">
-                <div class="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-xs shrink-0">
-                  ⏳
-                </div>
-                <div class="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-900 leading-relaxed font-medium">
-                  Юлія переглядає ваше повідомлення. Відповідь з'явиться тут у чаті.
-                </div>
-              </div>
-            `;
-          }
-
-          return bubblesHtml;
-        }).join('');
-
-        container.scrollTop = container.scrollHeight;
-
-      } catch(err) {
-        console.error('Error loading client chat:', err);
-      }
-    }
-
-    function selectChatTopic(btn, topic) {
-      document.querySelectorAll('#chat-topic-chips .chat-topic-chip').forEach(el => {
-        el.className = 'chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all';
-      });
-      btn.className = 'chat-topic-chip active px-3 py-1 rounded-full text-xs font-bold bg-brand-700 text-white transition-all shadow-xs';
-      const hiddenInput = document.getElementById('chat-selected-topic');
-      if (hiddenInput) hiddenInput.value = topic;
-    }
-
-    async function sendClientChatMessage(e) {
-      if (e) e.preventDefault();
-      if (!currentUser || !currentUser.email) {
-        showToast('Будь ласка, увійдіть в акаунт', '⚠️');
-        return;
-      }
-
-      const input = document.getElementById('chat-message-input');
-      const topicInput = document.getElementById('chat-selected-topic');
-      const btn = document.getElementById('btn-chat-send');
-
-      const question = (input?.value || '').trim();
-      const topic = (topicInput?.value || 'Загальне питання').trim();
-
-      if (!question) {
-        showToast('Введіть текст повідомлення', '⚠️');
-        return;
-      }
-
-      const origText = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.innerHTML = '<span>Надсилаємо...</span>';
-        btn.disabled = true;
-      }
-
-      try {
-        const payload = {
-          client_name: currentUser.name || currentUser.first_name || 'Клієнт',
-          client_email: currentUser.email,
-          client_phone: currentUser.phone || '',
-          topic: topic,
-          question: question
-        };
-
-        const res = await fetch('/api/inquiries', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        if (res.ok) {
-          input.value = '';
-          showToast('Повідомлення надіслано Юлії! ✨');
-          await loadClientChat(currentUser.email);
-        } else {
-          const data = await res.json();
-          showToast(data.error || 'Помилка надсилання повідомлення', '⚠️');
-        }
-      } catch (err) {
-        showToast('Помилка з\'єднання з сервером', '⚠️');
-      } finally {
-        if (btn) {
-          btn.innerHTML = origText;
-          btn.disabled = false;
-        }
-      }
-    }
-
-    function refreshClientChat() {
-      if (currentUser && currentUser.email) {
-        loadClientChat(currentUser.email);
-        showToast('Чат оновлено 🔄');
-      }
     }
 
     // =======================================================

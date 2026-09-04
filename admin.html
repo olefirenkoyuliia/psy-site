@@ -412,47 +412,6 @@
         </p>
       </div>
 
-      <!-- Telegram Bot Notification Trigger Settings -->
-      <div class="bg-gradient-to-r from-sky-50 via-white to-sky-50/50 p-6 sm:p-8 rounded-2xl border border-sky-200 shadow-sm space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-sky-100 pb-4">
-          <div class="flex items-center gap-2.5">
-            <span class="text-2xl">🔔</span>
-            <div>
-              <h2 class="font-bold text-sky-950 text-base sm:text-lg">Telegram-сповіщення про нові повідомлення в чаті</h2>
-              <p class="text-xs text-sky-800">Миттєвий тригер у Telegram Юлії при кожному новому зверненні клієнта на сайті</p>
-            </div>
-          </div>
-          <span id="admin-tg-status-badge" class="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200 font-bold self-start sm:self-auto">
-            ⏳ Перевірка...
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-sky-950">Telegram Bot Token (від @BotFather):</label>
-            <input type="password" id="admin-tg-bot-token" placeholder="123456789:ABCdefGHIjklMNO..." class="w-full px-4 py-2.5 rounded-xl border border-sky-200 focus:ring-2 focus:ring-sky-500 outline-none bg-white font-mono text-xs">
-          </div>
-          <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-sky-950">Telegram Chat ID (від @userinfobot):</label>
-            <input type="text" id="admin-tg-chat-id" placeholder="123456789" class="w-full px-4 py-2.5 rounded-xl border border-sky-200 focus:ring-2 focus:ring-sky-500 outline-none bg-white font-mono text-xs">
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-          <p class="text-[11px] text-sky-800 max-w-md leading-relaxed">
-            💡 Створіть бота в <strong>@BotFather</strong>, напишіть йому <code>/start</code>, дізнайтеся ваш Chat ID у <strong>@userinfobot</strong> і збережіть.
-          </p>
-          <div class="flex items-center gap-2">
-            <button onclick="testAdminTelegram()" id="btn-admin-test-tg" class="px-4 py-2.5 bg-white hover:bg-sky-50 text-sky-900 border border-sky-300 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-xs">
-              <span>🧪 Тестувати Telegram</span>
-            </button>
-            <button onclick="saveAdminTelegram()" id="btn-admin-save-tg" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
-              💾 Зберегти
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Section 1: Main Texts & Profile -->
       <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
         <div class="border-b border-gray-100 pb-4 flex items-center gap-2.5">
@@ -769,7 +728,6 @@
       document.getElementById('admin-dashboard').classList.remove('hidden');
       checkGithubToken();
       checkGeminiToken();
-      loadAdminTelegram();
       loadData();
       renderAnalytics();
     }
@@ -1781,108 +1739,6 @@
         delete appData.geminiModel;
         checkGeminiToken();
         showToast('AI ключ видалено (активний вбудований режим)');
-      }
-    }
-
-    // =======================================================
-    // TELEGRAM NOTIFICATIONS SETTINGS (ADMIN)
-    // =======================================================
-    async function loadAdminTelegram() {
-      try {
-        const res = await fetch('/api/telegram/config');
-        if (!res.ok) return;
-        const data = await res.json();
-        const badge = document.getElementById('admin-tg-status-badge');
-        const inputToken = document.getElementById('admin-tg-bot-token');
-        const inputChatId = document.getElementById('admin-tg-chat-id');
-
-        if (inputChatId && data.chatId) inputChatId.value = data.chatId;
-        if (inputToken && data.hasToken) inputToken.placeholder = `Встановлено (${data.maskedToken})`;
-
-        if (badge) {
-          if (data.configured) {
-            badge.className = 'text-xs px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold self-start sm:self-auto';
-            badge.innerHTML = '<span>🟢 Активно • Підключено</span>';
-          } else {
-            badge.className = 'text-xs px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-bold self-start sm:self-auto';
-            badge.innerHTML = '<span>⚠️ Не налаштовано</span>';
-          }
-        }
-      } catch(e) {}
-    }
-
-    async function saveAdminTelegram() {
-      const inputToken = document.getElementById('admin-tg-bot-token');
-      const inputChatId = document.getElementById('admin-tg-chat-id');
-      const btn = document.getElementById('btn-admin-save-tg');
-
-      const botToken = (inputToken?.value || '').trim();
-      const chatId = (inputChatId?.value || '').trim();
-
-      const origText = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.innerHTML = '<span>Зберігаємо...</span>';
-        btn.disabled = true;
-      }
-
-      try {
-        const res = await fetch('/api/telegram/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ botToken, chatId })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          showToast('Налаштування Telegram збережено! ✨');
-          if (inputToken) inputToken.value = '';
-          await loadAdminTelegram();
-        } else {
-          showToast(data.error || 'Помилка збереження', '⚠️');
-        }
-      } catch(e) {
-        showToast('Помилка з\'єднання з сервером', '⚠️');
-      } finally {
-        if (btn) {
-          btn.innerHTML = origText;
-          btn.disabled = false;
-        }
-      }
-    }
-
-    async function testAdminTelegram() {
-      const inputToken = document.getElementById('admin-tg-bot-token');
-      const inputChatId = document.getElementById('admin-tg-chat-id');
-      const btn = document.getElementById('btn-admin-test-tg');
-
-      const botToken = (inputToken?.value || '').trim();
-      const chatId = (inputChatId?.value || '').trim();
-
-      const origText = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.innerHTML = '<span>Відправка...</span>';
-        btn.disabled = true;
-      }
-
-      try {
-        const res = await fetch('/api/telegram/test', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ botToken, chatId })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          showToast('✅ Тестове сповіщення надіслано в Telegram!');
-          await loadAdminTelegram();
-        } else {
-          showToast(data.error || 'Помилка тесту Telegram', '⚠️');
-        }
-      } catch(e) {
-        showToast('Помилка з\'єднання з сервером', '⚠️');
-      } finally {
-        if (btn) {
-          btn.innerHTML = origText;
-          btn.disabled = false;
-        }
       }
     }
 

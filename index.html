@@ -350,9 +350,6 @@
         <a href="#pricing" class="hover:text-brand-700 transition-colors whitespace-nowrap">Формати</a>
         <a href="#booking-widget" class="hover:text-brand-700 transition-colors whitespace-nowrap">Підбір часу</a>
         <a href="#topics" class="hover:text-brand-700 transition-colors whitespace-nowrap">Запити</a>
-        <a href="#ask-psychologist" class="text-brand-700 hover:text-brand-800 font-bold transition-colors whitespace-nowrap flex items-center gap-1 bg-brand-50 px-2.5 py-1 rounded-full border border-brand-200">
-          <span>💬</span> <span>Запитати онлайн</span>
-        </a>
         <a href="#method" class="hover:text-brand-700 transition-colors whitespace-nowrap">Підхід</a>
         <a href="#diplomas" class="hover:text-brand-700 transition-colors whitespace-nowrap">Освіта</a>
         <a href="#faq" class="hover:text-brand-700 transition-colors whitespace-nowrap">FAQ</a>
@@ -400,14 +397,6 @@
     <div id="mobile-menu-drawer" class="hidden md:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 bg-warm-bg/98 backdrop-blur-2xl z-[9999] overflow-y-auto border-t border-warm-border shadow-2xl transition-all duration-300" style="-webkit-overflow-scrolling: touch;">
       <div class="p-4 sm:p-6 pb-28 space-y-4 max-w-lg mx-auto">
         
-        <!-- Primary Online Question CTA Badge -->
-        <a href="#ask-psychologist" onclick="closeMobileMenu()" class="w-full p-4 rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-brand-800 text-white font-bold text-sm shadow-md flex items-center justify-between">
-          <span class="flex items-center gap-2.5">
-            <span class="text-xl">💬</span> <span>Запитати психолога онлайн</span>
-          </span>
-          <span class="text-[11px] bg-emerald-400/30 text-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300/40 uppercase font-bold">100% Анонімно</span>
-        </a>
-
         <!-- Navigation Links Grid -->
         <nav class="grid grid-cols-1 gap-1 text-sm font-semibold text-warm-text bg-white p-2 rounded-3xl border border-warm-border shadow-xs">
           <a href="#about" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
@@ -927,96 +916,6 @@
 
       </div>
 
-    </div>
-  </section>
-
-  <!-- Section: Ask Psychologist Online (Анонімне запитання психологу) -->
-  <section id="ask-psychologist" class="py-20 bg-gradient-to-br from-brand-900 via-emerald-950 to-brand-900 text-white relative z-10 overflow-hidden border-t border-brand-800">
-    <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-brand-400/10 rounded-full blur-3xl pointer-events-none"></div>
-
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="text-center max-w-2xl mx-auto mb-10 space-y-3">
-        <span class="text-xs font-bold tracking-widest text-emerald-300 uppercase px-3.5 py-1 rounded-full bg-emerald-900/80 border border-emerald-700/60 inline-block shadow-xs">
-          💬 Безкоштовний перший крок
-        </span>
-        <h2 class="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-          Запитайте психолога онлайн
-        </h2>
-        <p class="text-emerald-100/90 text-sm sm:text-base leading-relaxed">
-          Впізнали свою ситуацію або не впевнені, чи допоможе терапія? Опишіть ваше запитання — Юлія особисто надасть вам відповідь у вашому особистому кабінеті.
-        </p>
-      </div>
-
-      <div class="bg-white text-warm-text p-6 sm:p-10 rounded-[2.5rem] shadow-2xl border border-emerald-800/40 space-y-6">
-        <!-- Topic Selection -->
-        <div class="space-y-2.5">
-          <label class="block text-xs font-bold uppercase tracking-wider text-warm-muted">
-            1. Оберіть тему вашого питання:
-          </label>
-          <div class="flex flex-wrap gap-2" id="inquiry-topic-chips">
-            <button type="button" onclick="selectInquiryTopic('Тривога та стрес', this)" class="inquiry-chip active px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-700 text-white transition-all">
-              🌿 Тривога та стрес
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Стосунки та розрив', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              💞 Стосунки та розрив
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Вигорання та робота', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              🔋 Вигорання та робота
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Самооцінка та межі', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              🛡️ Самооцінка та межі
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Втрата або криза', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              💔 Втрата або криза
-            </button>
-            <button type="button" onclick="selectInquiryTopic('Інше запитання', this)" class="inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all">
-              ✨ Інше
-            </button>
-          </div>
-        </div>
-
-        <!-- Question Input -->
-        <div class="space-y-2">
-          <label for="inquiry-question-text" class="block text-xs font-bold uppercase tracking-wider text-warm-muted">
-            2. Опишіть вашу ситуацію або питання:
-          </label>
-          <textarea id="inquiry-question-text" rows="4" placeholder="Наприклад: Останнім часом відчуваю постійну фонову тривогу, важко приймати рішення на роботі. Чи підійде мені короткострокова терапія і з чого краще почати?.." class="w-full p-4 rounded-2xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all resize-none"></textarea>
-        </div>
-
-        <!-- Contact Input -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label for="inquiry-client-name" class="block text-xs font-bold uppercase tracking-wider text-warm-muted mb-1">
-              Ваше ім'я (або псевдонім):
-            </label>
-            <input type="text" id="inquiry-client-name" placeholder="Наприклад: Олена" class="w-full p-3.5 rounded-xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-          </div>
-          <div>
-            <label for="inquiry-client-email" class="block text-xs font-bold uppercase tracking-wider text-warm-muted mb-1">
-              Ваш Email (для сповіщення про відповідь):
-            </label>
-            <input type="email" id="inquiry-client-email" placeholder="olena@example.com" class="w-full p-3.5 rounded-xl border border-warm-border bg-warm-bg/20 text-warm-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all">
-          </div>
-        </div>
-
-        <!-- Privacy & Submit Button -->
-        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-warm-border/60">
-          <div class="flex flex-col gap-1 text-xs text-warm-muted text-left">
-            <div class="flex items-center gap-1.5">
-              <span class="text-emerald-700 font-bold flex items-center gap-1">🔒 AES-256 Зашифровано</span>
-              <span>• 100% Конфіденційно</span>
-            </div>
-            <p class="text-[11px] text-warm-muted">
-              Надсилаючи запитання, ви даєте згоду на обробку ваших даних цим сайтом згідно з <a href="/privacy.html" target="_blank" class="text-brand-700 hover:text-brand-900 underline font-bold">Політикою конфіденційності</a>.
-            </p>
-          </div>
-          <button type="button" onclick="submitClientInquiry()" id="btn-submit-inquiry" class="w-full sm:w-auto px-8 py-4 rounded-full bg-brand-700 hover:bg-brand-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 shrink-0">
-            <span>✉️ Надіслати запитання Юлії</span>
-            <span>➔</span>
-          </button>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -1830,16 +1729,6 @@
     }
     updateBookingSummary();
 
-    let selectedInquiryTopicVal = 'Тривога та стрес';
-
-    function selectInquiryTopic(topic, btn) {
-      selectedInquiryTopicVal = topic;
-      document.querySelectorAll('.inquiry-chip').forEach(b => {
-        b.className = 'inquiry-chip px-3.5 py-1.5 rounded-full text-xs font-semibold bg-warm-bg text-warm-text border border-warm-border hover:border-brand-400 transition-all';
-      });
-      btn.className = 'inquiry-chip active px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-700 text-white transition-all';
-    }
-
     function toggleMobileMenu() {
       const drawer = document.getElementById('mobile-menu-drawer');
       const hamburgerIcon = document.getElementById('hamburger-icon');
@@ -1874,80 +1763,6 @@
         closeIcon?.classList.add('hidden');
         if (menuBtnText) menuBtnText.textContent = 'Меню';
         document.body.style.overflow = '';
-      }
-    }
-
-    async function submitClientInquiry() {
-      const questionEl = document.getElementById('inquiry-question-text');
-      const nameEl = document.getElementById('inquiry-client-name');
-      const emailEl = document.getElementById('inquiry-client-email');
-      const btn = document.getElementById('btn-submit-inquiry');
-
-      const question = (questionEl?.value || '').trim();
-      const clientName = (nameEl?.value || 'Користувач').trim();
-      const clientEmail = (emailEl?.value || '').trim().toLowerCase();
-
-      if (!question) {
-        alert('Будь ласка, опишіть ваше запитання.');
-        questionEl?.focus();
-        return;
-      }
-
-      if (!clientEmail || !clientEmail.includes('@')) {
-        alert('Будь ласка, вкажіть коректний Email, щоб отримати відповідь від Юлії.');
-        emailEl?.focus();
-        return;
-      }
-
-      const origBtnText = btn.innerHTML;
-      btn.innerHTML = '<span>⏳ Надсилаємо...</span>';
-      btn.disabled = true;
-
-      try {
-        const res = await fetch('/api/inquiries', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            client_name: clientName,
-            client_email: clientEmail,
-            topic: selectedInquiryTopicVal,
-            question: question
-          })
-        });
-
-        const data = await res.json();
-        if (!res.ok || data.error) {
-          alert('Помилка: ' + (data.error || 'Не вдалося надіслати запитання'));
-          return;
-        }
-
-        // Store user email in localStorage for cabinet auto-linking
-        localStorage.setItem('psy_client_email', clientEmail);
-        localStorage.setItem('psy_client_name', clientName);
-
-        // Track conversion event in real-time analytics
-        try {
-          fetch('/api/track', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              event: 'inquiry_submit',
-              visitorId: localStorage.getItem('psy_vid') || 'anon',
-              metadata: { topic: selectedInquiryTopicVal, name: clientName, email: clientEmail }
-            })
-          }).catch(() => {});
-        } catch(e) {}
-
-        if (questionEl) questionEl.value = '';
-        
-        alert(`🌿 Дякуємо, ${clientName}!\n\nВаше запитання успішно передано Юлії. Відповідь з'явиться у вашому Особистому кабінеті.\n\nНатисніть «ОК», щоб відкрити кабінет.`);
-        window.location.href = '/cabinet.html';
-
-      } catch(err) {
-        alert('Помилка з\'єднання з сервером. Спробуйте ще раз.');
-      } finally {
-        btn.innerHTML = origBtnText;
-        btn.disabled = false;
       }
     }
 
