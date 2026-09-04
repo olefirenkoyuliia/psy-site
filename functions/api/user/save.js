@@ -49,27 +49,46 @@ export async function onRequestPost(context) {
     const encryptedPhone = phone ? await encryptText(phone, env.ENCRYPTION_SECRET) : '';
     const encryptedTg = telegram ? await encryptText(telegram, env.ENCRYPTION_SECRET) : '';
 
-    // Update in D1
-    await env.DB.prepare(
-      "UPDATE users SET " +
-      "name = COALESCE(NULLIF(?, ''), name), " +
-      "phone = ?, " +
-      "telegram = ?, " +
-      "preferred_format = ?, " +
-      "therapy_goal = ?, " +
-      "notes = ?, " +
-      "updated_at = CURRENT_TIMESTAMP " +
-      "WHERE email = ? OR google_id = ?"
-    ).bind(
-      name,
-      encryptedPhone,
-      encryptedTg,
-      preferredFormat,
-      encryptedGoal,
-      encryptedNotes,
-      email,
-      googleId
-    ).run();
+    // Upsert in D1
+    const existing = await env.DB.prepare(
+      "SELECT id FROM users WHERE (email != '' AND email = ?) OR (google_id != '' AND google_id = ?)"
+    ).bind(email, googleId).first();
+
+    if (existing) {
+      await env.DB.prepare(
+        "UPDATE users SET " +
+        "name = COALESCE(NULLIF(?, ''), name), " +
+        "phone = ?, " +
+        "telegram = ?, " +
+        "preferred_format = ?, " +
+        "therapy_goal = ?, " +
+        "notes = ?, " +
+        "updated_at = CURRENT_TIMESTAMP " +
+        "WHERE id = ?"
+      ).bind(
+        name,
+        encryptedPhone,
+        encryptedTg,
+        preferredFormat,
+        encryptedGoal,
+        encryptedNotes,
+        existing.id
+      ).run();
+    } else {
+      await env.DB.prepare(
+        "INSERT INTO users (email, google_id, name, phone, telegram, preferred_format, therapy_goal, notes, role) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'client')"
+      ).bind(
+        email,
+        googleId || `usr_${Date.now()}`,
+        name || 'Користувач',
+        encryptedPhone,
+        encryptedTg,
+        preferredFormat,
+        encryptedGoal,
+        encryptedNotes
+      ).run();
+    }
 
     // Fetch updated record and decrypt for return
     const updatedUser = await env.DB.prepare(
