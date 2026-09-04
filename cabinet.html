@@ -213,47 +213,121 @@
         </div>
       </div>
 
-      <!-- CLIENT'S UPCOMING SESSIONS LIST -->
-      <div id="client-upcoming-sessions-container" class="hidden space-y-4">
-        <div class="p-6 rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-900 text-white shadow-card border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-xs font-bold mb-1">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span>Ваш розклад онлайн-консультацій</span>
-            </div>
-            <h2 class="font-serif-luxury font-bold text-xl text-white">
-              Заплановані консультації (<span id="client-sessions-count">0</span>)
-            </h2>
-            <p class="text-xs text-emerald-200">Індивідуальні сесії психотерапії з Юлією Олефіренко</p>
-          </div>
-        </div>
-
-        <div id="client-sessions-cards-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Populated dynamically with each scheduled session -->
+      <!-- CLIENT TABS SWITCHER (Visible ONLY for Clients) -->
+      <div id="client-tabs-nav" class="hidden">
+        <div class="inline-flex p-1.5 bg-white rounded-2xl border border-warm-border shadow-soft text-xs font-bold text-warm-muted flex-wrap gap-1">
+          <button type="button" id="tab-btn-client-space" onclick="switchClientView('space')" class="px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2">
+            <span>📋 Мій кабінет та сесії</span>
+          </button>
+          <button type="button" id="tab-btn-client-chat" onclick="switchClientView('chat')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
+            <span>💬 Приватний діалог з психологом</span>
+            <span id="client-chat-badge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold hidden">0</span>
+          </button>
         </div>
       </div>
 
-      <!-- CLIENT'S INQUIRIES & PSYCHOLOGIST REPLIES -->
-      <div id="client-inquiries-container" class="hidden space-y-4">
-        <div class="p-6 rounded-3xl bg-white border border-warm-border shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold mb-1 border border-emerald-200">
-              <span>💬</span> <span>Ваш приватний діалог з психологом</span>
+      <!-- ======================================================== -->
+      <!-- CLIENT VIEW 1: MAIN SPACE & SESSIONS (Default)          -->
+      <!-- ======================================================== -->
+      <div id="client-space-view" class="space-y-8">
+        <!-- CLIENT'S UPCOMING SESSIONS LIST -->
+        <div id="client-upcoming-sessions-container" class="hidden space-y-4">
+          <div class="p-6 rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-brand-900 text-white shadow-card border border-emerald-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-xs font-bold mb-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Ваш розклад онлайн-консультацій</span>
+              </div>
+              <h2 class="font-serif-luxury font-bold text-xl text-white">
+                Заплановані консультації (<span id="client-sessions-count">0</span>)
+              </h2>
+              <p class="text-xs text-emerald-200">Індивідуальні сесії психотерапії з Юлією Олефіренко</p>
             </div>
-            <h2 class="font-serif-luxury font-bold text-xl text-warm-text">
-              Мої запитання та відповіді Юлії (<span id="client-inquiries-count">0</span>)
-            </h2>
-            <p class="text-xs text-warm-muted">Тут зберігаються ваші онлайн-запитання та детальні коментарі психолога</p>
           </div>
 
-          <a href="/#ask-psychologist" class="px-4 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-1.5 shrink-0">
-            <span>➕ Задати нове питання</span>
-          </a>
+          <div id="client-sessions-cards-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Populated dynamically with each scheduled session -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- CLIENT VIEW 2: DEDICATED PRIVATE DIALOGUE (CHAT)        -->
+      <!-- ======================================================== -->
+      <div id="client-chat-view" class="hidden space-y-6">
+        
+        <!-- Chat Shell Container -->
+        <div class="rounded-3xl bg-white border border-warm-border shadow-soft overflow-hidden flex flex-col max-w-4xl mx-auto">
+          
+          <!-- Chat Header -->
+          <div class="p-4 sm:p-5 bg-gradient-to-r from-emerald-50/80 via-white to-warm-card border-b border-warm-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+              <div class="relative">
+                <img src="/images/IMG_5187.JPG" alt="Юлія Олефіренко" class="w-12 h-12 rounded-2xl object-cover border-2 border-brand-300 shadow-sm">
+                <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-300" title="Онлайн"></span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-bold text-warm-text text-sm sm:text-base">Юлія Олефіренко</h3>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Психологиня</span>
+                </div>
+                <p class="text-[11px] text-warm-muted flex items-center gap-1.5">
+                  <span>🔒 Приватний зашифрований діалог (Zero-Knowledge AES-256)</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="refreshClientChat()" title="Оновити діалог" class="px-3.5 py-2 rounded-xl bg-warm-bg hover:bg-gray-200 text-warm-text transition-colors text-xs font-bold flex items-center gap-1.5 shadow-xs">
+                <span>🔄</span> <span>Оновити чат</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chat Messages Scrollable Feed -->
+          <div id="client-chat-messages-container" class="p-4 sm:p-6 space-y-5 overflow-y-auto max-h-[520px] min-h-[360px] bg-warm-bg/30">
+            <!-- Messages populated dynamically -->
+          </div>
+
+          <!-- Chat Input Footer -->
+          <div class="p-4 sm:p-5 bg-white border-t border-warm-border space-y-3">
+            
+            <!-- Topic Selection Chips -->
+            <div class="space-y-1.5">
+              <div class="text-[11px] font-bold text-warm-muted flex items-center gap-1">
+                <span>🎯 Оберіть тему звернення:</span>
+              </div>
+              <div class="flex flex-wrap gap-1.5" id="chat-topic-chips">
+                <button type="button" onclick="selectChatTopic(this, 'Загальне питання')" class="chat-topic-chip active px-3 py-1 rounded-full text-xs font-bold bg-brand-700 text-white transition-all shadow-xs">Загальне питання</button>
+                <button type="button" onclick="selectChatTopic(this, 'Тривога та стрес')" class="chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all">🌿 Тривога / стрес</button>
+                <button type="button" onclick="selectChatTopic(this, 'Стосунки та конфлікти')" class="chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all">❤️ Стосунки</button>
+                <button type="button" onclick="selectChatTopic(this, 'Самооцінка та впевненість')" class="chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all">✨ Самооцінка</button>
+                <button type="button" onclick="selectChatTopic(this, 'Символдрама та сни')" class="chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all">🌙 Сни / Символдрама</button>
+              </div>
+              <input type="hidden" id="chat-selected-topic" value="Загальне питання">
+            </div>
+
+            <!-- Chat Textarea Form -->
+            <form id="client-chat-form" onsubmit="sendClientChatMessage(event)" class="space-y-2">
+              <div class="relative">
+                <textarea id="chat-message-input" rows="3" required placeholder="Напишіть ваше конфіденційне запитання або тему для Юлії..." class="w-full p-3.5 rounded-2xl border border-warm-border text-xs sm:text-sm font-normal outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white leading-relaxed resize-none text-warm-text shadow-xs"></textarea>
+              </div>
+
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <div class="text-[11px] text-warm-muted flex items-center gap-1.5">
+                  <span>🔒</span> <span>Текст шифрується на пристрої перед відправкою (Zero-Knowledge)</span>
+                </div>
+                <button type="submit" id="btn-chat-send" class="px-6 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 shrink-0">
+                  <span>Надіслати Юлії</span>
+                  <span>✈️</span>
+                </button>
+              </div>
+            </form>
+
+          </div>
+
         </div>
 
-        <div id="client-inquiries-cards-list" class="space-y-4">
-          <!-- Dynamically populated -->
-        </div>
       </div>
 
       <!-- OWNER TABS SWITCHER (Visible ONLY for Julia / Owner) -->
@@ -1572,6 +1646,9 @@
             <span>🌐 Створити Google Meet</span>
           </a>
         `;
+        document.getElementById('client-tabs-nav')?.classList.add('hidden');
+        document.getElementById('client-chat-view')?.classList.add('hidden');
+        document.getElementById('client-space-view')?.classList.add('hidden');
         ownerTabsNav.classList.remove('hidden');
         switchOwnerView('schedule');
         loadAppointmentsList();
@@ -1580,11 +1657,11 @@
       } else {
         roleBadge.innerHTML = '<span>🟢</span> <span>Особистий простір клієнта</span>';
         welcomeName.textContent = user.first_name || user.name.split(' ')[0] || 'Клієнте';
-        welcomeSubtitle.textContent = 'Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та підготуватися до зустрічі з Юлією Олефіренко.';
+        welcomeSubtitle.textContent = 'Тут ви можете налаштувати контактні дані, вказати ваш запит до терапії та вести приватний діалог з Юлією Олефіренко.';
         heroActions.innerHTML = `
-          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
-            <span>💬 Написати Юлії</span>
-          </a>
+          <button onclick="switchClientView('chat')" class="px-5 py-3 rounded-full bg-white hover:bg-brand-50 text-brand-800 font-bold text-xs shadow-hover transition-all flex items-center justify-center gap-2">
+            <span>💬 Приватний діалог з Юлією</span>
+          </button>
           <a href="/#pricing" class="px-5 py-3 rounded-full bg-brand-900/40 hover:bg-brand-900/60 text-white border border-white/20 font-bold text-xs transition-all flex items-center justify-center gap-2">
             <span>📅 Записатися на сесію</span>
           </a>
@@ -1593,9 +1670,10 @@
         document.getElementById('owner-schedule-view').classList.add('hidden');
         document.getElementById('owner-inquiries-view').classList.add('hidden');
         document.getElementById('owner-clients-view').classList.add('hidden');
-        document.getElementById('personal-profile-view').classList.remove('hidden');
+        document.getElementById('client-tabs-nav')?.classList.remove('hidden');
+        switchClientView('space');
         loadClientUpcomingSession(user.email);
-        loadClientInquiries(user.email);
+        loadClientChat(user.email);
       }
 
       // Profile Card
@@ -1605,6 +1683,28 @@
       document.getElementById('card-user-email').textContent = user.email || '';
 
       populateForm(user);
+    }
+
+    function switchClientView(view) {
+      const btnSpace = document.getElementById('tab-btn-client-space');
+      const btnChat = document.getElementById('tab-btn-client-chat');
+      const spaceView = document.getElementById('client-space-view');
+      const chatView = document.getElementById('client-chat-view');
+      const profileView = document.getElementById('personal-profile-view');
+
+      const activeCls = 'px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2';
+      const inactiveCls = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
+
+      if (btnSpace) btnSpace.className = view === 'space' ? activeCls : inactiveCls;
+      if (btnChat) btnChat.className = view === 'chat' ? activeCls : inactiveCls;
+
+      if (spaceView) spaceView.classList.toggle('hidden', view !== 'space');
+      if (profileView) profileView.classList.toggle('hidden', view !== 'space');
+      if (chatView) chatView.classList.toggle('hidden', view !== 'chat');
+
+      if (view === 'chat' && currentUser && currentUser.email) {
+        loadClientChat(currentUser.email);
+      }
     }
 
     function switchOwnerView(view) {
@@ -1793,73 +1893,193 @@
       }
     }
 
-    async function loadClientInquiries(clientEmail) {
-      const container = document.getElementById('client-inquiries-container');
-      const listEl = document.getElementById('client-inquiries-cards-list');
-      const countEl = document.getElementById('client-inquiries-count');
-      if (!container || !listEl || !clientEmail) return;
+    let cachedClientChatInquiries = [];
+
+    async function loadClientChat(clientEmail) {
+      const container = document.getElementById('client-chat-messages-container');
+      const badge = document.getElementById('client-chat-badge');
+      if (!container || !clientEmail) return;
 
       try {
         const res = await fetch(`/api/inquiries?email=${encodeURIComponent(clientEmail)}`);
         if (!res.ok) return;
         const data = await res.json();
         const inquiries = data.inquiries || [];
+        cachedClientChatInquiries = inquiries;
 
-        if (inquiries.length === 0) {
-          container.classList.add('hidden');
+        if (badge) {
+          if (inquiries.length > 0) {
+            badge.textContent = inquiries.length;
+            badge.classList.remove('hidden');
+          } else {
+            badge.classList.add('hidden');
+          }
+        }
+
+        const sortedInquiries = [...inquiries].reverse();
+
+        if (sortedInquiries.length === 0) {
+          container.innerHTML = `
+            <div class="p-8 rounded-3xl bg-white border border-warm-border text-center space-y-3 max-w-md mx-auto my-auto shadow-sm">
+              <div class="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-3xl mx-auto shadow-sm">
+                🌿
+              </div>
+              <h4 class="font-bold text-warm-text text-base">Ваш приватний діалог з Юлією</h4>
+              <p class="text-xs text-warm-muted leading-relaxed">
+                Тут ви можете конфіденційно запитати Юлію про ваші переживання, сновидіння, тривожні стани чи формат терапії.
+              </p>
+              <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center justify-center gap-1.5">
+                <span>🔒</span> <span>Наскрізне шифрування AES-256 (E2EE)</span>
+              </div>
+            </div>
+          `;
           return;
         }
 
-        container.classList.remove('hidden');
-        if (countEl) countEl.textContent = inquiries.length;
-
-        listEl.innerHTML = inquiries.map(inq => {
+        container.innerHTML = sortedInquiries.map(inq => {
           const isAnswered = inq.status === 'answered' && inq.answer;
-          const dateStr = inq.created_at ? new Date(inq.created_at).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+          const timeStr = inq.created_at ? new Date(inq.created_at).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) : '';
+          const dateStr = inq.created_at ? new Date(inq.created_at).toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' }) : '';
 
-          return `
-            <div class="p-6 rounded-3xl bg-white border border-warm-border shadow-soft space-y-4">
-              <div class="flex items-center justify-between border-b border-warm-border/60 pb-3">
-                <span class="px-3 py-1 rounded-full text-xs font-bold ${isAnswered ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">
-                  ${isAnswered ? '🌿 Отримано відповідь Юлії' : '⏳ На розгляді у психолога'}
+          let bubblesHtml = `
+            <!-- Client Question Bubble (Right) -->
+            <div class="flex flex-col items-end space-y-1.5 max-w-[88%] sm:max-w-[75%] ml-auto">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-800/10 text-brand-900 text-[10px] font-bold">
+                <span>🎯 ${escapeHtml(inq.topic || 'Загальне питання')}</span>
+              </div>
+              <div class="p-4 rounded-3xl rounded-tr-sm bg-gradient-to-r from-brand-700 to-brand-800 text-white shadow-sm text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">
+                ${escapeHtml(inq.question)}
+              </div>
+              <div class="text-[10px] text-warm-muted flex items-center gap-1.5 pr-1 font-medium">
+                <span>${dateStr} ${timeStr}</span>
+                <span>•</span>
+                <span class="${isAnswered ? 'text-emerald-700 font-bold' : 'text-amber-700 font-bold'}">
+                  ${isAnswered ? '✓ Відповідь надано' : '⏳ На розгляді у психолога'}
                 </span>
-                <span class="text-xs text-warm-muted">Тема: <strong>${escapeHtml(inq.topic || 'Загальне')}</strong> • ${dateStr}</span>
               </div>
-
-              <div class="space-y-1">
-                <div class="text-[11px] font-bold uppercase tracking-wider text-warm-muted">Ваше запитання:</div>
-                <p class="text-xs text-warm-text italic bg-warm-bg/40 p-3 rounded-xl border border-warm-border/50">
-                  «${escapeHtml(inq.question)}»
-                </p>
-              </div>
-
-              ${isAnswered ? `
-                <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50/80 to-brand-50/60 border border-emerald-200 text-xs text-warm-text space-y-3">
-                  <div class="flex items-center justify-between font-bold text-emerald-900 text-xs">
-                    <span class="flex items-center gap-1.5"><span>👩‍⚕️</span> <strong>Юлія Олефіренко (Психолог):</strong></span>
-                  </div>
-                  <div class="text-xs leading-relaxed whitespace-pre-wrap text-warm-text font-normal">
-                    ${escapeHtml(inq.answer)}
-                  </div>
-                  <div class="pt-2 border-t border-emerald-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <span class="text-[11px] text-emerald-800 font-semibold">Бажаєте розібрати цю тему детально на консультації?</span>
-                    <a href="/#pricing" class="px-4 py-2 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-xs text-center">
-                      📅 Записатися на сесію
-                    </a>
-                  </div>
-                </div>
-              ` : `
-                <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-900 flex items-center gap-2">
-                  <span>⏳</span>
-                  <span>Юлія переглядає ваше запитання. Відповідь з'явиться тут найближчим часом.</span>
-                </div>
-              `}
             </div>
           `;
+
+          if (isAnswered) {
+            bubblesHtml += `
+              <!-- Psychologist Answer Bubble (Left) -->
+              <div class="flex items-start gap-3 max-w-[92%] sm:max-w-[82%] mr-auto pt-2">
+                <img src="/images/IMG_5187.JPG" alt="Юлія Олефіренко" class="w-9 h-9 rounded-2xl object-cover border border-brand-200 shrink-0 mt-1 shadow-sm">
+                <div class="space-y-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-warm-text text-xs">Юлія Олефіренко</span>
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">Психологиня</span>
+                  </div>
+                  <div class="p-4 sm:p-5 rounded-3xl rounded-tl-sm bg-white border border-emerald-200 shadow-soft text-xs sm:text-sm text-warm-text leading-relaxed whitespace-pre-wrap space-y-3">
+                    <div>${escapeHtml(inq.answer)}</div>
+                    <div class="pt-2 border-t border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                      <span class="text-[11px] text-emerald-800 font-semibold">Бажаєте опрацювати цю тему на онлайн-сесії?</span>
+                      <a href="/#pricing" class="px-3.5 py-1.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs shadow-xs text-center shrink-0 transition-colors">
+                        📅 Записатися на сесію
+                      </a>
+                    </div>
+                  </div>
+                  <div class="text-[10px] text-warm-muted pl-1">
+                    <span>Відповідь психологині</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          } else {
+            bubblesHtml += `
+              <!-- Waiting Status Bubble (Left) -->
+              <div class="flex items-start gap-2.5 max-w-[85%] mr-auto pl-1">
+                <div class="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-xs shrink-0">
+                  ⏳
+                </div>
+                <div class="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-900 leading-relaxed font-medium">
+                  Юлія переглядає ваше повідомлення. Відповідь з'явиться тут у чаті.
+                </div>
+              </div>
+            `;
+          }
+
+          return bubblesHtml;
         }).join('');
 
+        container.scrollTop = container.scrollHeight;
+
       } catch(err) {
-        console.error('Error loading client inquiries:', err);
+        console.error('Error loading client chat:', err);
+      }
+    }
+
+    function selectChatTopic(btn, topic) {
+      document.querySelectorAll('#chat-topic-chips .chat-topic-chip').forEach(el => {
+        el.className = 'chat-topic-chip px-3 py-1 rounded-full text-xs font-medium bg-warm-bg hover:bg-warm-card text-warm-text border border-warm-border transition-all';
+      });
+      btn.className = 'chat-topic-chip active px-3 py-1 rounded-full text-xs font-bold bg-brand-700 text-white transition-all shadow-xs';
+      const hiddenInput = document.getElementById('chat-selected-topic');
+      if (hiddenInput) hiddenInput.value = topic;
+    }
+
+    async function sendClientChatMessage(e) {
+      if (e) e.preventDefault();
+      if (!currentUser || !currentUser.email) {
+        showToast('Будь ласка, увійдіть в акаунт', '⚠️');
+        return;
+      }
+
+      const input = document.getElementById('chat-message-input');
+      const topicInput = document.getElementById('chat-selected-topic');
+      const btn = document.getElementById('btn-chat-send');
+
+      const question = (input?.value || '').trim();
+      const topic = (topicInput?.value || 'Загальне питання').trim();
+
+      if (!question) {
+        showToast('Введіть текст повідомлення', '⚠️');
+        return;
+      }
+
+      const origText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.innerHTML = '<span>Надсилаємо...</span>';
+        btn.disabled = true;
+      }
+
+      try {
+        const payload = {
+          client_name: currentUser.name || currentUser.first_name || 'Клієнт',
+          client_email: currentUser.email,
+          client_phone: currentUser.phone || '',
+          topic: topic,
+          question: question
+        };
+
+        const res = await fetch('/api/inquiries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          input.value = '';
+          showToast('Повідомлення надіслано Юлії! ✨');
+          await loadClientChat(currentUser.email);
+        } else {
+          const data = await res.json();
+          showToast(data.error || 'Помилка надсилання повідомлення', '⚠️');
+        }
+      } catch (err) {
+        showToast('Помилка з\'єднання з сервером', '⚠️');
+      } finally {
+        if (btn) {
+          btn.innerHTML = origText;
+          btn.disabled = false;
+        }
+      }
+    }
+
+    function refreshClientChat() {
+      if (currentUser && currentUser.email) {
+        loadClientChat(currentUser.email);
+        showToast('Чат оновлено 🔄');
       }
     }
 
