@@ -52,7 +52,7 @@ export async function onRequestPost(context) {
       role: assignedRole,
       phone: '',
       telegram: '',
-      preferred_format: 'Платформа (Відеокімната)',
+      preferred_format: 'Google Meet',
       therapy_goal: '',
       notes: ''
     };
@@ -77,7 +77,7 @@ export async function onRequestPost(context) {
       } else {
         const insertRes = await env.DB.prepare(
           "INSERT INTO users (google_id, email, name, first_name, last_name, picture, preferred_format, role) " +
-          "VALUES (?, ?, ?, ?, ?, ?, 'Платформа (Відеокімната)', ?)"
+          "VALUES (?, ?, ?, ?, ?, ?, 'Google Meet', ?)"
         ).bind(googleId, email, name, firstName, lastName, picture, assignedRole).run();
 
         const newId = insertRes.meta?.last_row_id || 1;

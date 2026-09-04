@@ -507,12 +507,12 @@
               </div>
 
               <div class="space-y-1.5">
-                <label class="block text-xs font-bold text-warm-text">Бажаний формат відеозустрічі:</label>
-                <select id="input-format" class="w-full px-4 py-3 rounded-xl border border-warm-border focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-xs bg-white text-warm-text outline-none font-medium">
-                  <option value="Платформа (Відеокімната)">Відеокімната на платформі (Рекомендовано, 1 клік без переходу)</option>
-                  <option value="Google Meet">Google Meet</option>
-                  <option value="Telegram Video">Telegram Відеодзвінок</option>
-                </select>
+                <label class="block text-xs font-bold text-warm-text">Формат відеозустрічей:</label>
+                <div class="p-3.5 rounded-xl border border-warm-border bg-warm-bg/50 text-xs font-medium text-warm-text flex items-center gap-2">
+                  <span class="text-emerald-700">🌐</span>
+                  <span><strong>Google Meet</strong> (онлайн-відеозвʼязок)</span>
+                </div>
+                <input type="hidden" id="input-format" value="Google Meet">
               </div>
 
               <div class="space-y-1.5">
@@ -972,11 +972,10 @@
           </div>
           <div class="space-y-1">
             <label class="block text-xs font-bold text-warm-text">Формат сесій:</label>
-            <select id="modal-client-format" class="w-full px-3.5 py-2.5 rounded-xl border border-warm-border text-xs">
-              <option value="Платформа (Відеокімната)">Відеокімната на платформі</option>
-              <option value="Google Meet">Google Meet</option>
-              <option value="Telegram Video">Telegram Відео</option>
-            </select>
+            <div class="px-3.5 py-2.5 rounded-xl border border-warm-border bg-warm-bg/50 text-xs font-medium text-warm-text flex items-center gap-1.5">
+              <span>🌐 Google Meet</span>
+            </div>
+            <input type="hidden" id="modal-client-format" value="Google Meet">
           </div>
         </div>
 
@@ -1308,7 +1307,7 @@
             role: isOwnerUser(profile) ? 'owner' : 'client',
             phone: '',
             telegram: '',
-            preferred_format: 'Платформа (Відеокімната)',
+            preferred_format: 'Google Meet',
             therapy_goal: '',
             notes: ''
           };
@@ -1357,7 +1356,7 @@
           role: isOwnerUser(decoded) ? 'owner' : 'client',
           phone: '',
           telegram: '',
-          preferred_format: 'Платформа (Відеокімната)',
+          preferred_format: 'Google Meet',
           therapy_goal: '',
           notes: ''
         };
@@ -1380,7 +1379,7 @@
         role: "owner",
         phone: "+380 (99) 000-00-00",
         telegram: "psy_olefirenkoyuliia",
-        preferred_format: "Платформа (Відеокімната)",
+        preferred_format: "Google Meet",
         therapy_goal: "Практикуюча психологиня, консультантка із символдрами",
         notes: "Кабінет власниці практики"
       };
@@ -1431,7 +1430,7 @@
             ...demoProfile,
             phone: "+380 (67) 123-45-67",
             telegram: "oleksandr_psy",
-            preferred_format: "Платформа (Відеокімната)",
+            preferred_format: "Google Meet",
             therapy_goal: "Робота з вигоранням та внутрішнім критиком",
             notes: "Сесії по вівторках"
           };
@@ -1441,7 +1440,7 @@
           ...demoProfile,
           phone: "+380 (67) 123-45-67",
           telegram: "oleksandr_psy",
-          preferred_format: "Платформа (Відеокімната)",
+          preferred_format: "Google Meet",
           therapy_goal: "Робота з вигоранням та внутрішнім критиком",
           notes: "Сесії по вівторках"
         };
@@ -1587,7 +1586,7 @@
               session_time: "18:00",
               duration_minutes: 50,
               room_code: "psy-meet-petrenko",
-              meet_url: "/meet.html?room=psy-meet-petrenko",
+              meet_url: "https://meet.google.com/psy-meet-petrenko",
               therapist_notes: "Розбір образу символдрами «Джерело».",
               status: "scheduled"
             }
@@ -1603,7 +1602,7 @@
             session_time: "18:00",
             duration_minutes: 50,
             room_code: "psy-meet-petrenko",
-            meet_url: "/meet.html?room=psy-meet-petrenko",
+            meet_url: "https://meet.google.com/psy-meet-petrenko",
             therapist_notes: "Розбір образу символдрами «Джерело».",
             status: "scheduled"
           }
@@ -3410,7 +3409,7 @@
               picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
               phone: "+380 (67) 123-45-67",
               telegram: "oleksandr_psy",
-              preferred_format: "Платформа (Відеокімната)",
+              preferred_format: "Google Meet",
               therapy_goal: "Робота з вигоранням та внутрішнім критиком після зміни роботи",
               admin_notes: "Сесії по вівторках о 18:00. Добре йде техніка символдрами «Луг».",
               created_at: "2026-08-30 19:40:00"
@@ -3426,7 +3425,7 @@
             picture: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
             phone: "+380 (67) 123-45-67",
             telegram: "oleksandr_psy",
-            preferred_format: "Платформа (Відеокімната)",
+            preferred_format: "Google Meet",
             therapy_goal: "Робота з вигоранням та внутрішнім критиком",
             admin_notes: "Сесії по вівторках о 18:00.",
             created_at: "2026-08-30 19:40:00"
@@ -3472,7 +3471,7 @@
                 </div>
               </div>
               <span class="px-2.5 py-1 rounded-full bg-brand-50 text-brand-800 text-[10px] font-bold border border-brand-200">
-                ${escapeHtml(client.preferred_format || 'Платформа')}
+                🌐 Google Meet
               </span>
             </div>
 
@@ -3557,7 +3556,7 @@
       document.getElementById('modal-client-name').value = client.name || '';
       document.getElementById('modal-client-phone').value = client.phone || '';
       document.getElementById('modal-client-telegram').value = (client.telegram || '').replace(/^@/, '');
-      document.getElementById('modal-client-format').value = client.preferred_format || 'Платформа (Відеокімната)';
+      document.getElementById('modal-client-format').value = 'Google Meet';
       document.getElementById('modal-client-goal').value = client.therapy_goal || '';
       document.getElementById('modal-client-admin-notes').value = client.admin_notes || '';
 
@@ -3576,7 +3575,7 @@
         name: document.getElementById('modal-client-name').value.trim(),
         phone: document.getElementById('modal-client-phone').value.trim(),
         telegram: document.getElementById('modal-client-telegram').value.trim(),
-        preferred_format: document.getElementById('modal-client-format').value,
+        preferred_format: 'Google Meet',
         therapy_goal: document.getElementById('modal-client-goal').value.trim(),
         admin_notes: document.getElementById('modal-client-admin-notes').value.trim()
       };
@@ -3619,7 +3618,7 @@
       document.getElementById('input-email').value = user.email || '';
       document.getElementById('input-phone').value = user.phone || '';
       document.getElementById('input-telegram').value = (user.telegram || '').replace(/^@/, '');
-      document.getElementById('input-format').value = user.preferred_format || 'Платформа (Відеокімната)';
+      document.getElementById('input-format').value = 'Google Meet';
       document.getElementById('input-goal').value = user.therapy_goal || '';
       document.getElementById('input-notes').value = user.notes || '';
     }

@@ -83,9 +83,9 @@ export async function onRequestPost(context) {
       // Generate clean unique room code
       const randomHex = Math.random().toString(36).substring(2, 8);
       const roomCode = item.room_code || `psy-olefirenko-${randomHex}`;
-      const meetFormat = item.meet_format || 'google_meet';
-      const googleMeetUrl = (item.google_meet_url || 'https://meet.google.com/new').trim();
-      const meetUrl = meetFormat === 'google_meet' ? googleMeetUrl : `/meet.html?room=${roomCode}`;
+      const meetFormat = 'google_meet';
+      const googleMeetUrl = (item.google_meet_url || item.meet_url || 'https://meet.google.com/new').trim();
+      const meetUrl = googleMeetUrl.startsWith('http') ? googleMeetUrl : `https://meet.google.com/${roomCode}`;
 
       const sessionType = item.session_type || (durationMinutes === 15 ? 'discovery_15' : 'standard');
 
