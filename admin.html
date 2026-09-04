@@ -120,8 +120,13 @@
           <div class="flex items-center gap-2.5">
             <span class="text-2xl">📊</span>
             <div>
-              <h2 class="font-bold text-gray-900 text-base sm:text-lg">Статистика відвідувань та Конверсії</h2>
-              <p class="text-xs text-gray-500">Аналітика переходів, реальні люди vs боти, ліди в Telegram</p>
+              <div class="flex items-center gap-2">
+                <h2 class="font-bold text-gray-900 text-base sm:text-lg">Статистика за сьогодні</h2>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300" id="stat-period-badge">
+                  Скидання о 00:01
+                </span>
+              </div>
+              <p class="text-xs text-gray-500">Унікальні відвідувачі (без повторних переходів), перегляди, кліки в Telegram</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
@@ -144,7 +149,7 @@
               <span class="text-sm">👤</span>
             </div>
             <div class="text-2xl sm:text-3xl font-extrabold text-emerald-900" id="stat-humans">0</div>
-            <p class="text-[10px] text-emerald-700 font-medium">Реальні люди</p>
+            <p class="text-[10px] text-emerald-700 font-medium">Унікальні люди з 00:01</p>
           </div>
 
           <!-- Metric 2: Telegram Leads -->
@@ -157,14 +162,14 @@
             <p class="text-[10px] text-sky-700 font-medium">Кліки на запис</p>
           </div>
 
-          <!-- Metric 3: Online Inquiries -->
+          <!-- Metric 3: Page Views -->
           <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-1">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800">Запитання</span>
-              <span class="text-sm">✉️</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800">Перегляди</span>
+              <span class="text-sm">👀</span>
             </div>
-            <div class="text-2xl sm:text-3xl font-extrabold text-amber-900" id="stat-inquiries">0</div>
-            <p class="text-[10px] text-amber-700 font-medium">Звернення з сайту</p>
+            <div class="text-2xl sm:text-3xl font-extrabold text-amber-900" id="stat-views">0</div>
+            <p class="text-[10px] text-amber-700 font-medium">Сторінок за день</p>
           </div>
 
           <!-- Metric 4: Registered Clients -->
@@ -772,25 +777,26 @@
       reader.readAsDataURL(file);
     }
 
-    // 3. Real-time Cloudflare D1 SQL Analytics Dashboard
+    // 3. Real-time Cloudflare D1 SQL Analytics Dashboard (Daily reset at 00:01)
     async function renderAnalytics() {
       try {
         const res = await fetch('/api/stats?t=' + Date.now());
         if (!res.ok) throw new Error('API error');
+        const stats = await res.json();
         const humans = stats.humans || 0;
         const bots = stats.bots || 0;
         const tg = stats.tgClicks || 0;
-        const inquiries = stats.inquiriesCount || 0;
+        const views = stats.views || 0;
         const clients = stats.totalClients || 0;
-        const totalLeads = stats.totalLeads || (tg + inquiries + clients);
+        const totalLeads = stats.totalLeads || (tg + clients);
         const convRate = stats.conversion || (humans > 0 ? Math.min(100, ((totalLeads / humans) * 100)).toFixed(1) : '0');
 
-        document.getElementById('stat-humans').textContent = humans;
+        if (document.getElementById('stat-humans')) document.getElementById('stat-humans').textContent = humans;
         if (document.getElementById('stat-bots')) document.getElementById('stat-bots').textContent = bots;
-        document.getElementById('stat-tg').textContent = tg;
-        if (document.getElementById('stat-inquiries')) document.getElementById('stat-inquiries').textContent = inquiries;
+        if (document.getElementById('stat-tg')) document.getElementById('stat-tg').textContent = tg;
+        if (document.getElementById('stat-views')) document.getElementById('stat-views').textContent = views;
         if (document.getElementById('stat-clients')) document.getElementById('stat-clients').textContent = clients;
-        document.getElementById('stat-conversion').textContent = convRate + '%';
+        if (document.getElementById('stat-conversion')) document.getElementById('stat-conversion').textContent = convRate + '%';
 
         // Aggregate Sources
         const sourcesMap = stats.sources || {};

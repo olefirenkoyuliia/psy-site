@@ -1,5 +1,7 @@
 export async function onRequestGet(context) {
-  const { env } = context;
+  const { request, env } = context;
+  const url = new URL(request.url);
+  const showAllTime = url.searchParams.get('range') === 'all';
 
   if (!env.DB) {
     return new Response(JSON.stringify({
@@ -13,7 +15,8 @@ export async function onRequestGet(context) {
       events: [],
       chatInquiries: [],
       quizSubmissions: [],
-      topicAnalytics: []
+      topicAnalytics: [],
+      period: 'Сьогодні (з 00:01)'
     }), {
       headers: {
         'Content-Type': 'application/json',
@@ -24,11 +27,22 @@ export async function onRequestGet(context) {
   }
 
   try {
-    // 1. Fetch recent events from D1 SQL database
-    const rows = await env.DB.prepare(
-      "SELECT id, event_type, visitor_id, source, device, metadata, created_at " +
-      "FROM analytics_events ORDER BY id DESC LIMIT 300"
-    ).all();
+    // 1. Calculate Daily Reset Cutoff at 00:01:00 Kyiv Time (Europe/Kyiv)
+    const { cutoffSql, kyivDate } = getKyivResetUtcCutoff();
+
+    // 2. Fetch events from D1 SQL database
+    let rows;
+    if (showAllTime) {
+      rows = await env.DB.prepare(
+        "SELECT id, event_type, visitor_id, source, device, metadata, created_at " +
+        "FROM analytics_events ORDER BY id DESC LIMIT 500"
+      ).all();
+    } else {
+      rows = await env.DB.prepare(
+        "SELECT id, event_type, visitor_id, source, device, metadata, created_at " +
+        "FROM analytics_events WHERE created_at >= ? ORDER BY id DESC LIMIT 500"
+      ).bind(cutoffSql).all();
+    }
 
     const allEvents = rows.results || [];
 
@@ -43,7 +57,9 @@ export async function onRequestGet(context) {
     const quizSubmissions = [];
     const topicCounts = {};
 
+    // Deduplication sets: ensure a single user (visitorId / IP) counts as 1 visitor
     const countedVisitors = new Set();
+    const countedTgVisitors = new Set();
 
     function categorizeTopic(text) {
       if (!text) return '💬 Загальний запит';
@@ -63,28 +79,36 @@ export async function onRequestGet(context) {
       try { meta = JSON.parse(row.metadata || '{}'); } catch(e) {}
 
       const isBot = meta.isBot || false;
+      const visitorKey = row.visitor_id || meta.ip || String(row.id);
+
       if (isBot) {
         bots++;
       } else {
-        if (row.visitor_id && !countedVisitors.has(row.visitor_id)) {
-          countedVisitors.add(row.visitor_id);
+        // Count strictly unique human visitors per day
+        if (!countedVisitors.has(visitorKey)) {
+          countedVisitors.add(visitorKey);
           humans++;
-        }
-        if (row.source) {
-          sourcesMap[row.source] = (sourcesMap[row.source] || 0) + 1;
-        }
-        if (row.device) {
-          devicesMap[row.device] = (devicesMap[row.device] || 0) + 1;
+          if (row.source) {
+            sourcesMap[row.source] = (sourcesMap[row.source] || 0) + 1;
+          }
+          if (row.device) {
+            devicesMap[row.device] = (devicesMap[row.device] || 0) + 1;
+          }
         }
       }
 
-      if (row.event_type === 'page_view') pageViews++;
-      if (row.event_type === 'tg_click' || row.event_type === 'booking_click') tgClicks++;
+      if (row.event_type === 'page_view') {
+        pageViews++;
+      }
+      
+      if (row.event_type === 'tg_click' || row.event_type === 'booking_click') {
+        tgClicks++;
+        countedTgVisitors.add(visitorKey);
+      }
 
       let actionTitle = 'Перегляд сайту';
       if (row.event_type === 'tg_click') actionTitle = 'Клік у Telegram 💬';
       if (row.event_type === 'booking_click') actionTitle = 'Запис на час 📅';
-      if (row.event_type === 'inquiry_submit') actionTitle = 'Запитання психологу ✉️';
       if (row.event_type === 'user_login') actionTitle = 'Вхід в кабінет 👤';
       if (row.event_type === 'quiz_completed') actionTitle = 'Пройдено опитування 🧭';
       if (row.event_type === 'instagram_click') actionTitle = 'Перехід в Instagram 📸';
@@ -156,7 +180,7 @@ export async function onRequestGet(context) {
       });
     });
 
-    // Build Topic Analytics breakdown
+    // Topic Analytics
     const totalTopicQueries = Object.values(topicCounts).reduce((a, b) => a + b, 0);
     const topicAnalytics = Object.keys(topicCounts).map(t => ({
       topic: t,
@@ -173,14 +197,8 @@ export async function onRequestGet(context) {
       registeredClients = usersQuery.results || [];
     } catch(e) {}
 
-    let totalInquiries = 0;
-    try {
-      const inqRes = await env.DB.prepare("SELECT COUNT(*) as cnt FROM client_inquiries").first();
-      totalInquiries = inqRes?.cnt || 0;
-    } catch(e) {}
-
     const humanCount = Math.max(humans, countedVisitors.size);
-    const totalLeads = tgClicks + totalInquiries + (registeredClients.length || 0);
+    const totalLeads = tgClicks + (registeredClients.length || 0);
     const convRate = humanCount > 0 ? Math.min(100, ((totalLeads / humanCount) * 100)).toFixed(1) : '0';
 
     return new Response(JSON.stringify({
@@ -189,10 +207,12 @@ export async function onRequestGet(context) {
       bots: bots,
       views: pageViews || humanCount,
       tgClicks: tgClicks,
-      inquiriesCount: totalInquiries,
       totalClients: registeredClients.length,
       totalLeads: totalLeads,
       conversion: convRate,
+      period: 'Сьогодні (з 00:01)',
+      kyivDate: kyivDate,
+      resetCutoffUtc: cutoffSql,
       sources: sourcesMap,
       devices: devicesMap,
       events: formattedEvents,
@@ -218,3 +238,35 @@ export async function onRequestGet(context) {
   }
 }
 
+function getKyivResetUtcCutoff() {
+  const now = new Date();
+  
+  // Format current date and time in Kyiv timezone (Europe/Kyiv)
+  const kyivDateStr = now.toLocaleDateString("en-CA", { timeZone: "Europe/Kyiv" }); // "YYYY-MM-DD"
+  const kyivTimeStr = now.toLocaleTimeString("en-GB", { timeZone: "Europe/Kyiv", hour12: false }); // "HH:MM:SS"
+  const [kHour, kMin] = kyivTimeStr.split(":").map(Number);
+  
+  // Target date for Kyiv 00:01:00
+  let targetKyivDate = kyivDateStr;
+  if (kHour === 0 && kMin === 0) {
+    // If current time in Kyiv is between 00:00:00 and 00:00:59, the active period started yesterday at 00:01
+    const prevDate = new Date(now.getTime() - 24 * 3600 * 1000);
+    targetKyivDate = prevDate.toLocaleDateString("en-CA", { timeZone: "Europe/Kyiv" });
+  }
+  
+  // Determine Kyiv GMT offset
+  const tempDate = new Date(`${targetKyivDate}T12:00:00Z`);
+  const kyivOffsetPart = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Kyiv", timeZoneName: "shortOffset" }).format(tempDate);
+  const offsetMatch = kyivOffsetPart.match(/GMT([+-]\d+)(?::(\d+))?/);
+  const offsetHours = offsetMatch ? parseInt(offsetMatch[1], 10) : 3;
+  
+  const tzOffsetString = (offsetHours >= 0 ? "+" : "-") + String(Math.abs(offsetHours)).padStart(2, "0") + ":00";
+  const kyivResetDate = new Date(`${targetKyivDate}T00:01:00.000${tzOffsetString}`);
+  
+  const utcSqlStr = kyivResetDate.toISOString().replace("T", " ").substring(0, 19);
+  
+  return {
+    cutoffSql: utcSqlStr,
+    kyivDate: targetKyivDate
+  };
+}
