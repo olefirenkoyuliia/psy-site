@@ -97,7 +97,7 @@
           <span>←</span> <span class="hidden xs:inline sm:inline">На головну</span>
         </a>
 
-        <a href="admin.html" id="admin-panel-direct-btn" class="hidden sm:inline-flex items-center gap-1 px-3.5 py-2 rounded-full bg-warm-card hover:bg-brand-50 text-brand-800 border border-warm-border text-xs font-bold transition-colors">
+        <a href="admin.html" id="admin-panel-direct-btn" class="hidden items-center gap-1 px-3.5 py-2 rounded-full bg-warm-card hover:bg-brand-50 text-brand-800 border border-warm-border text-xs font-bold transition-colors">
           <span>⚙️ Адмінка</span>
         </a>
 
@@ -1467,7 +1467,11 @@
       document.getElementById('auth-screen').classList.remove('hidden');
       document.getElementById('cabinet-dashboard').classList.add('hidden');
       document.getElementById('header-user-widget').classList.add('hidden');
-      document.getElementById('admin-panel-direct-btn').classList.add('hidden');
+      const adminBtn = document.getElementById('admin-panel-direct-btn');
+      if (adminBtn) {
+        adminBtn.classList.add('hidden');
+        adminBtn.classList.remove('inline-flex');
+      }
     }
 
     function renderDashboard(user) {
@@ -1487,8 +1491,13 @@
       if (headerName) headerName.textContent = user.name.split(' ')[0] || user.name;
       if (headerTitle) headerTitle.textContent = isOwner ? 'Кабінет власниці' : 'Особистий кабінет клієнта';
       if (adminBtn) {
-        if (isOwner) adminBtn.classList.remove('hidden');
-        else adminBtn.classList.add('hidden');
+        if (isOwner) {
+          adminBtn.classList.remove('hidden');
+          adminBtn.classList.add('inline-flex');
+        } else {
+          adminBtn.classList.add('hidden');
+          adminBtn.classList.remove('inline-flex');
+        }
       }
 
       // Hero Updates
