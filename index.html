@@ -379,67 +379,67 @@
         </a>
 
         <!-- Mobile Menu Toggle Button (Prominent & High Touch Target) -->
-        <button type="button" onclick="toggleMobileMenu()" id="mobile-menu-btn" class="md:hidden px-3.5 py-2 rounded-full bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0" aria-label="Меню">
-          <svg id="hamburger-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button type="button" onclick="toggleMobileMenu(event)" id="mobile-menu-btn" class="md:hidden relative z-[110] px-3.5 py-2 rounded-full bg-brand-700 hover:bg-brand-800 text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer select-none touch-manipulation shrink-0" aria-label="Меню" aria-expanded="false">
+          <svg id="hamburger-icon" class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
-          <svg id="close-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="close-icon" class="w-4 h-4 hidden pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
           </svg>
-          <span id="menu-btn-text">Меню</span>
+          <span id="menu-btn-text" class="pointer-events-none">Меню</span>
         </button>
 
       </div>
     </div>
-
-    <!-- Mobile Navigation Drawer -->
-    <div id="mobile-menu-drawer" class="hidden md:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 bg-warm-bg/98 backdrop-blur-2xl z-[9999] overflow-y-auto border-t border-warm-border shadow-2xl transition-all duration-300" style="-webkit-overflow-scrolling: touch;">
-      <div class="p-4 sm:p-6 pb-28 space-y-4 max-w-lg mx-auto">
-        
-        <!-- Navigation Links Grid -->
-        <nav class="grid grid-cols-1 gap-1 text-sm font-semibold text-warm-text bg-white p-2 rounded-3xl border border-warm-border shadow-xs">
-          <a href="#about" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
-            <span class="text-lg">🌿</span> <span>Про Юлію Олефіренко</span>
-          </a>
-          <a href="#pricing" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
-            <span class="text-lg">💰</span> <span>Формати та вартість</span>
-          </a>
-          <a href="#topics" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
-            <span class="text-lg">🧭</span> <span>Запити, з якими працюю</span>
-          </a>
-          <a href="#method" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
-            <span class="text-lg">🧠</span> <span>Метод & Символдрама</span>
-          </a>
-          <a href="#diplomas" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
-            <span class="text-lg">🎓</span> <span>Освіта та сертифікати</span>
-          </a>
-          <a href="#faq" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
-            <span class="text-lg">❓</span> <span>Часті запитання (FAQ)</span>
-          </a>
-          <a href="https://www.instagram.com/psy_olefirenkoyulia" target="_blank" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors text-pink-700">
-            <span class="text-lg">📸</span> <span>Instagram блог</span>
-          </a>
-          <a href="/privacy.html" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors text-warm-muted text-xs">
-            <span class="text-lg">🔒</span> <span>Політика конфіденційності</span>
-          </a>
-        </nav>
-
-        <!-- Mobile Action Buttons -->
-        <div class="pt-2 space-y-2.5">
-          <a href="cabinet.html" class="w-full py-3.5 px-4 rounded-2xl bg-white border border-warm-border text-warm-text font-bold text-xs flex items-center justify-center gap-2 shadow-xs">
-            <span class="text-base">👤</span> <span>Особистий кабінет клієнта</span>
-          </a>
-          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="w-full py-3.5 px-4 rounded-2xl bg-brand-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-soft">
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/>
-            </svg>
-            <span>Написати Юлії в Telegram</span>
-          </a>
-        </div>
-
-      </div>
-    </div>
   </header>
+
+  <!-- Mobile Navigation Drawer (Direct child of body to avoid iOS/WebKit backdrop-filter containing block issues) -->
+  <div id="mobile-menu-drawer" class="hidden md:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 bg-warm-bg/98 backdrop-blur-2xl z-[99] overflow-y-auto border-t border-warm-border shadow-2xl transition-all duration-300" style="-webkit-overflow-scrolling: touch;">
+    <div class="p-4 sm:p-6 pb-28 space-y-4 max-w-lg mx-auto">
+      
+      <!-- Navigation Links Grid -->
+      <nav class="grid grid-cols-1 gap-1 text-sm font-semibold text-warm-text bg-white p-2 rounded-3xl border border-warm-border shadow-xs">
+        <a href="#about" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+          <span class="text-lg">🌿</span> <span>Про Юлію Олефіренко</span>
+        </a>
+        <a href="#pricing" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+          <span class="text-lg">💰</span> <span>Формати та вартість</span>
+        </a>
+        <a href="#topics" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+          <span class="text-lg">🧭</span> <span>Запити, з якими працюю</span>
+        </a>
+        <a href="#method" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+          <span class="text-lg">🧠</span> <span>Метод & Символдрама</span>
+        </a>
+        <a href="#diplomas" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+          <span class="text-lg">🎓</span> <span>Освіта та сертифікати</span>
+        </a>
+        <a href="#faq" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors">
+          <span class="text-lg">❓</span> <span>Часті запитання (FAQ)</span>
+        </a>
+        <a href="https://www.instagram.com/psy_olefirenkoyulia" target="_blank" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors text-pink-700">
+          <span class="text-lg">📸</span> <span>Instagram блог</span>
+        </a>
+        <a href="/privacy.html" onclick="closeMobileMenu()" class="p-3 rounded-2xl hover:bg-warm-bg flex items-center gap-3 transition-colors text-warm-muted text-xs">
+          <span class="text-lg">🔒</span> <span>Політика конфіденційності</span>
+        </a>
+      </nav>
+
+      <!-- Mobile Action Buttons -->
+      <div class="pt-2 space-y-2.5">
+        <a href="cabinet.html" class="w-full py-3.5 px-4 rounded-2xl bg-white border border-warm-border text-warm-text font-bold text-xs flex items-center justify-center gap-2 shadow-xs">
+          <span class="text-base">👤</span> <span>Особистий кабінет клієнта</span>
+        </a>
+        <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="w-full py-3.5 px-4 rounded-2xl bg-brand-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-soft">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/>
+          </svg>
+          <span>Написати Юлії в Telegram</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
 
   <!-- Hero Section -->
   <section class="pt-32 pb-16 md:pt-40 md:pb-24 overflow-hidden relative z-10">
@@ -1725,8 +1725,13 @@
     }
     updateBookingSummary();
 
-    function toggleMobileMenu() {
+    function toggleMobileMenu(event) {
+      if (event) {
+        if (typeof event.preventDefault === 'function') event.preventDefault();
+        if (typeof event.stopPropagation === 'function') event.stopPropagation();
+      }
       const drawer = document.getElementById('mobile-menu-drawer');
+      const btn = document.getElementById('mobile-menu-btn');
       const hamburgerIcon = document.getElementById('hamburger-icon');
       const closeIcon = document.getElementById('close-icon');
       const menuBtnText = document.getElementById('menu-btn-text');
@@ -1735,12 +1740,14 @@
       const isHidden = drawer.classList.contains('hidden');
       if (isHidden) {
         drawer.classList.remove('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
         hamburgerIcon?.classList.add('hidden');
         closeIcon?.classList.remove('hidden');
         if (menuBtnText) menuBtnText.textContent = '✕';
         document.body.style.overflow = 'hidden';
       } else {
         drawer.classList.add('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
         hamburgerIcon?.classList.remove('hidden');
         closeIcon?.classList.add('hidden');
         if (menuBtnText) menuBtnText.textContent = 'Меню';
@@ -1750,17 +1757,31 @@
 
     function closeMobileMenu() {
       const drawer = document.getElementById('mobile-menu-drawer');
+      const btn = document.getElementById('mobile-menu-btn');
       const hamburgerIcon = document.getElementById('hamburger-icon');
       const closeIcon = document.getElementById('close-icon');
       const menuBtnText = document.getElementById('menu-btn-text');
       if (drawer) {
         drawer.classList.add('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
         hamburgerIcon?.classList.remove('hidden');
         closeIcon?.classList.add('hidden');
         if (menuBtnText) menuBtnText.textContent = 'Меню';
         document.body.style.overflow = '';
       }
     }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768) {
+        closeMobileMenu();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeMobileMenu();
+      }
+    });
 
     // 5. Approach Tabs Switcher
     function switchTab(tabName, btn) {
