@@ -201,9 +201,40 @@ export async function onRequestGet(context) {
     const totalLeads = tgClicks + (registeredClients.length || 0);
     const convRate = humanCount > 0 ? Math.min(100, ((totalLeads / humanCount) * 100)).toFixed(1) : '0';
 
+    // Calculate All-Time Unique Visitors (across entire history)
+    let allTimeHumans = humanCount;
+    let allTimeViews = pageViews;
+    let allTimeTgClicks = tgClicks;
+    try {
+      const allTimeQuery = await env.DB.prepare(
+        "SELECT visitor_id, event_type, metadata FROM analytics_events"
+      ).all();
+      
+      const allTimeCounted = new Set();
+      let allViewsCount = 0;
+      let allTgCount = 0;
+      (allTimeQuery.results || []).forEach(r => {
+        let meta = {};
+        try { meta = JSON.parse(r.metadata || '{}'); } catch(e) {}
+        const isBot = meta.isBot || false;
+        if (!isBot) {
+          const vKey = r.visitor_id || meta.ip || '';
+          if (vKey) allTimeCounted.add(vKey);
+        }
+        if (r.event_type === 'page_view') allViewsCount++;
+        if (r.event_type === 'tg_click' || r.event_type === 'booking_click') allTgCount++;
+      });
+      allTimeHumans = Math.max(allTimeCounted.size, humanCount);
+      allTimeViews = Math.max(allViewsCount, pageViews);
+      allTimeTgClicks = Math.max(allTgCount, tgClicks);
+    } catch(e) {}
+
     return new Response(JSON.stringify({
       success: true,
       humans: humanCount,
+      allTimeHumans: allTimeHumans,
+      allTimeViews: allTimeViews,
+      allTimeTgClicks: allTimeTgClicks,
       bots: bots,
       views: pageViews || humanCount,
       tgClicks: tgClicks,

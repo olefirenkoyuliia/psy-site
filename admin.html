@@ -139,20 +139,30 @@
           </div>
         </div>
 
-        <!-- 5 KPI Metrics Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        <!-- 6 KPI Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
           
-          <!-- Metric 1: Real Humans -->
+          <!-- Metric 1: Today Real Humans -->
           <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-1">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800">Відвідувачі</span>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800">Сьогодні</span>
               <span class="text-sm">👤</span>
             </div>
             <div class="text-2xl sm:text-3xl font-extrabold text-emerald-900" id="stat-humans">0</div>
-            <p class="text-[10px] text-emerald-700 font-medium">Унікальні люди з 00:01</p>
+            <p class="text-[10px] text-emerald-700 font-medium">Людей з 00:01</p>
           </div>
 
-          <!-- Metric 2: Telegram Leads -->
+          <!-- Metric 2: All-Time Real Humans -->
+          <div class="p-4 rounded-2xl bg-teal-50/60 border border-teal-200/80 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-teal-800">За весь час</span>
+              <span class="text-sm">🌐</span>
+            </div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-teal-900" id="stat-alltime-humans">0</div>
+            <p class="text-[10px] text-teal-700 font-medium">Всі унікальні люди</p>
+          </div>
+
+          <!-- Metric 3: Telegram Leads -->
           <div class="p-4 rounded-2xl bg-sky-50/60 border border-sky-200/80 space-y-1">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-bold uppercase tracking-wider text-sky-800">Telegram</span>
@@ -162,7 +172,7 @@
             <p class="text-[10px] text-sky-700 font-medium">Кліки на запис</p>
           </div>
 
-          <!-- Metric 3: Page Views -->
+          <!-- Metric 4: Page Views -->
           <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-1">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800">Перегляди</span>
@@ -172,7 +182,7 @@
             <p class="text-[10px] text-amber-700 font-medium">Сторінок за день</p>
           </div>
 
-          <!-- Metric 4: Registered Clients -->
+          <!-- Metric 5: Registered Clients -->
           <div class="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-200/80 space-y-1">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-800">Кабінети</span>
@@ -182,8 +192,8 @@
             <p class="text-[10px] text-indigo-700 font-medium">Клієнти в базі</p>
           </div>
 
-          <!-- Metric 5: Total Conversion Rate -->
-          <div class="p-4 rounded-2xl bg-purple-50/60 border border-purple-200/80 space-y-1 col-span-2 sm:col-span-1">
+          <!-- Metric 6: Total Conversion Rate -->
+          <div class="p-4 rounded-2xl bg-purple-50/60 border border-purple-200/80 space-y-1">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-bold uppercase tracking-wider text-purple-800">Конверсія</span>
               <span class="text-sm">🎯</span>
@@ -792,6 +802,7 @@
         const convRate = stats.conversion || (humans > 0 ? Math.min(100, ((totalLeads / humans) * 100)).toFixed(1) : '0');
 
         if (document.getElementById('stat-humans')) document.getElementById('stat-humans').textContent = humans;
+        if (document.getElementById('stat-alltime-humans')) document.getElementById('stat-alltime-humans').textContent = stats.allTimeHumans || humans;
         if (document.getElementById('stat-bots')) document.getElementById('stat-bots').textContent = bots;
         if (document.getElementById('stat-tg')) document.getElementById('stat-tg').textContent = tg;
         if (document.getElementById('stat-views')) document.getElementById('stat-views').textContent = views;
