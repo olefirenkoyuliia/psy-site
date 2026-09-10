@@ -88,11 +88,12 @@
         "#консультаціяонлайн"
       ],
       "url": "https://www.tiktok.com/@yulia_psychologist_/video/7683497457396796692",
+      "src": "videos/tiktok_1.mp4",
+      "poster": "videos/tiktok_1_cover.jpg",
       "views": "1.8K+",
       "likes": "40+",
       "duration": "1:09",
-      "category": "Консультації",
-      "bgGradient": "from-brand-900 via-brand-800 to-stone-900"
+      "category": "Консультації"
     },
     {
       "id": "7681325061026090260",
@@ -105,62 +106,12 @@
         "#саморегуляція"
       ],
       "url": "https://www.tiktok.com/@yulia_psychologist_/video/7681325061026090260",
+      "src": "videos/tiktok_2.mp4",
+      "poster": "videos/tiktok_2_cover.jpg",
       "views": "2.4K+",
       "likes": "120+",
       "duration": "2:31",
-      "category": "Саморегуляція",
-      "bgGradient": "from-stone-900 via-zinc-800 to-brand-950"
-    },
-    {
-      "id": "7683497457396796693",
-      "title": "Метод символдрами: мова образів для зцілення 🌿",
-      "caption": "Чому робота з несвідомим через образи допомагає м’яко подолати глибинні блоки",
-      "tags": [
-        "#символдрама",
-        "#психотерапія",
-        "#емоції",
-        "#гармонія"
-      ],
-      "url": "https://www.tiktok.com/@yulia_psychologist_",
-      "views": "3.1K+",
-      "likes": "190+",
-      "duration": "1:45",
-      "category": "Символдрама",
-      "bgGradient": "from-emerald-950 via-brand-900 to-stone-900"
-    },
-    {
-      "id": "7681325061026090261",
-      "title": "Як дозволити собі відпочити без почуття провини ☕",
-      "caption": "Чому турбота про власні потреби — це не егоїзм, а необхідна основа для життя",
-      "tags": [
-        "#самооцінка",
-        "#межі",
-        "#відпочинок",
-        "#психолог"
-      ],
-      "url": "https://www.tiktok.com/@yulia_psychologist_",
-      "views": "2.9K+",
-      "likes": "155+",
-      "duration": "1:15",
-      "category": "Психопрактика",
-      "bgGradient": "from-stone-900 via-brand-900 to-zinc-900"
-    },
-    {
-      "id": "7683497457396796694",
-      "title": "Перша зустріч з психологом: чого очікувати? 🤍",
-      "caption": "Як проходить первинна консультація, чому це безпечно та як підготуватися",
-      "tags": [
-        "#консультація",
-        "#довіра",
-        "#безпечнийпростір",
-        "#підтримка"
-      ],
-      "url": "https://www.tiktok.com/@yulia_psychologist_",
-      "views": "4.5K+",
-      "likes": "280+",
-      "duration": "1:30",
-      "category": "Початок терапії",
-      "bgGradient": "from-brand-900 via-teal-950 to-stone-900"
+      "category": "Саморегуляція"
     }
   ]
 }
