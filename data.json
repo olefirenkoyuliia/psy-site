@@ -87,8 +87,6 @@
         "#підтримка"
       ],
       "url": "https://www.tiktok.com/@yulia_psychologist_/video/7683497457396796692",
-      "src": "videos/tiktok_1.mp4",
-      "poster": "videos/tiktok_1_cover.jpg",
       "views": "1.8K+",
       "likes": "40+",
       "duration": "1:09",
@@ -104,46 +102,10 @@
         "#саморегуляція"
       ],
       "url": "https://www.tiktok.com/@yulia_psychologist_/video/7681325061026090260",
-      "src": "videos/tiktok_2.mp4",
-      "poster": "videos/tiktok_2_cover.jpg",
       "views": "2.4K+",
       "likes": "120+",
       "duration": "2:31",
       "category": "Саморегуляція"
-    },
-    {
-      "id": "7683497457396796693",
-      "title": "Знайомство з методом символдрами 🌿",
-      "caption": "Як образи та робота з несвідомим допомагають знайти прихований внутрішній ресурс",
-      "tags": [
-        "#символдрама",
-        "#психотерапія",
-        "#гармонія"
-      ],
-      "url": "https://www.tiktok.com/@yulia_psychologist_",
-      "src": "videos/tiktok_3.mp4",
-      "poster": "videos/tiktok_3_cover.jpg",
-      "views": "3.1K+",
-      "likes": "190+",
-      "duration": "0:10",
-      "category": "Символдрама"
-    },
-    {
-      "id": "7681325061026090261",
-      "title": "Простір психологічної підтримки та безпеки 🤍",
-      "caption": "Чому важливо мати безпечний простір для роботи з емоціями та відновлення рівноваги",
-      "tags": [
-        "#підтримка",
-        "#безпечнийпростір",
-        "#психолог"
-      ],
-      "url": "https://www.tiktok.com/@yulia_psychologist_",
-      "src": "videos/tiktok_4.mp4",
-      "poster": "videos/tiktok_4_cover.jpg",
-      "views": "2.9K+",
-      "likes": "155+",
-      "duration": "0:50",
-      "category": "Психопрактика"
     }
   ]
 }
