@@ -600,7 +600,6 @@
               <h3 class="font-serif-luxury text-3xl font-bold text-warm-text">
                 Консультування
               </h3>
-              <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</span>
             </div>
             <p class="text-sm text-warm-muted leading-relaxed">
               Підходить, якщо є певна конкретна ситуація або питання, які хочеться розібрати та знайти рішення.
@@ -643,7 +642,6 @@
               <h3 class="font-serif-luxury text-3xl font-bold text-warm-text">
                 Терапія
               </h3>
-              <span class="text-2xl font-serif-luxury font-bold text-brand-700" data-bind="pricing.regularSessionPrice">1 200 грн</span>
             </div>
             <p class="text-sm text-warm-muted leading-relaxed">
               Поступове занурення у ваш запит. Для глибоких внутрішніх змін, кращого розуміння себе та внутрішнього відновлення.
@@ -717,11 +715,11 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="book-formats">
             <button type="button" onclick="selectSlot('format', 'Консультування (до 10 зустрічей)', this)" class="slot-btn format-btn active p-4 rounded-2xl border-2 border-brand-600 bg-brand-50 text-left font-bold text-sm text-brand-900 transition-all flex items-center justify-between">
               <span>💬 Консультування (1–10 сесій)</span>
-              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-brand-200" data-bind="pricing.regularSessionPrice">1 200 грн</span>
+              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-brand-200 text-brand-800">1–10 сесій</span>
             </button>
             <button type="button" onclick="selectSlot('format', 'Психотерапія (глибинна робота)', this)" class="slot-btn format-btn p-4 rounded-2xl border border-warm-border bg-warm-bg/30 text-left font-bold text-sm text-warm-text transition-all flex items-center justify-between hover:border-brand-400">
               <span>🌊 Психотерапія (глибинний метод)</span>
-              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-warm-border" data-bind="pricing.regularSessionPrice">1 200 грн</span>
+              <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded-full border border-warm-border text-warm-muted">Регулярно</span>
             </button>
           </div>
         </div>
@@ -772,7 +770,7 @@
             <div id="summary-text" class="font-bold text-base sm:text-lg text-white">
               Консультування • Будні дні • День (14–18)
             </div>
-            <div class="text-xs text-brand-200" id="booking-price-hint">Вартість сесії: <span data-bind="pricing.regularSessionPrice">1 200 грн</span> (<span data-bind="pricing.duration">50 хвилин</span>)</div>
+            <div class="text-xs text-brand-200" id="booking-price-hint">Тривалість: <span data-bind="pricing.duration">50 хвилин</span> • Google Meet</div>
           </div>
           <a id="booking-tg-btn" href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-white hover:bg-brand-50 text-brand-900 font-bold text-sm shadow-2xl transition-all transform hover:scale-105 shrink-0" data-bind-telegram>
             <span>Забронювати в Telegram</span>
@@ -1239,7 +1237,7 @@
             <span class="faq-icon w-8 h-8 rounded-full bg-white flex items-center justify-center text-xl text-brand-700 shadow-sm transition-transform duration-300 shrink-0">+</span>
           </button>
           <div class="faq-answer hidden p-6 pt-2 text-warm-muted leading-relaxed text-sm sm:text-base bg-warm-bg/40 border-t border-warm-border/50">
-            Вартість однієї індивідуальної зустрічі (як консультації, так і регулярної терапії) становить <strong>1 200 грн</strong> (50 хвилин). Зустрічі проходять онлайн по відеозв'язку у Google Meet у затишній конфіденційній атмосфері. Оплата здійснюється офіційно на рахунок ФОП.
+            Зустрічі проходять онлайн по відеозв'язку у Google Meet у затишній конфіденційній атмосфері (тривалість однієї зустрічі — 50 хвилин). Вартість та детальні умови наведені у розділі «Формати роботи» вище. Оплата здійснюється офіційно на рахунок ФОП.
           </div>
         </div>
 
@@ -2715,7 +2713,7 @@ Telegram Юлії: https://t.me/psy_olefirenkoyuliia
           </div>
           <div class="flex items-center gap-2">
             <span class="text-brand-600 font-bold">✓</span>
-            <span><strong>Тривалість:</strong> 50 хвилин (вартість: 1 200 грн)</span>
+            <span><strong>Тривалість:</strong> 50 хвилин</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-brand-600 font-bold">✓</span>
