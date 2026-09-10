@@ -8,7 +8,9 @@
     "quote": "У житті кожної людини трапляються складні періоди. Просити про підтримку — це нормально",
     "quoteDesc": "У роботі для мене важливим є створення безпечного простору прийняття та довіри, де людина зможе отримати новий досвід, дозволити собі бути різною та віднайти свій внутрішній ресурс.",
     "telegram": "https://t.me/psy_olefirenkoyuliia",
-    "instagram": "https://instagram.com/psy_olefirenkoyulia"
+    "instagram": "https://instagram.com/psy_olefirenkoyulia",
+    "tiktok": "https://www.tiktok.com/@yulia_psychologist_",
+    "tiktokHandle": "@yulia_psychologist_"
   },
   "pricing": {
     "firstSessionPrice": "1 200 грн",
@@ -72,6 +74,93 @@
       "title": "Аналітична психологія",
       "category": "Підвищення кваліфікації",
       "image": "images/IMG_4499.jpeg"
+    }
+  ],
+  "tiktokVideos": [
+    {
+      "id": "7683497457396796692",
+      "title": "Запис на консультацію в особисті 💌",
+      "caption": "Як впоратися з тривогою, зрозуміти свої емоції та відновити внутрішній ресурс",
+      "tags": [
+        "#психолог",
+        "#психологіястосунків",
+        "#підтримка",
+        "#консультаціяонлайн"
+      ],
+      "url": "https://www.tiktok.com/@yulia_psychologist_/video/7683497457396796692",
+      "views": "1.8K+",
+      "likes": "40+",
+      "duration": "1:09",
+      "category": "Консультації",
+      "bgGradient": "from-brand-900 via-brand-800 to-stone-900"
+    },
+    {
+      "id": "7681325061026090260",
+      "title": "Саморегуляція та психологічна підтримка 📩",
+      "caption": "Прості та дієві техніки відновлення контакту з собою та пошуку внутрішньої опори",
+      "tags": [
+        "#психолог",
+        "#психологія",
+        "#допомога",
+        "#саморегуляція"
+      ],
+      "url": "https://www.tiktok.com/@yulia_psychologist_/video/7681325061026090260",
+      "views": "2.4K+",
+      "likes": "120+",
+      "duration": "2:31",
+      "category": "Саморегуляція",
+      "bgGradient": "from-stone-900 via-zinc-800 to-brand-950"
+    },
+    {
+      "id": "7683497457396796693",
+      "title": "Метод символдрами: мова образів для зцілення 🌿",
+      "caption": "Чому робота з несвідомим через образи допомагає м’яко подолати глибинні блоки",
+      "tags": [
+        "#символдрама",
+        "#психотерапія",
+        "#емоції",
+        "#гармонія"
+      ],
+      "url": "https://www.tiktok.com/@yulia_psychologist_",
+      "views": "3.1K+",
+      "likes": "190+",
+      "duration": "1:45",
+      "category": "Символдрама",
+      "bgGradient": "from-emerald-950 via-brand-900 to-stone-900"
+    },
+    {
+      "id": "7681325061026090261",
+      "title": "Як дозволити собі відпочити без почуття провини ☕",
+      "caption": "Чому турбота про власні потреби — це не егоїзм, а необхідна основа для життя",
+      "tags": [
+        "#самооцінка",
+        "#межі",
+        "#відпочинок",
+        "#психолог"
+      ],
+      "url": "https://www.tiktok.com/@yulia_psychologist_",
+      "views": "2.9K+",
+      "likes": "155+",
+      "duration": "1:15",
+      "category": "Психопрактика",
+      "bgGradient": "from-stone-900 via-brand-900 to-zinc-900"
+    },
+    {
+      "id": "7683497457396796694",
+      "title": "Перша зустріч з психологом: чого очікувати? 🤍",
+      "caption": "Як проходить первинна консультація, чому це безпечно та як підготуватися",
+      "tags": [
+        "#консультація",
+        "#довіра",
+        "#безпечнийпростір",
+        "#підтримка"
+      ],
+      "url": "https://www.tiktok.com/@yulia_psychologist_",
+      "views": "4.5K+",
+      "likes": "280+",
+      "duration": "1:30",
+      "category": "Початок терапії",
+      "bgGradient": "from-brand-900 via-teal-950 to-stone-900"
     }
   ]
 }
