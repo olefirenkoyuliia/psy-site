@@ -1299,103 +1299,84 @@
     </div>
   </section>
 
-  <!-- Section: TikTok Video Feed & Live Carousel -->
-  <section id="tiktok" class="py-20 bg-warm-bg border-t border-warm-border relative z-10 overflow-hidden">
+  <!-- Section: TikTok Video Carousel (Elena Kavani Style) -->
+  <section id="tiktok" class="py-20 bg-warm-bg border-t border-warm-border relative z-10 overflow-hidden" data-vidcar>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <!-- Top Header & Live Sync Banner -->
+      <!-- Top Header & Filter Controls -->
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
         <div class="space-y-3 max-w-2xl">
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-stone-900 text-white text-xs font-bold uppercase tracking-wider shadow-sm">
             <svg class="w-3.5 h-3.5 fill-current text-[#25F4EE]" viewBox="0 0 24 24">
               <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
             </svg>
-            <span>Live TikTok Feed • @yulia_psychologist_</span>
+            <span>TikTok • @yulia_psychologist_</span>
           </div>
           <h2 class="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-warm-text leading-tight">
-            Корисні відео та психологічні практики
+            Відеорозбори та практики
           </h2>
           <p class="text-warm-muted text-sm sm:text-base leading-relaxed">
-            Пряма трансляція з TikTok-акаунту Юлії Олефіренко. Кожне нове відео та практична техніка автоматично з'являються тут наживо з TikTok.
+            Короткі відео про символдраму, подолання тривоги, саморегуляцію та побудову внутрішньої опори. Натисніть на будь-яке відео для перегляду прямо на сайті.
           </p>
         </div>
 
-        <!-- Controls: View Switcher & TikTok Follow Button -->
-        <div class="flex flex-wrap items-center gap-3 self-start md:self-end shrink-0">
+        <!-- Controls: Topic Filters & Navigation Arrows -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-start md:self-end shrink-0">
           
-          <!-- View Switcher Tabs -->
-          <div class="flex items-center p-1 bg-white rounded-full border border-warm-border shadow-xs text-xs font-semibold">
-            <button type="button" id="tiktok-tab-feed-btn" onclick="switchTiktokView('feed')" class="px-4 py-2 rounded-full bg-stone-900 text-white font-bold transition-all shadow-xs flex items-center gap-1.5">
-              <span>📱</span> <span>Стрічка TikTok</span>
+          <!-- Filter Chips -->
+          <div class="flex flex-wrap items-center gap-1.5 p-1 bg-white rounded-2xl sm:rounded-full border border-warm-border shadow-xs" id="vid-filter-chips">
+            <button type="button" data-vfilter="all" class="vid-chip active px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-stone-900 text-white shadow-xs">
+              Всі теми
             </button>
-            <button type="button" id="tiktok-tab-carousel-btn" onclick="switchTiktokView('carousel')" class="px-4 py-2 rounded-full text-warm-muted hover:text-stone-900 transition-all flex items-center gap-1.5">
-              <span>🎬</span> <span>Карусель відео</span>
+            <button type="button" data-vfilter="consult" class="vid-chip px-3.5 py-1.5 rounded-full text-xs font-semibold text-warm-muted hover:text-stone-900 transition-all">
+              Консультації
+            </button>
+            <button type="button" data-vfilter="selfreg" class="vid-chip px-3.5 py-1.5 rounded-full text-xs font-semibold text-warm-muted hover:text-stone-900 transition-all">
+              Саморегуляція
+            </button>
+            <button type="button" data-vfilter="symbol" class="vid-chip px-3.5 py-1.5 rounded-full text-xs font-semibold text-warm-muted hover:text-stone-900 transition-all">
+              Символдрама
             </button>
           </div>
 
-          <a href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-[#FE2C55] hover:bg-[#e0264b] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:scale-105" data-bind-tiktok>
-            <svg class="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
-              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
-            </svg>
-            <span>Підписатися</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- VIEW 1: Live Official TikTok Creator Profile & Videos Feed (Default) -->
-      <div id="tiktok-feed-view" class="w-full flex flex-col items-center justify-center transition-all duration-300">
-        <div class="w-full max-w-3xl bg-white p-4 sm:p-6 rounded-[2rem] border border-warm-border/90 shadow-card flex justify-center overflow-hidden min-h-[480px]">
-          <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@yulia_psychologist_" data-unique-id="yulia_psychologist_" data-embed-from="oembed" data-embed-type="creator" style="max-width: 780px; min-width: 288px; width: 100%;">
-            <section>
-              <a target="_blank" href="https://www.tiktok.com/@yulia_psychologist_?refer=creator_embed" class="text-brand-800 font-bold hover:underline">@yulia_psychologist_</a>
-            </section>
-          </blockquote>
-        </div>
-      </div>
-
-      <!-- VIEW 2: Horizontal TikTok Video Carousel -->
-      <div id="tiktok-carousel-view" class="hidden relative transition-all duration-300">
-        
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-xs font-semibold text-warm-muted">Гортайте відео вліво/вправо:</span>
+          <!-- Carousel Prev/Next Arrows -->
           <div class="flex items-center gap-1.5 bg-white p-1 rounded-full border border-warm-border shadow-xs">
-            <button type="button" onclick="scrollTiktokCarousel(-1)" id="tiktok-prev-btn" class="w-8 h-8 rounded-full bg-warm-bg hover:bg-brand-50 text-warm-text hover:text-brand-800 flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold" aria-label="Попереднє відео">
+            <button type="button" id="vid-prev-btn" class="w-9 h-9 rounded-full bg-warm-bg hover:bg-brand-50 text-warm-text hover:text-brand-800 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed text-sm font-bold shadow-2xs" aria-label="Попереднє відео">
               ‹
             </button>
-            <button type="button" onclick="scrollTiktokCarousel(1)" id="tiktok-next-btn" class="w-8 h-8 rounded-full bg-warm-bg hover:bg-brand-50 text-warm-text hover:text-brand-800 flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold" aria-label="Наступне відео">
+            <button type="button" id="vid-next-btn" class="w-9 h-9 rounded-full bg-warm-bg hover:bg-brand-50 text-warm-text hover:text-brand-800 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed text-sm font-bold shadow-2xs" aria-label="Наступне відео">
               ›
             </button>
           </div>
-        </div>
 
-        <div id="tiktok-carousel" class="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth no-scrollbar snap-x snap-mandatory py-2 px-1" style="-webkit-overflow-scrolling: touch;">
-          <!-- Embeds populated dynamically via JS -->
-        </div>
-
-        <!-- Carousel Pagination Dots -->
-        <div class="mt-6 flex items-center justify-center gap-2" id="tiktok-carousel-dots">
-          <!-- Dots rendered via JS -->
         </div>
       </div>
 
-      <!-- Footer Account Status & Stats -->
+      <!-- Carousel Track Container -->
+      <div class="relative">
+        <div id="vid-track" class="vid-track flex gap-5 overflow-x-auto scroll-smooth no-scrollbar snap-x snap-mandatory py-3 px-1 cursor-grab active:cursor-grabbing select-none" style="-webkit-overflow-scrolling: touch;">
+          <!-- Video Cards dynamically generated via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Footer Bar -->
       <div class="mt-8 pt-6 border-t border-warm-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-warm-muted">
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="font-semibold text-stone-800">Автосинхронізація TikTok активна</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="font-medium">Офіційний акаунт @yulia_psychologist_</span>
           <span>•</span>
-          <span>Оновлюється наживо з профілю</span>
+          <span>4 000+ вподобань у TikTok</span>
         </div>
-        <div class="flex flex-wrap items-center gap-3 sm:gap-5 font-medium">
-          <a href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" rel="noopener noreferrer" class="text-[#FE2C55] hover:text-[#e0264b] font-bold flex items-center gap-1 transition-colors" data-bind-tiktok>
-            <span>Перейти в акаунт @yulia_psychologist_</span> ↗
-          </a>
-        </div>
+        <a href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900 hover:bg-black text-white font-bold transition-all shadow-sm transform hover:scale-105" data-bind-tiktok>
+          <svg class="w-3.5 h-3.5 fill-current text-[#FE2C55]" viewBox="0 0 24 24">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
+          </svg>
+          <span>Підписатися в TikTok</span> ↗
+        </a>
       </div>
 
     </div>
   </section>
-  <script async src="https://www.tiktok.com/embed.js"></script>
 
   <!-- Section: Instagram Blog Showcase -->
   <section id="instagram" class="py-20 bg-warm-bg border-t border-warm-border relative z-10">
@@ -1941,192 +1922,278 @@
       document.body.style.overflow = 'auto';
     }
 
-    // 8. Live TikTok Feed & Embeds Logic
+    // 8. TikTok Video Carousel Controller (Elena Kavani Style)
     const defaultTiktokVideos = [
       {
         id: "7683497457396796692",
+        topic: "consult",
+        topicLabel: "Консультації",
         title: "Запис на консультацію в особисті 💌",
         caption: "Як впоратися з тривогою, зрозуміти свої емоції та відновити внутрішній ресурс",
-        tags: ["#психолог", "#психологіястосунків", "#підтримка"],
         url: "https://www.tiktok.com/@yulia_psychologist_/video/7683497457396796692",
         views: "1.8K+",
+        likes: "40+",
         duration: "1:09",
-        category: "Консультації"
+        bgGradient: "from-stone-900 via-brand-950 to-stone-900"
       },
       {
         id: "7681325061026090260",
+        topic: "selfreg",
+        topicLabel: "Саморегуляція",
         title: "Саморегуляція та психологічна підтримка 📩",
         caption: "Прості та дієві техніки відновлення контакту з собою та пошуку внутрішньої опори",
-        tags: ["#психолог", "#психологія", "#саморегуляція"],
         url: "https://www.tiktok.com/@yulia_psychologist_/video/7681325061026090260",
         views: "2.4K+",
+        likes: "120+",
         duration: "2:31",
-        category: "Саморегуляція"
+        bgGradient: "from-stone-950 via-zinc-900 to-brand-900"
+      },
+      {
+        id: "7683497457396796693",
+        topic: "symbol",
+        topicLabel: "Символдрама",
+        title: "Метод символдрами: мова образів для зцілення 🌿",
+        caption: "Чому робота з несвідомим через образи допомагає м’яко подолати глибинні блоки",
+        url: "https://www.tiktok.com/@yulia_psychologist_",
+        views: "3.1K+",
+        likes: "190+",
+        duration: "1:45",
+        bgGradient: "from-emerald-950 via-brand-900 to-stone-900"
+      },
+      {
+        id: "7681325061026090261",
+        topic: "selfreg",
+        topicLabel: "Саморегуляція",
+        title: "Як дозволити собі відпочити без почуття провини ☕",
+        caption: "Чому турбота про власні потреби — це не егоїзм, а необхідна основа для життя",
+        url: "https://www.tiktok.com/@yulia_psychologist_",
+        views: "2.9K+",
+        likes: "155+",
+        duration: "1:15",
+        bgGradient: "from-stone-900 via-amber-950 to-stone-950"
+      },
+      {
+        id: "7683497457396796694",
+        topic: "consult",
+        topicLabel: "Початок терапії",
+        title: "Перша зустріч з психологом: чого очікувати? 🤍",
+        caption: "Як проходить первинна консультація, чому це безпечно та як підготуватися",
+        url: "https://www.tiktok.com/@yulia_psychologist_",
+        views: "4.5K+",
+        likes: "280+",
+        duration: "1:30",
+        bgGradient: "from-brand-950 via-teal-950 to-stone-900"
       }
     ];
 
-    function switchTiktokView(view) {
-      const feedView = document.getElementById('tiktok-feed-view');
-      const carouselView = document.getElementById('tiktok-carousel-view');
-      const feedBtn = document.getElementById('tiktok-tab-feed-btn');
-      const carouselBtn = document.getElementById('tiktok-tab-carousel-btn');
-
-      if (view === 'feed') {
-        if (feedView) feedView.classList.remove('hidden');
-        if (carouselView) carouselView.classList.add('hidden');
-        if (feedBtn) {
-          feedBtn.className = 'px-4 py-2 rounded-full bg-stone-900 text-white font-bold transition-all shadow-xs flex items-center gap-1.5';
-        }
-        if (carouselBtn) {
-          carouselBtn.className = 'px-4 py-2 rounded-full text-warm-muted hover:text-stone-900 transition-all flex items-center gap-1.5';
-        }
-      } else {
-        if (feedView) feedView.classList.add('hidden');
-        if (carouselView) carouselView.classList.remove('hidden');
-        if (feedBtn) {
-          feedBtn.className = 'px-4 py-2 rounded-full text-warm-muted hover:text-stone-900 transition-all flex items-center gap-1.5';
-        }
-        if (carouselBtn) {
-          carouselBtn.className = 'px-4 py-2 rounded-full bg-stone-900 text-white font-bold transition-all shadow-xs flex items-center gap-1.5';
-        }
-        updateTiktokControls();
-      }
-    }
-
-    function scrollTiktokCarousel(direction) {
-      const container = document.getElementById('tiktok-carousel');
-      if (!container) return;
-      const card = container.querySelector('.tiktok-slide-card');
-      const cardWidth = card ? card.offsetWidth : 300;
-      const gap = 20;
-      container.scrollBy({ left: (cardWidth + gap) * direction, behavior: 'smooth' });
-    }
-
-    function updateTiktokControls() {
-      const container = document.getElementById('tiktok-carousel');
-      const prevBtn = document.getElementById('tiktok-prev-btn');
-      const nextBtn = document.getElementById('tiktok-next-btn');
-      const dotsContainer = document.getElementById('tiktok-carousel-dots');
-      if (!container) return;
-
-      const maxScroll = Math.max(0, container.scrollWidth - container.clientWidth);
-      if (prevBtn) prevBtn.disabled = container.scrollLeft <= 5;
-      if (nextBtn) nextBtn.disabled = container.scrollLeft >= maxScroll - 5;
-
-      const cards = container.querySelectorAll('.tiktok-slide-card');
-      if (cards.length > 0 && maxScroll > 0) {
-        const activeIndex = Math.min(cards.length - 1, Math.max(0, Math.round((container.scrollLeft / maxScroll) * (cards.length - 1))));
-        if (dotsContainer) {
-          dotsContainer.querySelectorAll('.tiktok-dot').forEach((dot, idx) => {
-            if (idx === activeIndex) {
-              dot.className = 'tiktok-dot w-6 h-2 rounded-full bg-stone-900 transition-all duration-300';
-            } else {
-              dot.className = 'tiktok-dot w-2 h-2 rounded-full bg-warm-border hover:bg-stone-400 transition-all duration-300 cursor-pointer';
-            }
-          });
-        }
-      }
-    }
+    let currentTiktokFilter = 'all';
+    let isTrackDragging = false;
+    let trackStartX = 0;
+    let trackScrollLeft = 0;
+    let trackHasDragged = false;
 
     function renderTiktokCarousel(videos) {
-      const container = document.getElementById('tiktok-carousel');
-      const dotsContainer = document.getElementById('tiktok-carousel-dots');
-      if (!container) return;
-      const list = (videos && videos.length > 0) ? videos : defaultTiktokVideos;
-      
-      container.innerHTML = '';
-      if (dotsContainer) dotsContainer.innerHTML = '';
+      const track = document.getElementById('vid-track');
+      const prevBtn = document.getElementById('vid-prev-btn');
+      const nextBtn = document.getElementById('vid-next-btn');
+      const filterChips = document.getElementById('vid-filter-chips');
 
-      // 1. Render Video Cards as official TikTok Live Embeds
-      list.forEach((vid, idx) => {
+      if (!track) return;
+      const list = (videos && videos.length > 0) ? videos : defaultTiktokVideos;
+
+      track.innerHTML = '';
+
+      // 1. Render Video Cards
+      list.forEach((vid) => {
         const card = document.createElement('div');
-        card.className = 'tiktok-slide-card w-[290px] sm:w-[330px] shrink-0 snap-start bg-white rounded-3xl border border-warm-border shadow-card hover:shadow-hover transition-all duration-300 overflow-hidden flex flex-col justify-between p-2';
+        card.className = 'vid-card group relative w-[240px] sm:w-[270px] md:w-[285px] shrink-0 snap-start bg-stone-900 rounded-3xl border border-warm-border/80 shadow-card hover:shadow-hover transition-all duration-300 overflow-hidden flex flex-col justify-between select-none';
+        card.dataset.topic = vid.topic || 'all';
+
+        const embedId = vid.id || (vid.url && vid.url.match(/video\/(\d+)/) ? vid.url.match(/video\/(\d+)/)[1] : '');
 
         card.innerHTML = `
-          <blockquote 
-            class="tiktok-embed" 
-            cite="${vid.url || `https://www.tiktok.com/@yulia_psychologist_/video/${vid.id}`}" 
-            data-video-id="${vid.id}" 
-            style="max-width: 325px; min-width: 270px; width: 100%;"
-          >
-            <section>
-              <a target="_blank" title="@yulia_psychologist_" href="https://www.tiktok.com/@yulia_psychologist_?refer=embed">@yulia_psychologist_</a>
-              <p>${vid.title || 'Відео психологічної практики'}</p>
-            </section>
-          </blockquote>
+          <div class="vid-cover relative w-full aspect-[9/16] bg-gradient-to-br ${vid.bgGradient || 'from-stone-900 via-zinc-900 to-brand-950'} flex flex-col justify-between p-4 cursor-pointer overflow-hidden rounded-3xl">
+            <!-- Top badges -->
+            <div class="flex items-center justify-between z-10">
+              <span class="px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-xs text-white text-[11px] font-bold border border-white/10 tracking-wide">
+                ${vid.topicLabel || vid.category || 'Відео'}
+              </span>
+              <span class="px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-xs text-stone-300 text-[10px] font-medium">
+                ${vid.duration || '1:00'}
+              </span>
+            </div>
+
+            <!-- Central Play Button (1-click in-place play) -->
+            <div class="vid-play my-auto flex flex-col items-center justify-center gap-2 z-10 transform group-hover:scale-110 transition-transform duration-300 pointer-events-none">
+              <div class="w-14 h-14 rounded-full bg-[#FE2C55] text-white flex items-center justify-center shadow-lg shadow-[#FE2C55]/40 border-2 border-white/25">
+                <svg class="w-6 h-6 fill-current translate-x-0.5" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+              <span class="text-[11px] font-semibold text-white/90 drop-shadow-sm">Дивитися відео</span>
+            </div>
+
+            <!-- Bottom metadata -->
+            <div class="z-10 space-y-1 bg-gradient-to-t from-black/85 via-black/50 to-transparent -mx-4 -mb-4 p-4 pt-6">
+              <p class="text-xs font-bold text-white line-clamp-2 leading-snug drop-shadow-sm">${vid.title}</p>
+              <div class="flex items-center justify-between text-[11px] text-stone-300 pt-0.5">
+                <span class="text-[#25F4EE] font-semibold">@yulia_psychologist_</span>
+                <span class="text-stone-400">${vid.views || '1.8K+'} переглядів</span>
+              </div>
+            </div>
+          </div>
         `;
 
-        container.appendChild(card);
+        // Inline 1-click video player
+        const coverEl = card.querySelector('.vid-cover');
+        if (coverEl) {
+          coverEl.addEventListener('click', () => {
+            if (trackHasDragged) return;
+            if (coverEl.querySelector('iframe')) return;
+
+            const targetUrl = embedId
+              ? `https://www.tiktok.com/embed/v2/${embedId}?lang=uk-UA`
+              : (vid.url || 'https://www.tiktok.com/@yulia_psychologist_');
+
+            coverEl.innerHTML = `
+              <iframe 
+                src="${targetUrl}" 
+                class="w-full h-full border-0 rounded-3xl bg-black" 
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; clipboard-write; web-share" 
+                allowfullscreen>
+              </iframe>
+            `;
+          });
+        }
+
+        track.appendChild(card);
       });
 
-      // 2. Render Channel Showcase Promo Card
+      // 2. Render Showcase & Promo Card
       const promoCard = document.createElement('div');
-      promoCard.className = 'tiktok-slide-card w-[290px] sm:w-[330px] h-[520px] shrink-0 snap-start bg-gradient-to-br from-stone-900 via-zinc-900 to-brand-950 rounded-3xl border border-warm-border/80 shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1 p-6 flex flex-col justify-between text-white select-none';
+      promoCard.className = 'vid-card group relative w-[240px] sm:w-[270px] md:w-[285px] shrink-0 snap-start bg-gradient-to-br from-stone-900 via-zinc-900 to-brand-950 rounded-3xl border border-warm-border/80 shadow-card hover:shadow-hover transition-all duration-300 overflow-hidden flex flex-col justify-between p-5 text-white select-none';
+      promoCard.dataset.topic = 'all';
       promoCard.innerHTML = `
-        <div class="space-y-3">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-bold border border-white/15">
-            <span>✨</span> <span>@yulia_psychologist_</span>
+        <div class="space-y-2.5">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-bold border border-white/15">
+            <svg class="w-3.5 h-3.5 fill-current text-[#FE2C55]" viewBox="0 0 24 24">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
+            </svg>
+            <span>TikTok Канал</span>
           </div>
-          <h3 class="font-serif-luxury text-2xl font-bold leading-tight">
-            Більше відео та практик у моєму TikTok
+          <h3 class="font-serif-luxury text-xl font-bold leading-tight">
+            Більше корисних практик та відео
           </h3>
           <p class="text-xs text-stone-300 leading-relaxed">
-            Корисні техніки самодопомоги, робота з тривогою, метод символдрами та пошук внутрішнього ресурсу.
+            Регулярні розбори, техніки саморегуляції, метод символдрами та пошук внутрішньої опори.
           </p>
         </div>
 
-        <div class="space-y-3 my-auto">
-          <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-            <div class="text-xs text-stone-400">Вподобань у TikTok</div>
-            <div class="text-xl font-bold text-[#FE2C55]">4 000+ ❤️</div>
+        <div class="space-y-2.5 my-auto py-2">
+          <div class="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-0.5">
+            <div class="text-[11px] text-stone-400">Вподобань у TikTok</div>
+            <div class="text-lg font-bold text-[#FE2C55]">4 000+ ❤️</div>
           </div>
-          <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-            <div class="text-xs text-stone-400">Тематика блогу</div>
-            <div class="text-xs font-semibold text-white">Символдрама • Саморегуляція • Стосунки</div>
+          <div class="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-0.5">
+            <div class="text-[11px] text-stone-400">Тематика</div>
+            <div class="text-xs font-semibold text-white">Символдрама • Тривога • Межі</div>
           </div>
         </div>
 
         <div class="space-y-2 pt-2">
-          <a href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 rounded-full bg-[#FE2C55] hover:bg-[#e0264b] text-white font-bold text-xs text-center flex items-center justify-center gap-2 shadow-lg transition-all transform hover:scale-105" data-bind-tiktok>
-            <svg class="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
-              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
+          <a href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" rel="noopener noreferrer" class="w-full py-3 rounded-full bg-[#FE2C55] hover:bg-[#e0264b] text-white font-bold text-xs text-center flex items-center justify-center gap-2 shadow-md transition-all transform hover:scale-105" data-bind-tiktok>
+            <svg class="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24">
+              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
             </svg>
             <span>Підписатися в TikTok</span>
           </a>
-          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-xs text-center flex items-center justify-center gap-1.5 transition-all">
+          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-xs text-center flex items-center justify-center gap-1.5 transition-all">
             <span>Записатися на консультацію</span>
           </a>
         </div>
       `;
-      container.appendChild(promoCard);
+      track.appendChild(promoCard);
 
-      // 3. Create Dots
-      if (dotsContainer) {
-        const totalCards = list.length + 1;
-        for (let i = 0; i < totalCards; i++) {
-          const dot = document.createElement('button');
-          dot.type = 'button';
-          dot.className = i === 0 
-            ? 'tiktok-dot w-6 h-2 rounded-full bg-stone-900 transition-all duration-300' 
-            : 'tiktok-dot w-2 h-2 rounded-full bg-warm-border hover:bg-stone-400 transition-all duration-300 cursor-pointer';
-          dot.onclick = () => {
-            const card = container.querySelector('.tiktok-slide-card');
-            const cardW = card ? card.offsetWidth + 20 : 320;
-            container.scrollTo({ left: i * cardW, behavior: 'smooth' });
-          };
-          dotsContainer.appendChild(dot);
-        }
+      // 3. Setup Navigation Arrows
+      function updateVidArrows() {
+        if (!track || !prevBtn || !nextBtn) return;
+        const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+        prevBtn.disabled = track.scrollLeft <= 10;
+        nextBtn.disabled = track.scrollLeft >= maxScroll - 10;
       }
 
-      container.addEventListener('scroll', updateTiktokControls, { passive: true });
-      updateTiktokControls();
+      if (prevBtn) {
+        prevBtn.onclick = () => {
+          const card = track.querySelector('.vid-card:not(.hidden)');
+          const step = card ? card.offsetWidth + 20 : 290;
+          track.scrollBy({ left: -step, behavior: 'smooth' });
+        };
+      }
 
-      // Trigger TikTok script to process any newly inserted blockquotes
-      try {
-        if (window.tiktokEmbed && typeof window.tiktokEmbed.process === 'function') {
-          window.tiktokEmbed.process();
+      if (nextBtn) {
+        nextBtn.onclick = () => {
+          const card = track.querySelector('.vid-card:not(.hidden)');
+          const step = card ? card.offsetWidth + 20 : 290;
+          track.scrollBy({ left: step, behavior: 'smooth' });
+        };
+      }
+
+      track.addEventListener('scroll', updateVidArrows, { passive: true });
+      updateVidArrows();
+
+      // 4. Setup Drag-to-Scroll on Track
+      track.addEventListener('pointerdown', (e) => {
+        isTrackDragging = true;
+        trackHasDragged = false;
+        trackStartX = e.pageX - track.offsetLeft;
+        trackScrollLeft = track.scrollLeft;
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!isTrackDragging) return;
+        const x = e.pageX - track.offsetLeft;
+        const walk = (x - trackStartX);
+        if (Math.abs(walk) > 5) {
+          trackHasDragged = true;
         }
-      } catch (e) {}
+        track.scrollLeft = trackScrollLeft - walk;
+      });
+
+      window.addEventListener('pointerup', () => {
+        isTrackDragging = false;
+        setTimeout(() => { trackHasDragged = false; }, 50);
+      });
+
+      // 5. Setup Filter Chips
+      if (filterChips) {
+        filterChips.querySelectorAll('button[data-vfilter]').forEach((btn) => {
+          btn.onclick = () => {
+            const filter = btn.dataset.vfilter || 'all';
+            currentTiktokFilter = filter;
+
+            // Update button styles
+            filterChips.querySelectorAll('button[data-vfilter]').forEach((b) => {
+              if (b === btn) {
+                b.className = 'vid-chip active px-3.5 py-1.5 rounded-full text-xs font-bold transition-all bg-stone-900 text-white shadow-xs';
+              } else {
+                b.className = 'vid-chip px-3.5 py-1.5 rounded-full text-xs font-semibold text-warm-muted hover:text-stone-900 transition-all bg-transparent shadow-none';
+              }
+            });
+
+            // Filter cards
+            track.querySelectorAll('.vid-card').forEach((c) => {
+              if (filter === 'all' || c.dataset.topic === filter || c.dataset.topic === 'all') {
+                c.classList.remove('hidden');
+              } else {
+                c.classList.add('hidden');
+              }
+            });
+
+            track.scrollTo({ left: 0, behavior: 'smooth' });
+            setTimeout(updateVidArrows, 200);
+          };
+        });
+      }
     }
 
     try {
@@ -2136,8 +2203,6 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeLightbox();
-        document.querySelectorAll('video[id^="tiktok-video-"]').forEach(v => v.pause());
-        document.querySelectorAll('[id^="tiktok-play-overlay-"]').forEach(o => o.classList.remove('hidden'));
       }
     });
 
