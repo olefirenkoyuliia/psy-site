@@ -1570,48 +1570,6 @@
     </div>
   </div>
 
-  <!-- TikTok Video Preview Modal -->
-  <div id="tiktok-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 transition-all duration-300" onclick="closeTiktokModal(event)">
-    <div class="relative w-full max-w-md max-h-[94vh] bg-stone-900 rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col" onclick="event.stopPropagation()">
-      
-      <!-- Modal Header -->
-      <div class="p-4 bg-stone-950/90 border-b border-white/10 flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-full bg-stone-800 border border-white/20 flex items-center justify-center text-sm shadow-sm">
-            🎵
-          </div>
-          <div>
-            <h4 id="tiktok-modal-title" class="font-bold text-sm text-white leading-tight line-clamp-1">Відео Юлії Олефіренко</h4>
-            <p class="text-[11px] text-brand-300 font-medium">@yulia_psychologist_ • TikTok</p>
-          </div>
-        </div>
-        <button onclick="closeTiktokModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors text-base" title="Закрити (Esc)">
-          ✕
-        </button>
-      </div>
-
-      <!-- Modal Body (Interactive Player Container) -->
-      <div class="relative bg-black flex-grow flex items-center justify-center min-h-[460px] max-h-[66vh] overflow-hidden" id="tiktok-modal-player-container">
-        <!-- Player iframe or fallback inserted dynamically -->
-      </div>
-
-      <!-- Modal Footer Info & Action CTAs -->
-      <div class="p-4 bg-stone-950 border-t border-white/10 space-y-3">
-        <p id="tiktok-modal-caption" class="text-xs text-stone-300 leading-relaxed line-clamp-2"></p>
-        <div class="flex items-center gap-2.5 pt-1">
-          <a id="tiktok-modal-open-link" href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" rel="noopener noreferrer" class="flex-1 py-2.5 px-4 rounded-xl bg-[#FE2C55] hover:bg-[#e0264b] text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 shadow-md transition-all">
-            <span>Відкрити в TikTok</span>
-            <span class="text-sm">↗</span>
-          </a>
-          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="py-2.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 transition-all">
-            <span>Записатися</span>
-          </a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
   <!-- Dynamic Interactive Scripts -->
   <script>
     // 1. Ambient Cursor Follower Glow
@@ -2052,55 +2010,54 @@
       }
     }
 
-    function openTiktokModal(videoId, title, caption, videoUrl) {
-      const modal = document.getElementById('tiktok-modal');
-      const playerContainer = document.getElementById('tiktok-modal-player-container');
-      const titleEl = document.getElementById('tiktok-modal-title');
-      const captionEl = document.getElementById('tiktok-modal-caption');
-      const openLink = document.getElementById('tiktok-modal-open-link');
+    function playTiktokInline(btnOrCard, videoId, videoUrl) {
+      const card = btnOrCard.closest('.tiktok-slide-card');
+      if (!card) return;
 
-      if (!modal) return;
-      if (titleEl) titleEl.textContent = title || 'Відео Юлії Олефіренко';
-      if (captionEl) captionEl.textContent = caption || '';
-      if (openLink) openLink.href = videoUrl || (videoId ? `https://www.tiktok.com/@yulia_psychologist_/video/${videoId}` : 'https://www.tiktok.com/@yulia_psychologist_');
+      // Stop any other currently playing video cards in the carousel
+      document.querySelectorAll('.tiktok-slide-card.is-playing').forEach(otherCard => {
+        if (otherCard !== card) {
+          stopTiktokInline(otherCard);
+        }
+      });
 
-      if (playerContainer) {
-        if (videoId && videoId.length > 5) {
-          playerContainer.innerHTML = `
+      const playerContainer = card.querySelector('.card-player-container');
+      const coverContainer = card.querySelector('.card-cover-container');
+
+      if (playerContainer && coverContainer) {
+        card.classList.add('is-playing');
+        coverContainer.classList.add('hidden');
+        playerContainer.classList.remove('hidden');
+
+        playerContainer.innerHTML = `
+          <div class="relative w-full h-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-3xl">
+            <div class="absolute top-3 right-3 z-30">
+              <button type="button" onclick="event.stopPropagation(); stopTiktokInline(this.closest('.tiktok-slide-card'))" class="px-3 py-1.5 rounded-full bg-black/70 hover:bg-black text-white text-xs font-bold backdrop-blur-md border border-white/20 transition-all flex items-center gap-1.5 shadow-lg active:scale-95" title="Згорнути плеєр">
+                <span>✕</span> <span>Згорнути</span>
+              </button>
+            </div>
             <iframe 
-              src="https://www.tiktok.com/embed/v2/${encodeURIComponent(videoId)}" 
-              class="w-full h-[460px] border-0" 
+              src="https://www.tiktok.com/embed/v2/${encodeURIComponent(videoId)}?autoplay=1" 
+              class="w-full h-full border-0 rounded-3xl" 
               allow="autoplay; fullscreen; encrypted-media; picture-in-picture" 
               allowfullscreen>
             </iframe>
-          `;
-        } else {
-          playerContainer.innerHTML = `
-            <div class="p-8 text-center text-white space-y-4">
-              <div class="text-5xl">📱</div>
-              <p class="font-bold text-base">Дивитися відео в TikTok</p>
-              <a href="${videoUrl || 'https://www.tiktok.com/@yulia_psychologist_'}" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#FE2C55] text-white font-bold text-sm shadow-md">
-                <span>Відкрити TikTok</span> ➔
-              </a>
-            </div>
-          `;
-        }
+          </div>
+        `;
       }
-
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      document.body.style.overflow = 'hidden';
     }
 
-    function closeTiktokModal(e) {
-      if (e && e.target && e.target !== e.currentTarget && !e.target.closest('button')) return;
-      const modal = document.getElementById('tiktok-modal');
-      const playerContainer = document.getElementById('tiktok-modal-player-container');
-      if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        if (playerContainer) playerContainer.innerHTML = '';
-        document.body.style.overflow = 'auto';
+    function stopTiktokInline(card) {
+      if (!card) return;
+      card.classList.remove('is-playing');
+      const playerContainer = card.querySelector('.card-player-container');
+      const coverContainer = card.querySelector('.card-cover-container');
+      if (playerContainer) {
+        playerContainer.classList.add('hidden');
+        playerContainer.innerHTML = '';
+      }
+      if (coverContainer) {
+        coverContainer.classList.remove('hidden');
       }
     }
 
@@ -2115,60 +2072,74 @@
 
       list.forEach((vid, idx) => {
         const card = document.createElement('div');
-        card.className = 'tiktok-slide-card w-[275px] sm:w-[310px] shrink-0 snap-start bg-white rounded-3xl border border-warm-border shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden group cursor-pointer';
-        card.onclick = () => openTiktokModal(vid.id, vid.title, vid.caption, vid.url);
+        card.className = 'tiktok-slide-card w-[290px] sm:w-[325px] h-[550px] sm:h-[580px] shrink-0 snap-start bg-white rounded-3xl border border-warm-border shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden relative group';
 
         const tagsHtml = (vid.tags || []).slice(0, 2).map(t => `<span class="px-2 py-0.5 rounded-md bg-white/15 text-white text-[10px] font-medium backdrop-blur-xs">${t}</span>`).join(' ');
 
         card.innerHTML = `
-          <div class="relative aspect-[9/13] bg-gradient-to-br ${vid.bgGradient || 'from-stone-900 to-brand-900'} p-5 flex flex-col justify-between overflow-hidden">
+          <!-- Active Inline Player Container (Hidden by default, loaded on play) -->
+          <div class="card-player-container hidden w-full h-full absolute inset-0 z-20 bg-black rounded-3xl"></div>
+
+          <!-- Cover & Info Container (Clicking anywhere starts video in-place) -->
+          <div class="card-cover-container w-full h-full flex flex-col justify-between cursor-pointer" onclick="playTiktokInline(this, '${vid.id}', '${vid.url}')">
             
-            <div class="absolute -right-8 -top-8 w-36 h-36 rounded-full bg-white/5 blur-2xl pointer-events-none"></div>
-            <div class="absolute -left-8 -bottom-8 w-36 h-36 rounded-full bg-brand-500/10 blur-2xl pointer-events-none"></div>
+            <!-- Poster Area -->
+            <div class="relative aspect-[9/11] bg-gradient-to-br ${vid.bgGradient || 'from-stone-900 to-brand-900'} p-5 flex flex-col justify-between overflow-hidden">
+              
+              <div class="absolute -right-8 -top-8 w-36 h-36 rounded-full bg-white/5 blur-2xl pointer-events-none"></div>
+              <div class="absolute -left-8 -bottom-8 w-36 h-36 rounded-full bg-brand-500/10 blur-2xl pointer-events-none"></div>
 
-            <div class="relative z-10 flex items-center justify-between">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-[11px] font-bold border border-white/10">
-                <svg class="w-3 h-3 fill-current text-[#25F4EE]" viewBox="0 0 24 24">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
-                </svg>
-                <span>${vid.category || 'TikTok'}</span>
-              </span>
-              <span class="px-2 py-0.5 rounded-full bg-black/40 text-white/90 text-[10px] font-semibold backdrop-blur-md border border-white/10">
-                ⏱️ ${vid.duration || '1:00'}
-              </span>
-            </div>
-
-            <div class="relative z-10 my-auto flex flex-col items-center justify-center">
-              <div class="w-14 h-14 rounded-full bg-white/90 group-hover:bg-[#FE2C55] text-stone-900 group-hover:text-white flex items-center justify-center text-xl shadow-xl transition-all duration-300 transform group-hover:scale-110 pl-1">
-                ▶
+              <div class="relative z-10 flex items-center justify-between">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-[11px] font-bold border border-white/10">
+                  <svg class="w-3 h-3 fill-current text-[#25F4EE]" viewBox="0 0 24 24">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
+                  </svg>
+                  <span>${vid.category || 'TikTok'}</span>
+                </span>
+                <span class="px-2 py-0.5 rounded-full bg-black/40 text-white/90 text-[10px] font-semibold backdrop-blur-md border border-white/10">
+                  ⏱️ ${vid.duration || '1:00'}
+                </span>
               </div>
-              <span class="text-[11px] text-white/80 font-medium mt-2 tracking-wide group-hover:text-white transition-colors">Дивитися відео</span>
-            </div>
 
-            <div class="relative z-10 space-y-1.5 bg-gradient-to-t from-black/85 via-black/40 to-transparent -mx-5 -mb-5 p-5 pt-6">
-              <div class="flex items-center gap-1.5">
-                ${tagsHtml}
+              <!-- Big Centered Play Button -->
+              <div class="relative z-10 my-auto flex flex-col items-center justify-center">
+                <div class="w-16 h-16 rounded-full bg-white group-hover:bg-[#FE2C55] text-stone-900 group-hover:text-white flex items-center justify-center text-2xl shadow-2xl transition-all duration-300 transform group-hover:scale-110 pl-1">
+                  ▶
+                </div>
+                <span class="text-xs font-bold text-white mt-3 tracking-wide drop-shadow-md group-hover:text-white transition-colors bg-black/30 px-3 py-1 rounded-full backdrop-blur-xs">
+                  Натисніть для перегляду
+                </span>
               </div>
-              <h3 class="font-serif-luxury text-base font-bold text-white line-clamp-2 leading-snug drop-shadow-sm">
-                ${vid.title}
-              </h3>
+
+              <div class="relative z-10 space-y-1 bg-gradient-to-t from-black/85 via-black/40 to-transparent -mx-5 -mb-5 p-5 pt-6">
+                <div class="flex items-center gap-1.5">
+                  ${tagsHtml}
+                </div>
+              </div>
+
             </div>
 
-          </div>
+            <!-- Card Bottom Info -->
+            <div class="p-4 bg-white space-y-2 flex-grow flex flex-col justify-between">
+              <div>
+                <h3 class="font-serif-luxury text-base font-bold text-warm-text line-clamp-2 leading-snug mb-1">
+                  ${vid.title}
+                </h3>
+                <p class="text-xs text-warm-muted line-clamp-2 leading-relaxed">
+                  ${vid.caption}
+                </p>
+              </div>
 
-          <div class="p-4 bg-white space-y-2.5 flex-grow flex flex-col justify-between">
-            <p class="text-xs text-warm-muted line-clamp-2 leading-relaxed">
-              ${vid.caption}
-            </p>
-
-            <div class="pt-2 border-t border-warm-border flex items-center justify-between text-[11px] font-semibold text-warm-muted">
-              <span class="flex items-center gap-1 text-stone-700">
-                <span>👁️</span> <span>${vid.views || '1K+'}</span>
-              </span>
-              <span class="text-brand-700 group-hover:text-[#FE2C55] font-bold flex items-center gap-1 transition-colors">
-                <span>Переглянути</span> ➔
-              </span>
+              <div class="pt-2 border-t border-warm-border flex items-center justify-between text-[11px] font-semibold text-warm-muted">
+                <span class="flex items-center gap-1 text-stone-700">
+                  <span>👁️</span> <span>${vid.views || '1K+'}</span>
+                </span>
+                <a href="${vid.url}" target="_blank" onclick="event.stopPropagation()" class="text-brand-700 hover:text-[#FE2C55] font-bold flex items-center gap-1 transition-colors" title="Відкрити в додатку TikTok">
+                  <span>В TikTok</span> ↗
+                </a>
+              </div>
             </div>
+
           </div>
         `;
 
@@ -2199,7 +2170,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeLightbox();
-        closeTiktokModal();
+        document.querySelectorAll('.tiktok-slide-card.is-playing').forEach(stopTiktokInline);
       }
     });
 
