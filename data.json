@@ -93,6 +93,7 @@
       "likes": "40+",
       "duration": "1:09",
       "category": "Консультації",
+      "isSoon": false,
       "bgGradient": "from-stone-900 via-brand-950 to-stone-900"
     },
     {
@@ -111,10 +112,11 @@
       "likes": "120+",
       "duration": "2:31",
       "category": "Саморегуляція",
+      "isSoon": false,
       "bgGradient": "from-stone-950 via-zinc-900 to-brand-900"
     },
     {
-      "id": "7683497457396796693",
+      "id": "",
       "topic": "symbol",
       "topicLabel": "Символдрама",
       "title": "Метод символдрами: мова образів для зцілення 🌿",
@@ -129,10 +131,11 @@
       "likes": "190+",
       "duration": "1:45",
       "category": "Символдрама",
+      "isSoon": true,
       "bgGradient": "from-emerald-950 via-brand-900 to-stone-900"
     },
     {
-      "id": "7681325061026090261",
+      "id": "",
       "topic": "selfreg",
       "topicLabel": "Саморегуляція",
       "title": "Як дозволити собі відпочити без почуття провини ☕",
@@ -147,10 +150,11 @@
       "likes": "155+",
       "duration": "1:15",
       "category": "Саморегуляція",
+      "isSoon": true,
       "bgGradient": "from-stone-900 via-amber-950 to-stone-950"
     },
     {
-      "id": "7683497457396796694",
+      "id": "",
       "topic": "consult",
       "topicLabel": "Початок терапії",
       "title": "Перша зустріч з психологом: чого очікувати? 🤍",
@@ -165,6 +169,7 @@
       "likes": "280+",
       "duration": "1:30",
       "category": "Консультації",
+      "isSoon": true,
       "bgGradient": "from-brand-950 via-teal-950 to-stone-900"
     }
   ]
