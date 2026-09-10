@@ -1936,6 +1936,30 @@
         views: "2.4K+",
         duration: "2:31",
         category: "Саморегуляція"
+      },
+      {
+        id: "7683497457396796693",
+        title: "Метод символдрами: мова образів для зцілення 🌿",
+        caption: "Чому робота з несвідомим через образи допомагає м’яко подолати глибинні блоки",
+        tags: ["#символдрама", "#психотерапія", "#гармонія"],
+        url: "https://www.tiktok.com/@yulia_psychologist_",
+        src: "videos/tiktok_3.mp4",
+        poster: "videos/tiktok_3_cover.jpg",
+        views: "3.1K+",
+        duration: "1:45",
+        category: "Символдрама"
+      },
+      {
+        id: "7681325061026090261",
+        title: "Як дозволити собі відпочити без почуття провини ☕",
+        caption: "Чому турбота про власні потреби — це не егоїзм, а необхідна основа для життя",
+        tags: ["#самооцінка", "#межі", "#відпочинок"],
+        url: "https://www.tiktok.com/@yulia_psychologist_",
+        src: "videos/tiktok_4.mp4",
+        poster: "videos/tiktok_4_cover.jpg",
+        views: "2.9K+",
+        duration: "1:15",
+        category: "Психопрактика"
       }
     ];
 
@@ -2010,8 +2034,8 @@
       const container = document.getElementById('tiktok-carousel');
       if (!container) return;
       const card = container.querySelector('.tiktok-slide-card');
-      const cardWidth = card ? card.offsetWidth : 320;
-      const gap = 24;
+      const cardWidth = card ? card.offsetWidth : 240;
+      const gap = 20;
       container.scrollBy({ left: (cardWidth + gap) * direction, behavior: 'smooth' });
     }
 
@@ -2050,12 +2074,12 @@
       container.innerHTML = '';
       if (dotsContainer) dotsContainer.innerHTML = '';
 
-      // 1. Render Video Cards
+      // 1. Render Video Cards (Proportionately scaled 1/3 smaller)
       list.forEach((vid, idx) => {
         const card = document.createElement('div');
-        card.className = 'tiktok-slide-card w-[290px] sm:w-[330px] h-[540px] sm:h-[580px] shrink-0 snap-start bg-stone-950 rounded-3xl border border-warm-border/80 shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1 overflow-hidden relative group flex flex-col justify-between select-none';
+        card.className = 'tiktok-slide-card w-[215px] sm:w-[245px] h-[375px] sm:h-[415px] shrink-0 snap-start bg-stone-950 rounded-2xl sm:rounded-3xl border border-warm-border/80 shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1 overflow-hidden relative group flex flex-col justify-between select-none';
 
-        const tagsHtml = (vid.tags || []).slice(0, 3).map(t => `<span class="px-2 py-0.5 rounded-md bg-white/20 text-white text-[10px] font-medium backdrop-blur-xs">${t}</span>`).join(' ');
+        const tagsHtml = (vid.tags || []).slice(0, 2).map(t => `<span class="px-1.5 py-0.5 rounded-md bg-white/20 text-white text-[9px] font-medium backdrop-blur-xs">${t}</span>`).join(' ');
 
         card.innerHTML = `
           <!-- Video Element -->
@@ -2073,16 +2097,16 @@
           ></video>
 
           <!-- Top Info Floating Overlay -->
-          <div class="relative z-10 p-4 flex items-center justify-between pointer-events-none bg-gradient-to-b from-black/75 via-black/30 to-transparent">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-white text-[11px] font-bold border border-white/15">
-              <svg class="w-3.5 h-3.5 fill-current text-[#25F4EE]" viewBox="0 0 24 24">
+          <div class="relative z-10 p-3 flex items-center justify-between pointer-events-none bg-gradient-to-b from-black/80 via-black/30 to-transparent">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/50 backdrop-blur-md text-white text-[10px] font-bold border border-white/15">
+              <svg class="w-3 h-3 fill-current text-[#25F4EE]" viewBox="0 0 24 24">
                 <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
               </svg>
               <span>${vid.category || 'TikTok'}</span>
             </span>
 
-            <div class="flex items-center gap-2 pointer-events-auto">
-              <button type="button" onclick="toggleTiktokMute(event, ${idx})" class="w-8 h-8 rounded-full bg-black/60 hover:bg-black text-white text-xs flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-md active:scale-95" title="Увімкнути/вимкнути звук">
+            <div class="flex items-center gap-1.5 pointer-events-auto">
+              <button type="button" onclick="toggleTiktokMute(event, ${idx})" class="w-7 h-7 rounded-full bg-black/60 hover:bg-black text-white text-[11px] flex items-center justify-center backdrop-blur-md border border-white/20 transition-all shadow-md active:scale-95" title="Увімкнути/вимкнути звук">
                 <span id="tiktok-vol-icon-${idx}">🔊</span>
               </button>
             </div>
@@ -2090,38 +2114,38 @@
 
           <!-- Center Big Play Button Overlay -->
           <div id="tiktok-play-overlay-${idx}" class="relative z-10 my-auto flex flex-col items-center justify-center cursor-pointer pointer-events-auto" onclick="toggleTiktokVideoPlay(${idx})">
-            <div class="w-16 h-16 rounded-full bg-[#FE2C55] hover:bg-[#e0264b] text-white flex items-center justify-center text-2xl shadow-2xl transition-all duration-300 transform group-hover:scale-110 pl-1.5 ring-4 ring-white/30">
+            <div class="w-12 h-12 rounded-full bg-[#FE2C55] hover:bg-[#e0264b] text-white flex items-center justify-center text-lg shadow-xl transition-all duration-300 transform group-hover:scale-110 pl-1 ring-4 ring-white/30">
               ▶
             </div>
-            <span class="text-xs font-bold text-white mt-3 tracking-wide drop-shadow-md bg-black/60 px-3.5 py-1 rounded-full backdrop-blur-sm">
-              Натисніть для перегляду
+            <span class="text-[10px] font-bold text-white mt-2 tracking-wide drop-shadow-md bg-black/60 px-2.5 py-0.5 rounded-full backdrop-blur-sm">
+              Переглянути
             </span>
           </div>
 
           <!-- Bottom Details & Progress Bar -->
-          <div class="relative z-10 p-4 pt-8 bg-gradient-to-t from-black/95 via-black/70 to-transparent space-y-2 pointer-events-none">
+          <div class="relative z-10 p-3 pt-6 bg-gradient-to-t from-black/95 via-black/75 to-transparent space-y-1.5 pointer-events-none">
             
-            <div class="w-full h-1 bg-white/20 rounded-full overflow-hidden pointer-events-auto cursor-pointer" onclick="seekTiktokVideo(event, ${idx})">
+            <div class="w-full h-1 bg-white/25 rounded-full overflow-hidden pointer-events-auto cursor-pointer" onclick="seekTiktokVideo(event, ${idx})">
               <div id="tiktok-progress-${idx}" class="h-full bg-[#FE2C55] w-0 transition-all duration-100"></div>
             </div>
 
-            <div class="flex items-center justify-between text-[11px] text-white/80">
-              <div class="flex items-center gap-1.5 flex-wrap">
+            <div class="flex items-center justify-between text-[10px] text-white/80">
+              <div class="flex items-center gap-1 flex-wrap">
                 ${tagsHtml}
               </div>
               <span id="tiktok-duration-${idx}" class="font-semibold text-white/90">⏱️ ${vid.duration || '1:00'}</span>
             </div>
 
-            <h3 class="font-serif-luxury text-base font-bold text-white leading-snug drop-shadow-sm">
+            <h3 class="font-serif-luxury text-xs sm:text-sm font-bold text-white leading-snug line-clamp-2 drop-shadow-sm">
               ${vid.title}
             </h3>
 
-            <div class="pt-1.5 border-t border-white/15 flex items-center justify-between text-[11px] font-semibold text-stone-300">
+            <div class="pt-1 border-t border-white/15 flex items-center justify-between text-[10px] font-semibold text-stone-300">
               <span class="flex items-center gap-1 text-white">
                 <span>👁️</span> <span>${vid.views || '1K+'}</span>
               </span>
-              <a href="${vid.url}" target="_blank" class="pointer-events-auto text-[#25F4EE] hover:text-white font-bold flex items-center gap-1 transition-colors" title="Відкрити в додатку TikTok">
-                <span>Відкрити в TikTok</span> ↗
+              <a href="${vid.url}" target="_blank" class="pointer-events-auto text-[#25F4EE] hover:text-white font-bold flex items-center gap-0.5 transition-colors" title="Відкрити в додатку TikTok">
+                <span>TikTok</span> ↗
               </a>
             </div>
 
@@ -2131,42 +2155,42 @@
         container.appendChild(card);
       });
 
-      // 2. Render 3rd Channel Showcase Card
+      // 2. Render Channel Showcase Promo Card
       const promoCard = document.createElement('div');
-      promoCard.className = 'tiktok-slide-card w-[290px] sm:w-[330px] h-[540px] sm:h-[580px] shrink-0 snap-start bg-gradient-to-br from-stone-900 via-zinc-900 to-brand-950 rounded-3xl border border-warm-border/80 shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1 p-6 flex flex-col justify-between text-white select-none';
+      promoCard.className = 'tiktok-slide-card w-[215px] sm:w-[245px] h-[375px] sm:h-[415px] shrink-0 snap-start bg-gradient-to-br from-stone-900 via-zinc-900 to-brand-950 rounded-2xl sm:rounded-3xl border border-warm-border/80 shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1 p-4 sm:p-5 flex flex-col justify-between text-white select-none';
       promoCard.innerHTML = `
-        <div class="space-y-3">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-bold border border-white/15">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-bold border border-white/15">
             <span>✨</span> <span>@yulia_psychologist_</span>
           </div>
-          <h3 class="font-serif-luxury text-2xl font-bold leading-tight">
+          <h3 class="font-serif-luxury text-base sm:text-lg font-bold leading-snug">
             Більше відео та практик у моєму TikTok
           </h3>
-          <p class="text-xs text-stone-300 leading-relaxed">
-            Корисні техніки самодопомоги, робота з тривогою, метод символдрами та пошук внутрішнього ресурсу.
+          <p class="text-[11px] text-stone-300 leading-relaxed line-clamp-3">
+            Техніки самодопомоги, подолання тривоги, символдрама та відновлення ресурсу.
           </p>
         </div>
 
-        <div class="space-y-3 my-auto">
-          <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-            <div class="text-xs text-stone-400">Вподобань у TikTok</div>
-            <div class="text-xl font-bold text-[#FE2C55]">4 000+ ❤️</div>
+        <div class="space-y-2 my-auto">
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+            <span class="text-[11px] text-stone-400">Вподобань</span>
+            <span class="text-sm font-bold text-[#FE2C55]">4 000+ ❤️</span>
           </div>
-          <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-            <div class="text-xs text-stone-400">Тематика блогу</div>
-            <div class="text-xs font-semibold text-white">Символдрама • Саморегуляція • Стосунки</div>
+          <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 space-y-0.5">
+            <div class="text-[10px] text-stone-400">Тематика блогу</div>
+            <div class="text-[11px] font-semibold text-white truncate">Символдрама • Саморегуляція</div>
           </div>
         </div>
 
-        <div class="space-y-2 pt-2">
-          <a href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 rounded-full bg-[#FE2C55] hover:bg-[#e0264b] text-white font-bold text-xs text-center flex items-center justify-center gap-2 shadow-lg transition-all transform hover:scale-105" data-bind-tiktok>
-            <svg class="w-4 h-4 fill-current text-white" viewBox="0 0 24 24">
+        <div class="space-y-1.5 pt-1">
+          <a href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-full bg-[#FE2C55] hover:bg-[#e0264b] text-white font-bold text-[11px] text-center flex items-center justify-center gap-1.5 shadow-md transition-all transform hover:scale-105" data-bind-tiktok>
+            <svg class="w-3.5 h-3.5 fill-current text-white" viewBox="0 0 24 24">
               <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
             </svg>
             <span>Підписатися в TikTok</span>
           </a>
-          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full py-3 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-xs text-center flex items-center justify-center gap-1.5 transition-all">
-            <span>Записатися на консультацію</span>
+          <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full py-2 rounded-full bg-white/10 hover:bg-white/20 text-white font-semibold text-[11px] text-center flex items-center justify-center gap-1 transition-all">
+            <span>Записатися</span>
           </a>
         </div>
       `;
@@ -2182,7 +2206,8 @@
             ? 'tiktok-dot w-6 h-2 rounded-full bg-stone-900 transition-all duration-300' 
             : 'tiktok-dot w-2 h-2 rounded-full bg-warm-border hover:bg-stone-400 transition-all duration-300 cursor-pointer';
           dot.onclick = () => {
-            const cardW = 340;
+            const card = container.querySelector('.tiktok-slide-card');
+            const cardW = card ? card.offsetWidth + 20 : 260;
             container.scrollTo({ left: i * cardW, behavior: 'smooth' });
           };
           dotsContainer.appendChild(dot);
