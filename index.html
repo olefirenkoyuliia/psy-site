@@ -2072,76 +2072,40 @@
 
       list.forEach((vid, idx) => {
         const card = document.createElement('div');
-        card.className = 'tiktok-slide-card w-[290px] sm:w-[325px] h-[550px] sm:h-[580px] shrink-0 snap-start bg-white rounded-3xl border border-warm-border shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1.5 flex flex-col overflow-hidden relative group';
+        card.className = 'tiktok-slide-card w-[310px] sm:w-[340px] h-[580px] sm:h-[620px] shrink-0 snap-start bg-stone-950 rounded-3xl border border-warm-border shadow-card hover:shadow-hover transition-all duration-300 overflow-hidden relative flex flex-col';
 
-        const tagsHtml = (vid.tags || []).slice(0, 2).map(t => `<span class="px-2 py-0.5 rounded-md bg-white/15 text-white text-[10px] font-medium backdrop-blur-xs">${t}</span>`).join(' ');
-
-        card.innerHTML = `
-          <!-- Active Inline Player Container (Hidden by default, loaded on play) -->
-          <div class="card-player-container hidden w-full h-full absolute inset-0 z-20 bg-black rounded-3xl"></div>
-
-          <!-- Cover & Info Container (Clicking anywhere starts video in-place) -->
-          <div class="card-cover-container w-full h-full flex flex-col justify-between cursor-pointer" onclick="playTiktokInline(this, '${vid.id}', '${vid.url}')">
-            
-            <!-- Poster Area -->
-            <div class="relative aspect-[9/11] bg-gradient-to-br ${vid.bgGradient || 'from-stone-900 to-brand-900'} p-5 flex flex-col justify-between overflow-hidden">
-              
-              <div class="absolute -right-8 -top-8 w-36 h-36 rounded-full bg-white/5 blur-2xl pointer-events-none"></div>
-              <div class="absolute -left-8 -bottom-8 w-36 h-36 rounded-full bg-brand-500/10 blur-2xl pointer-events-none"></div>
-
-              <div class="relative z-10 flex items-center justify-between">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-[11px] font-bold border border-white/10">
-                  <svg class="w-3 h-3 fill-current text-[#25F4EE]" viewBox="0 0 24 24">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.36a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3 15.64 6.34 6.34 0 0 0 9.34 22a6.34 6.34 0 0 0 6.34-6.34V8.71a8.21 8.21 0 0 0 4.91 1.62V6.89a4.85 4.85 0 0 1-1-.2z"/>
-                  </svg>
-                  <span>${vid.category || 'TikTok'}</span>
-                </span>
-                <span class="px-2 py-0.5 rounded-full bg-black/40 text-white/90 text-[10px] font-semibold backdrop-blur-md border border-white/10">
-                  ⏱️ ${vid.duration || '1:00'}
-                </span>
-              </div>
-
-              <!-- Big Centered Play Button -->
-              <div class="relative z-10 my-auto flex flex-col items-center justify-center">
-                <div class="w-16 h-16 rounded-full bg-white group-hover:bg-[#FE2C55] text-stone-900 group-hover:text-white flex items-center justify-center text-2xl shadow-2xl transition-all duration-300 transform group-hover:scale-110 pl-1">
-                  ▶
-                </div>
-                <span class="text-xs font-bold text-white mt-3 tracking-wide drop-shadow-md group-hover:text-white transition-colors bg-black/30 px-3 py-1 rounded-full backdrop-blur-xs">
-                  Натисніть для перегляду
-                </span>
-              </div>
-
-              <div class="relative z-10 space-y-1 bg-gradient-to-t from-black/85 via-black/40 to-transparent -mx-5 -mb-5 p-5 pt-6">
-                <div class="flex items-center gap-1.5">
-                  ${tagsHtml}
-                </div>
-              </div>
-
+        if (vid.id && vid.id.length > 5) {
+          card.innerHTML = `
+            <div class="relative w-full h-full bg-black rounded-3xl overflow-hidden">
+              <iframe 
+                src="https://www.tiktok.com/embed/v2/${encodeURIComponent(vid.id)}" 
+                class="w-full h-full border-0 rounded-3xl" 
+                loading="lazy"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture" 
+                allowfullscreen>
+              </iframe>
             </div>
-
-            <!-- Card Bottom Info -->
-            <div class="p-4 bg-white space-y-2 flex-grow flex flex-col justify-between">
-              <div>
-                <h3 class="font-serif-luxury text-base font-bold text-warm-text line-clamp-2 leading-snug mb-1">
-                  ${vid.title}
-                </h3>
-                <p class="text-xs text-warm-muted line-clamp-2 leading-relaxed">
-                  ${vid.caption}
-                </p>
-              </div>
-
-              <div class="pt-2 border-t border-warm-border flex items-center justify-between text-[11px] font-semibold text-warm-muted">
-                <span class="flex items-center gap-1 text-stone-700">
-                  <span>👁️</span> <span>${vid.views || '1K+'}</span>
+          `;
+        } else {
+          card.innerHTML = `
+            <div class="relative w-full h-full bg-gradient-to-br ${vid.bgGradient || 'from-stone-900 to-brand-900'} p-6 flex flex-col justify-between text-white">
+              <div class="flex items-center justify-between">
+                <span class="px-3 py-1 rounded-full bg-black/40 text-xs font-bold border border-white/10">
+                  🎵 ${vid.category || 'TikTok'}
                 </span>
-                <a href="${vid.url}" target="_blank" onclick="event.stopPropagation()" class="text-brand-700 hover:text-[#FE2C55] font-bold flex items-center gap-1 transition-colors" title="Відкрити в додатку TikTok">
-                  <span>В TikTok</span> ↗
-                </a>
+                <span class="text-xs text-white/80">⏱️ ${vid.duration || '1:00'}</span>
               </div>
+              <div class="text-center space-y-3">
+                <div class="text-5xl">📱</div>
+                <h3 class="font-bold text-base leading-snug">${vid.title}</h3>
+                <p class="text-xs text-white/70">${vid.caption}</p>
+              </div>
+              <a href="${vid.url}" target="_blank" class="w-full py-3 rounded-full bg-[#FE2C55] hover:bg-[#e0264b] text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 shadow-md">
+                <span>Відкрити в TikTok</span> ➔
+              </a>
             </div>
-
-          </div>
-        `;
+          `;
+        }
 
         container.appendChild(card);
 
