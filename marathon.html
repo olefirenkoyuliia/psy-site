@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="uk" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Безкоштовний онлайн-марафон — Юлія Олефіренко</title>
+  <meta name="description" content="Безкоштовний 7-денний онлайн-марафон від практикуючої психологині Юлії Олефіренко. Щоденні практичні відео-уроки, техніки самодопомоги та вправи для відновлення ресурсу.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Cormorant Garamond"', 'serif'],
+          },
+          colors: {
+            brand: {
+              50: '#F4F7F4',
+              100: '#E6ECE6',
+              200: '#CAD7CB',
+              300: '#ABC1AC',
+              400: '#8AA88C',
+              500: '#557C56',
+              600: '#436344',
+              700: '#354E36',
+              800: '#283B29',
+              900: '#1F2D20',
+            },
+            warm: {
+              bg: '#FAF8F5',
+              card: '#FFFFFF',
+              muted: '#78716C',
+              text: '#292524',
+              border: '#E7E5E4',
+              accent: '#EFECE6'
+            }
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(45, 43, 42, 0.05)',
+            'card': '0 10px 30px -4px rgba(45, 43, 42, 0.06)',
+            'hover': '0 20px 40px -4px rgba(45, 43, 42, 0.12)',
+            'glow': '0 0 25px rgba(85, 124, 86, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- TikTok Embed Script -->
+  <script async src="https://www.tiktok.com/embed.js"></script>
+
+  <style>
+    body {
+      background-color: #FAF8F5;
+      color: #292524;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    .glass-nav {
+      background: rgba(250, 248, 245, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: #F4F7F4;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: #CAD7CB;
+      border-radius: 9999px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+      background: #8AA88C;
+    }
+    .tiktok-embed {
+      margin: 0 auto !important;
+      max-width: 100% !important;
+      min-width: 280px !important;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
+    }
+    .animate-pulse-glow {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-100 selection:text-brand-900">
+
+  <!-- TOP NOTIFICATION / MARATHON HEADER -->
+  <header class="sticky top-0 z-40 glass-nav border-b border-warm-border/70 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
+      
+      <!-- Brand / Home Link -->
+      <div class="flex items-center gap-3">
+        <!-- Mobile Sidebar Toggle -->
+        <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95" aria-label="Меню уроків">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h7"/>
+          </svg>
+          <span class="text-xs font-semibold hidden xs:inline">Уроки</span>
+        </button>
+
+        <a href="index.html" class="group flex items-center gap-2.5">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-brand-600 text-white flex items-center justify-center font-serif text-lg font-bold shadow-soft group-hover:scale-105 transition-transform">
+            ЮО
+          </div>
+          <div>
+            <div class="font-serif font-bold text-base sm:text-lg text-warm-text leading-tight group-hover:text-brand-700 transition-colors">
+              Юлія Олефіренко
+            </div>
+            <div class="text-[10px] sm:text-xs text-brand-700 font-semibold flex items-center gap-1">
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+              Онлайн-марафон
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Center Progress Summary (Desktop) -->
+      <div class="hidden md:flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/80 border border-warm-border shadow-xs">
+        <div class="text-xs text-warm-muted font-medium">Ваш прогрес:</div>
+        <div class="w-28 bg-gray-100 rounded-full h-2 overflow-hidden border border-gray-200">
+          <div id="header-progress-bar" class="bg-brand-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <span id="header-progress-text" class="text-xs font-bold text-brand-800">0%</span>
+      </div>
+
+      <!-- Right Action Cluster -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a id="marathon-tg-btn" href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold shadow-xs hover:shadow-soft transition-all active:scale-95">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/>
+          </svg>
+          <span class="hidden sm:inline">Чат марафону</span>
+          <span class="sm:hidden">Чат</span>
+        </a>
+
+        <a href="index.html#booking-section" class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-soft transition-all active:scale-95">
+          <span>🌿 Консультація</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- HERO INTRO BANNER (Compact for Ads) -->
+  <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-700 text-white py-6 sm:py-8 px-4 sm:px-6 relative overflow-hidden">
+    <div class="absolute -right-10 -bottom-10 w-60 h-60 rounded-full bg-white/5 blur-2xl pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+      <div class="space-y-1.5 max-w-2xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-brand-100 text-xs font-semibold backdrop-blur-sm">
+          <span>✨ 7-денний онлайн-інтенсив</span>
+          <span class="text-white/40">•</span>
+          <span class="text-emerald-300 font-bold">100% Безкоштовно</span>
+        </div>
+        <h1 id="marathon-main-title" class="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
+          Віднови свій внутрішній ресурс
+        </h1>
+        <p id="marathon-main-subtitle" class="text-xs sm:text-sm text-brand-100/90 leading-relaxed">
+          Практичні щоденні відео-уроки, техніки самодопомоги та вправи від практикуючої психологині Юлії Олефіренко.
+        </p>
+      </div>
+
+      <!-- Quick Stats & Instructions -->
+      <div class="flex items-center gap-3 shrink-0">
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/15 text-center min-w-[100px]">
+          <div id="stat-unlocked-count" class="text-xl sm:text-2xl font-bold text-white">1 / 7</div>
+          <div class="text-[10px] sm:text-xs text-brand-200">Доступно уроків</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/15 text-center min-w-[100px]">
+          <div id="stat-completed-count" class="text-xl sm:text-2xl font-bold text-emerald-300">0 / 7</div>
+          <div class="text-[10px] sm:text-xs text-brand-200">Пройдено вами</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN MARATHON CONTAINER -->
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 w-full flex-1">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+      
+      <!-- ======================================================== -->
+      <!-- LEFT COLUMN: SIDEBAR TREE MENU (4 Cols on Desktop)       -->
+      <!-- ======================================================== -->
+      <aside id="marathon-sidebar" class="lg:col-span-4 fixed inset-y-0 left-0 z-50 w-80 lg:w-auto lg:static bg-white lg:bg-transparent shadow-2xl lg:shadow-none p-4 lg:p-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col max-h-screen lg:max-h-[calc(100vh-8rem)] lg:sticky lg:top-28">
+        
+        <!-- Mobile Sidebar Close Header -->
+        <div class="lg:hidden flex items-center justify-between pb-3 border-b border-warm-border mb-3">
+          <div class="font-serif font-bold text-lg text-warm-text">Програма марафону</div>
+          <button onclick="toggleMobileSidebar()" class="p-2 rounded-xl bg-gray-100 text-gray-500 hover:text-gray-900" aria-label="Закрити">
+            ✕
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-warm-border shadow-card p-4 sm:p-5 flex-1 flex flex-col overflow-hidden">
+          
+          <!-- Tree Sidebar Header -->
+          <div class="pb-3 border-b border-warm-border/60">
+            <div class="flex items-center justify-between">
+              <h2 class="font-bold text-sm sm:text-base text-warm-text flex items-center gap-2">
+                <span>🗓️</span> Дерево уроків
+              </h2>
+              <span id="sidebar-total-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-800 border border-brand-200">
+                7 днів
+              </span>
+            </div>
+            <p class="text-[11px] text-warm-muted mt-0.5">Нові ролики відкриваються щодня за розкладом</p>
+          </div>
+
+          <!-- Progress Bar inside sidebar -->
+          <div class="py-3 border-b border-warm-border/60 space-y-1.5">
+            <div class="flex items-center justify-between text-xs font-semibold">
+              <span class="text-warm-muted">Ваш прогрес</span>
+              <span id="sidebar-progress-label" class="text-brand-700">0 з 7 завершено</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden border border-gray-200">
+              <div id="sidebar-progress-bar" class="bg-brand-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Lessons Tree List (Scrollable) -->
+          <div id="lessons-tree-list" class="space-y-2.5 overflow-y-auto flex-1 pr-1 py-3 scrollbar-thin">
+            <!-- Lessons rendered dynamically via JS -->
+            <div class="text-center py-10 text-warm-muted text-xs">
+              Завантаження програми марафону...
+            </div>
+          </div>
+
+          <!-- Sidebar Bottom Helper / Community Link -->
+          <div class="pt-3 border-t border-warm-border/60">
+            <a id="sidebar-tg-link" href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-sky-50 to-brand-50 border border-sky-200/80 hover:border-sky-400 text-sky-900 text-xs font-bold flex items-center justify-between group transition-all">
+              <div class="flex items-center gap-2">
+                <span class="text-base">💬</span>
+                <div class="text-left">
+                  <div class="font-bold">Чат підтримки</div>
+                  <div class="text-[10px] text-sky-700 font-normal">Запитати Юлію в Telegram</div>
+                </div>
+              </div>
+              <span class="group-hover:translate-x-0.5 transition-transform text-sky-600">→</span>
+            </a>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- Sidebar Backdrop for Mobile -->
+      <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity"></div>
+
+
+      <!-- ======================================================== -->
+      <!-- RIGHT COLUMN: ACTIVE LESSON WORKSPACE (8 Cols on Desktop)-->
+      <!-- ======================================================== -->
+      <section class="lg:col-span-8 space-y-6">
+        
+        <!-- Active Lesson Main Card -->
+        <div id="lesson-content-card" class="bg-white rounded-3xl border border-warm-border shadow-card p-4 sm:p-8 space-y-6">
+          
+          <!-- Top Breadcrumb & Status -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-warm-border/60">
+            <div class="flex items-center gap-2 text-xs text-warm-muted font-medium">
+              <span class="px-2.5 py-1 rounded-full bg-brand-50 text-brand-800 font-bold" id="current-day-badge">
+                День 1
+              </span>
+              <span>•</span>
+              <span id="current-duration-badge" class="flex items-center gap-1">
+                ⏱️ 3 хв
+              </span>
+            </div>
+
+            <div id="current-status-badge">
+              <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                🟢 Доступний для перегляду
+              </span>
+            </div>
+          </div>
+
+          <!-- Lesson Title -->
+          <div class="space-y-2">
+            <h2 id="current-lesson-title" class="font-serif text-2xl sm:text-3xl font-bold text-warm-text leading-tight">
+              Знайомство зі своїми емоціями: як почути себе
+            </h2>
+            <p class="text-xs text-warm-muted flex items-center gap-1.5">
+              <span>📅 Дата публікації:</span>
+              <span id="current-lesson-date" class="font-semibold text-warm-text">Сьогодні</span>
+            </p>
+          </div>
+
+          <!-- VIDEO PLAYER / LOCKED CONTAINER -->
+          <div id="video-workspace-container" class="relative rounded-2xl overflow-hidden bg-stone-900 border border-warm-border shadow-inner min-h-[360px] flex items-center justify-center">
+            <!-- Rendered dynamically (video iframe, direct video, or locked countdown) -->
+          </div>
+
+          <!-- Quick Action Bar under Video -->
+          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-warm-bg border border-warm-border">
+            <button onclick="toggleLessonCompleted()" id="complete-lesson-btn" class="px-4 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 border border-warm-border hover:border-emerald-300 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95">
+              <span id="complete-checkbox" class="text-base">⬜</span>
+              <span id="complete-btn-text">Позначити як пройдений</span>
+            </button>
+
+            <div class="flex items-center gap-2">
+              <button onclick="navigateLesson(-1)" id="prev-lesson-btn" class="px-3.5 py-2 rounded-xl bg-white hover:bg-gray-100 text-warm-text border border-warm-border text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                ← Попередній
+              </button>
+              <button onclick="navigateLesson(1)" id="next-lesson-btn" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all shadow-xs disabled:opacity-40 disabled:cursor-not-allowed">
+                Наступний →
+              </button>
+            </div>
+          </div>
+
+          <!-- LESSON TEXT DETAILS & INSIGHTS -->
+          <div class="space-y-4 pt-2">
+            <div class="flex items-center gap-2 border-b border-warm-border/60 pb-2">
+              <span class="text-xl">📖</span>
+              <h3 class="font-bold text-base sm:text-lg text-warm-text">Про що цей урок та ключові інсайти</h3>
+            </div>
+            <div id="current-lesson-description" class="text-sm text-stone-700 leading-relaxed space-y-3 whitespace-pre-line font-normal">
+              Опис уроку завантажується...
+            </div>
+          </div>
+
+          <!-- PRACTICAL HOMEWORK / EXERCISE CARD -->
+          <div id="current-homework-container" class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-brand-50/70 via-emerald-50/40 to-warm-bg border border-brand-200/80 space-y-3 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">📝</span>
+                <div>
+                  <h4 class="font-bold text-sm sm:text-base text-brand-900">Практичне завдання на сьогодні</h4>
+                  <p class="text-[11px] text-brand-700">Виконайте цю вправу для закріплення результату</p>
+                </div>
+              </div>
+              <button onclick="copyHomeworkText()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-brand-100 text-brand-800 border border-brand-200 text-xs font-bold transition-all flex items-center gap-1 shadow-xs active:scale-95" title="Скопіювати в нотатки">
+                <span>📋</span>
+                <span id="copy-btn-text" class="hidden sm:inline">Скопіювати</span>
+              </button>
+            </div>
+
+            <div id="current-lesson-homework" class="text-xs sm:text-sm text-stone-800 bg-white/90 p-4 rounded-xl border border-brand-100 leading-relaxed whitespace-pre-line font-medium shadow-xs">
+              Завдання завантажується...
+            </div>
+          </div>
+
+          <!-- PERSONAL SESSION PROMO CTA -->
+          <div class="p-5 sm:p-6 rounded-2xl bg-warm-text text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-soft">
+            <div class="space-y-1 text-center sm:text-left">
+              <div class="text-xs text-brand-200 font-bold uppercase tracking-wider">Індивідуальна підтримка</div>
+              <h4 class="font-serif text-lg sm:text-xl font-bold text-white">Хочете глибше пропрацювати цю тему?</h4>
+              <p class="text-xs text-stone-300">Запишіться на 50-хвилинну індивідуальну онлайн-сесію з Юлією Олефіренко</p>
+            </div>
+            <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="shrink-0 px-5 py-3 rounded-full bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold transition-all shadow-glow hover:scale-105 active:scale-95 text-center">
+              Записатися на сесію →
+            </a>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-warm-border mt-12 py-8 px-4 text-center text-xs text-warm-muted">
+    <div class="max-w-4xl mx-auto space-y-2">
+      <div class="font-serif font-bold text-sm text-warm-text">Юлія Олефіренко • Практикуюча психологиня</div>
+      <p>Консультації за методом символдрами • Онлайн у Google Meet • Безкоштовний марафон</p>
+      <div class="pt-2 flex items-center justify-center gap-4 text-brand-700 font-semibold">
+        <a href="index.html" class="hover:underline">Головна сторінка</a>
+        <span>•</span>
+        <a href="cabinet.html" class="hover:underline">Особистий кабінет</a>
+        <span>•</span>
+        <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="hover:underline">Telegram</a>
+        <span>•</span>
+        <a href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" class="hover:underline">TikTok</a>
+      </div>
+      <p class="text-[10px] text-gray-400 pt-2">© 2026 Юлія Олефіренко. Всі права захищено.</p>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT APP LOGIC -->
+  <script>
+    // State Management
+    let marathonData = null;
+    let currentLessonIndex = 0;
+    let completedLessons = new Set();
+    let countdownInterval = null;
+
+    // Load Completed Lessons from LocalStorage
+    try {
+      const savedCompleted = localStorage.getItem('psy_marathon_completed');
+      if (savedCompleted) {
+        completedLessons = new Set(JSON.parse(savedCompleted));
+      }
+    } catch(e) {}
+
+    // 1. Initial Load: Fetch site_data
+    async function initMarathon() {
+      try {
+        // Try live API first
+        const res = await fetch('/api/data?t=' + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.marathon) {
+            marathonData = data.marathon;
+          }
+        }
+      } catch(e) {}
+
+      // Fallback: Check local data.json
+      if (!marathonData) {
+        try {
+          const localRes = await fetch('data.json?t=' + Date.now());
+          if (localRes.ok) {
+            const data = await localRes.json();
+            if (data && data.marathon) {
+              marathonData = data.marathon;
+            }
+          }
+        } catch(e) {}
+      }
+
+      // Fallback: Check localStorage
+      if (!marathonData) {
+        try {
+          const cached = localStorage.getItem('psy_site_data');
+          if (cached) {
+            const data = JSON.parse(cached);
+            if (data && data.marathon) marathonData = data.marathon;
+          }
+        } catch(e) {}
+      }
+
+      // Default Fallback structure if empty
+      if (!marathonData || !marathonData.lessons || marathonData.lessons.length === 0) {
+        marathonData = {
+          title: "Безкоштовний онлайн-марафон: Віднови свій ресурс",
+          subtitle: "7 днів до внутрішньої сили та спокою",
+          telegramChannel: "https://t.me/psy_olefirenkoyuliia",
+          lessons: [
+            {
+              id: "lesson-1",
+              day: 1,
+              title: "Знайомство зі своїми емоціями: як почути себе",
+              description: "У першому уроці ми розбираємо, чому ми часто пригнічуємо свої почуття та як відновити зв’язок із собою.",
+              homework: "Практика: зупиніться 3 рази на день та запишіть свої емоції.",
+              videoUrl: "https://www.tiktok.com/@yulia_psychologist_",
+              publishDate: new Date(Date.now() - 3600000).toISOString(),
+              duration: "3 хв"
+            }
+          ]
+        };
+      }
+
+      // Apply Global Marathon info
+      if (marathonData.title) {
+        document.getElementById('marathon-main-title').textContent = marathonData.title;
+        document.title = marathonData.title + ' — Юлія Олефіренко';
+      }
+      if (marathonData.subtitle) {
+        document.getElementById('marathon-main-subtitle').textContent = marathonData.subtitle;
+      }
+      if (marathonData.telegramChannel) {
+        document.getElementById('marathon-tg-btn').href = marathonData.telegramChannel;
+        const sLink = document.getElementById('sidebar-tg-link');
+        if (sLink) sLink.href = marathonData.telegramChannel;
+      }
+
+      // Handle URL hash routing (e.g. #lesson-2 or #day-3)
+      const hash = window.location.hash.replace('#', '');
+      if (hash) {
+        const foundIndex = marathonData.lessons.findIndex(l => l.id === hash || ('day-' + l.day) === hash);
+        if (foundIndex !== -1) {
+          currentLessonIndex = foundIndex;
+        }
+      }
+
+      // Render Tree & Active Lesson
+      renderLessonsTree();
+      selectLesson(currentLessonIndex, false);
+
+      // Start global timer check every 5 seconds to unlock scheduled lessons in real-time
+      setInterval(checkScheduledUnlocks, 5000);
+    }
+
+    // Check if a lesson is unlocked by its publishDate
+    function isLessonUnlocked(lesson) {
+      if (!lesson.publishDate) return true; // No date set = unlocked
+      const pubTime = new Date(lesson.publishDate).getTime();
+      return isNaN(pubTime) || pubTime <= Date.now();
+    }
+
+    // Format Date string nicely for Ukrainian locale
+    function formatLessonDate(dateStr) {
+      if (!dateStr) return "Доступний зараз";
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "Доступний";
+      
+      const now = new Date();
+      const isToday = d.toDateString() === now.toDateString();
+      
+      const pad = (n) => String(n).padStart(2, '0');
+      const timeStr = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+      if (isToday) {
+        return `Сьогодні о ${timeStr}`;
+      }
+
+      const months = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+      return `${d.getDate()} ${months[d.getMonth()]}, ${timeStr}`;
+    }
+
+    // Render the Left Sidebar Tree List
+    function renderLessonsTree() {
+      const container = document.getElementById('lessons-tree-list');
+      if (!container || !marathonData || !marathonData.lessons) return;
+
+      let unlockedCount = 0;
+      let completedCount = 0;
+
+      container.innerHTML = marathonData.lessons.map((lesson, idx) => {
+        const unlocked = isLessonUnlocked(lesson);
+        const isCompleted = completedLessons.has(lesson.id || ('lesson-' + idx));
+        const isActive = idx === currentLessonIndex;
+
+        if (unlocked) unlockedCount++;
+        if (isCompleted) completedCount++;
+
+        let statusIcon = '🔒';
+        let statusBadge = `<span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 border border-stone-200">${formatLessonDate(lesson.publishDate)}</span>`;
+
+        if (unlocked) {
+          if (isCompleted) {
+            statusIcon = '✅';
+            statusBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">Пройдено</span>`;
+          } else {
+            statusIcon = '🟢';
+            statusBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">Доступно</span>`;
+          }
+        }
+
+        const activeStyles = isActive 
+          ? 'bg-brand-50 border-brand-500 shadow-xs ring-2 ring-brand-400/20' 
+          : 'bg-warm-bg hover:bg-white border-warm-border';
+
+        return `
+          <div onclick="selectLesson(${idx})" class="p-3 sm:p-3.5 rounded-2xl border transition-all cursor-pointer select-none ${activeStyles} group">
+            <div class="flex items-start gap-2.5">
+              <div class="text-base pt-0.5 shrink-0">${statusIcon}</div>
+              <div class="flex-1 min-w-0 space-y-1">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="text-[11px] font-bold uppercase tracking-wider ${isActive ? 'text-brand-800' : 'text-warm-muted'}">
+                    День ${lesson.day || (idx + 1)}
+                  </span>
+                  ${statusBadge}
+                </div>
+                <div class="font-semibold text-xs sm:text-sm text-warm-text line-clamp-2 leading-snug group-hover:text-brand-800 transition-colors">
+                  ${escapeHtml(lesson.title || 'Урок ' + (idx + 1))}
+                </div>
+                <div class="flex items-center gap-2 text-[10px] text-warm-muted">
+                  <span>⏱️ ${escapeHtml(lesson.duration || '3 хв')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Update Badges & Counters
+      const total = marathonData.lessons.length;
+      document.getElementById('stat-unlocked-count').textContent = `${unlockedCount} / ${total}`;
+      document.getElementById('stat-completed-count').textContent = `${completedCount} / ${total}`;
+      document.getElementById('sidebar-total-badge').textContent = `${total} днів`;
+
+      const percent = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+      document.getElementById('header-progress-bar').style.width = percent + '%';
+      document.getElementById('header-progress-text').textContent = percent + '%';
+      document.getElementById('sidebar-progress-bar').style.width = percent + '%';
+      document.getElementById('sidebar-progress-label').textContent = `${completedCount} з ${total} (${percent}%)`;
+    }
+
+    // Select and display a specific lesson
+    function selectLesson(index, updateHash = true) {
+      if (!marathonData || !marathonData.lessons || !marathonData.lessons[index]) return;
+      
+      currentLessonIndex = index;
+      const lesson = marathonData.lessons[index];
+      const lessonId = lesson.id || ('lesson-' + index);
+
+      if (updateHash) {
+        window.history.replaceState(null, null, '#' + (lesson.id || 'day-' + lesson.day));
+      }
+
+      // Update Breadcrumbs & Header
+      document.getElementById('current-day-badge').textContent = `День ${lesson.day || (index + 1)}`;
+      document.getElementById('current-duration-badge').textContent = `⏱️ ${lesson.duration || '3 хв'}`;
+      document.getElementById('current-lesson-title').textContent = lesson.title;
+      document.getElementById('current-lesson-date').textContent = formatLessonDate(lesson.publishDate);
+      document.getElementById('current-lesson-description').textContent = lesson.description || 'Опис уроку скоро з’явиться.';
+      document.getElementById('current-lesson-homework').textContent = lesson.homework || 'Сьогодні просто поспостерігайте за своїм станом та емоціями.';
+
+      // Check Unlocked Status
+      const unlocked = isLessonUnlocked(lesson);
+      const isCompleted = completedLessons.has(lessonId);
+
+      // Render Video / Countdown Workspace
+      renderVideoWorkspace(lesson, unlocked);
+
+      // Update Completion Button
+      const compBtn = document.getElementById('complete-lesson-btn');
+      const compCheckbox = document.getElementById('complete-checkbox');
+      const compText = document.getElementById('complete-btn-text');
+
+      if (isCompleted) {
+        compBtn.className = 'px-4 py-2.5 rounded-xl bg-emerald-600 text-white border border-emerald-700 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95';
+        compCheckbox.textContent = '✅';
+        compText.textContent = 'Урок пройдено (Натисніть щоб скасувати)';
+      } else {
+        compBtn.className = 'px-4 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 border border-warm-border hover:border-emerald-300 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95';
+        compCheckbox.textContent = '⬜';
+        compText.textContent = 'Позначити як пройдений';
+      }
+
+      // Update Navigation Buttons (Prev / Next)
+      const prevBtn = document.getElementById('prev-lesson-btn');
+      const nextBtn = document.getElementById('next-lesson-btn');
+      prevBtn.disabled = (index === 0);
+      nextBtn.disabled = (index === marathonData.lessons.length - 1);
+
+      // Re-render sidebar to highlight active item
+      renderLessonsTree();
+
+      // Close mobile drawer if opened
+      closeMobileSidebar();
+
+      // Smooth scroll to top of lesson content on mobile
+      if (window.innerWidth < 1024) {
+        document.getElementById('lesson-content-card').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Render Video Player or Countdown Timer
+    function renderVideoWorkspace(lesson, unlocked) {
+      const container = document.getElementById('video-workspace-container');
+      const statusBadge = document.getElementById('current-status-badge');
+
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+
+      if (unlocked) {
+        statusBadge.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            🟢 Доступний для перегляду
+          </span>
+        `;
+
+        const videoUrl = (lesson.videoUrl || '').trim();
+
+        // 1. TikTok Embed Detection
+        if (videoUrl.includes('tiktok.com')) {
+          const match = videoUrl.match(/video\/(\d+)/);
+          const videoId = match ? match[1] : '';
+
+          container.innerHTML = `
+            <div class="w-full py-4 flex flex-col items-center justify-center bg-black/90 min-h-[480px]">
+              <blockquote class="tiktok-embed" cite="${escapeHtml(videoUrl)}" data-video-id="${videoId}" style="max-width: 605px;min-width: 325px;">
+                <section>
+                  <a target="_blank" title="@yulia_psychologist_" href="https://www.tiktok.com/@yulia_psychologist_">@yulia_psychologist_</a>
+                  <p>${escapeHtml(lesson.title)}</p>
+                </section>
+              </blockquote>
+              <div class="pt-3 text-center">
+                <a href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold backdrop-blur-sm transition-colors">
+                  <span>Відкрити ролик напряму в TikTok</span>
+                  <span>↗</span>
+                </a>
+              </div>
+            </div>
+          `;
+
+          if (window.tiktokEmbed) {
+            window.tiktokEmbed.load();
+          } else {
+            const script = document.createElement('script');
+            script.src = 'https://www.tiktok.com/embed.js';
+            script.async = true;
+            document.body.appendChild(script);
+          }
+
+        // 2. YouTube / YouTube Shorts Detection
+        } else if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+          let embedUrl = videoUrl;
+          if (videoUrl.includes('watch?v=')) {
+            embedUrl = videoUrl.replace('watch?v=', 'embed/');
+          } else if (videoUrl.includes('youtu.be/')) {
+            embedUrl = videoUrl.replace('youtu.be/', 'www.youtube.com/embed/');
+          } else if (videoUrl.includes('shorts/')) {
+            embedUrl = videoUrl.replace('shorts/', 'embed/');
+          }
+
+          container.innerHTML = `
+            <div class="w-full aspect-video sm:aspect-[9/16] max-w-md mx-auto">
+              <iframe class="w-full h-full rounded-2xl" src="${escapeHtml(embedUrl)}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+          `;
+
+        // 3. Direct MP4 Video file
+        } else if (videoUrl.endsWith('.mp4') || videoUrl.endsWith('.webm')) {
+          container.innerHTML = `
+            <div class="w-full max-w-md mx-auto p-2">
+              <video controls playsinline class="w-full rounded-xl shadow-lg bg-black">
+                <source src="${escapeHtml(videoUrl)}" type="video/mp4">
+                Ваш браузер не підтримує відео.
+              </video>
+            </div>
+          `;
+
+        // 4. Default / Placeholder Video Player
+        } else {
+          container.innerHTML = `
+            <div class="w-full min-h-[380px] p-8 text-center text-white flex flex-col items-center justify-center space-y-4 bg-gradient-to-b from-stone-900 to-black">
+              <div class="w-16 h-16 rounded-full bg-brand-600/30 border border-brand-500/50 flex items-center justify-center text-3xl animate-pulse-glow">
+                🎬
+              </div>
+              <div class="space-y-1 max-w-md">
+                <h4 class="font-bold text-lg text-white">${escapeHtml(lesson.title)}</h4>
+                <p class="text-xs text-stone-400">Перегляньте відео-урок та виконайте практичну вправу нижче</p>
+              </div>
+              ${videoUrl ? `
+                <a href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all shadow-glow flex items-center gap-1.5">
+                  <span>Дивитися ролик у TikTok</span>
+                  <span>↗</span>
+                </a>
+              ` : ''}
+            </div>
+          `;
+        }
+
+      } else {
+        // LOCKED STATE: Real-time Countdown Timer
+        statusBadge.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
+            <span>🔒</span> Відкриється незабаром
+          </span>
+        `;
+
+        const pubDate = new Date(lesson.publishDate);
+        const targetTime = pubDate.getTime();
+
+        container.innerHTML = `
+          <div class="w-full min-h-[380px] p-6 sm:p-10 text-center text-white flex flex-col items-center justify-center space-y-6 bg-gradient-to-b from-stone-900 via-stone-950 to-black relative">
+            <div class="w-20 h-20 rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center text-4xl shadow-glow">
+              🔒
+            </div>
+
+            <div class="space-y-2 max-w-md">
+              <div class="text-xs font-bold uppercase tracking-wider text-amber-400">
+                Урок відкриється: ${formatLessonDate(lesson.publishDate)}
+              </div>
+              <h3 class="font-serif text-xl sm:text-2xl font-bold text-white">
+                ${escapeHtml(lesson.title)}
+              </h3>
+              <p class="text-xs text-stone-400">
+                Юлія вже підготувала цей матеріал. Доступ відкриється автоматично відповідно до розкладу марафону.
+              </p>
+            </div>
+
+            <!-- Real-time Countdown Display -->
+            <div class="flex items-center justify-center gap-2 sm:gap-4 text-center">
+              <div class="bg-white/10 border border-white/15 rounded-2xl p-2.5 sm:p-3 min-w-[60px] sm:min-w-[70px]">
+                <div id="countdown-days" class="text-xl sm:text-2xl font-extrabold text-white">00</div>
+                <div class="text-[9px] sm:text-[10px] uppercase text-stone-400 font-bold">Днів</div>
+              </div>
+              <span class="text-xl font-bold text-white/40">:</span>
+              <div class="bg-white/10 border border-white/15 rounded-2xl p-2.5 sm:p-3 min-w-[60px] sm:min-w-[70px]">
+                <div id="countdown-hours" class="text-xl sm:text-2xl font-extrabold text-white">00</div>
+                <div class="text-[9px] sm:text-[10px] uppercase text-stone-400 font-bold">Годин</div>
+              </div>
+              <span class="text-xl font-bold text-white/40">:</span>
+              <div class="bg-white/10 border border-white/15 rounded-2xl p-2.5 sm:p-3 min-w-[60px] sm:min-w-[70px]">
+                <div id="countdown-mins" class="text-xl sm:text-2xl font-extrabold text-white">00</div>
+                <div class="text-[9px] sm:text-[10px] uppercase text-stone-400 font-bold">Хвилин</div>
+              </div>
+              <span class="text-xl font-bold text-white/40">:</span>
+              <div class="bg-white/10 border border-white/15 rounded-2xl p-2.5 sm:p-3 min-w-[60px] sm:min-w-[70px]">
+                <div id="countdown-secs" class="text-xl sm:text-2xl font-extrabold text-emerald-400">00</div>
+                <div class="text-[9px] sm:text-[10px] uppercase text-stone-400 font-bold">Секунд</div>
+              </div>
+            </div>
+
+            <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
+              <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="px-4 py-2 rounded-full bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5">
+                <span>💬 Отримати нагадування в Telegram</span>
+              </a>
+              <button onclick="selectLesson(0)" class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all">
+                Повернутися до Дня 1
+              </button>
+            </div>
+
+          </div>
+        `;
+
+        const updateTimer = () => {
+          const diff = targetTime - Date.now();
+          if (diff <= 0) {
+            if (countdownInterval) clearInterval(countdownInterval);
+            renderLessonsTree();
+            selectLesson(currentLessonIndex, false);
+            return;
+          }
+
+          const pad = (n) => String(n).padStart(2, '0');
+          const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+          const elD = document.getElementById('countdown-days');
+          const elH = document.getElementById('countdown-hours');
+          const elM = document.getElementById('countdown-mins');
+          const elS = document.getElementById('countdown-secs');
+
+          if (elD) elD.textContent = pad(d);
+          if (elH) elH.textContent = pad(h);
+          if (elM) elM.textContent = pad(m);
+          if (elS) elS.textContent = pad(s);
+        };
+
+        updateTimer();
+        countdownInterval = setInterval(updateTimer, 1000);
+      }
+    }
+
+    // Toggle Lesson Completed status
+    function toggleLessonCompleted() {
+      if (!marathonData || !marathonData.lessons) return;
+      const lesson = marathonData.lessons[currentLessonIndex];
+      const lessonId = lesson.id || ('lesson-' + currentLessonIndex);
+
+      if (completedLessons.has(lessonId)) {
+        completedLessons.delete(lessonId);
+      } else {
+        completedLessons.add(lessonId);
+      }
+
+      try {
+        localStorage.setItem('psy_marathon_completed', JSON.stringify(Array.from(completedLessons)));
+      } catch(e) {}
+
+      renderLessonsTree();
+      selectLesson(currentLessonIndex, false);
+    }
+
+    // Navigate to next or previous lesson
+    function navigateLesson(offset) {
+      const newIndex = currentLessonIndex + offset;
+      if (marathonData && marathonData.lessons && newIndex >= 0 && newIndex < marathonData.lessons.length) {
+        selectLesson(newIndex);
+      }
+    }
+
+    // Copy Homework text to clipboard
+    function copyHomeworkText() {
+      const text = document.getElementById('current-lesson-homework').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btnText = document.getElementById('copy-btn-text');
+        if (btnText) {
+          btnText.textContent = 'Скопійовано! ✓';
+          setTimeout(() => { btnText.textContent = 'Скопіювати'; }, 2500);
+        }
+      });
+    }
+
+    // Check if newly scheduled lessons became unlocked
+    function checkScheduledUnlocks() {
+      if (!marathonData || !marathonData.lessons) return;
+      let shouldRerender = false;
+      marathonData.lessons.forEach((lesson) => {
+        if (lesson.publishDate && isLessonUnlocked(lesson)) {
+          shouldRerender = true;
+        }
+      });
+      if (shouldRerender) {
+        renderLessonsTree();
+      }
+    }
+
+    // Mobile Sidebar Drawer toggles
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('marathon-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        closeMobileSidebar();
+      }
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('marathon-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar) sidebar.classList.add('-translate-x-full');
+      if (backdrop) backdrop.classList.add('hidden');
+    }
+
+    // Utility escape HTML
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Boot App
+    window.addEventListener('DOMContentLoaded', initMarathon);
+  </script>
+
+</body>
+</html>

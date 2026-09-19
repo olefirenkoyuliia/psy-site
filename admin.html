@@ -571,7 +571,92 @@
         </div>
       </div>
 
-      <!-- Section 5: Security & Password Settings -->
+      <!-- Section 5: TikTok Online Marathon Manager -->
+      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
+        <div class="border-b border-gray-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-xl shadow-xs">
+              🎯
+            </span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-bold text-gray-900 text-base sm:text-lg">Безкоштовний онлайн-марафон</h2>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
+                  TikTok реклама
+                </span>
+              </div>
+              <p class="text-xs text-gray-500">Автоматичний розклад публікації нових роликів за календарем, дерево уроків та масове додавання</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="marathon.html" target="_blank" class="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+              <span>Переглянути марафон</span>
+              <span>↗</span>
+            </a>
+            <button onclick="openBatchUploadModal()" class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs">
+              <span>⚡ Додати ролики пачкою</span>
+            </button>
+            <button onclick="addSingleLesson()" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs">
+              <span>+ Додати урок</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Global Marathon Settings -->
+        <div class="bg-gray-50/80 p-5 rounded-2xl border border-gray-200 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">Загальні налаштування марафону</h3>
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input type="checkbox" id="field-marathon-enabled" class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500 border-gray-300">
+              <span class="text-xs font-bold text-gray-800">Увімкнути марафон на сайті</span>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-700">Назва марафону:</label>
+              <input type="text" id="field-marathon-title" placeholder="Безкоштовний онлайн-марафон: Віднови свій ресурс" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-700">Підзаголовок / Слоган:</label>
+              <input type="text" id="field-marathon-subtitle" placeholder="7 днів до внутрішньої сили та спокою" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-700">Посилання на Telegram чат/канал марафону:</label>
+              <input type="url" id="field-marathon-telegram" placeholder="https://t.me/psy_olefirenkoyuliia" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-gray-700">Опис марафону для учасників:</label>
+              <input type="text" id="field-marathon-description" placeholder="Короткий опис інтенсиву..." class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Lessons Schedule & Drag-Drop Tree -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-700">
+                Календарний розклад та список відео-уроків:
+              </h3>
+              <span id="admin-marathon-count-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-700 border border-brand-200">0 уроків</span>
+            </div>
+            <p class="text-[11px] text-gray-400">🖐️ Перетягуйте уроки за іконку ⠿ для зміни порядку</p>
+          </div>
+
+          <!-- Dynamic List of Lesson Cards -->
+          <div id="admin-marathon-lessons-list" class="space-y-3">
+            <!-- Lessons rendered via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 6: Security & Password Settings -->
       <div class="bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm space-y-5">
         <div class="border-b border-gray-100 pb-4 flex items-center gap-2.5">
           <span class="text-xl">🔐</span>
@@ -677,6 +762,65 @@
         </button>
         <button onclick="confirmSaveEditedCert()" class="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 shadow-sm flex items-center gap-1.5">
           <span>💾</span> Зберегти зміни
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Batch Video Import / Schedule -->
+  <div id="batch-upload-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl border border-gray-100 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">⚡</span>
+          <div>
+            <h3 class="font-bold text-gray-900 text-base">Масове завантаження роликів пачкою</h3>
+            <p class="text-xs text-gray-500">Швидко згенеруйте розклад на 7 або більше днів</p>
+          </div>
+        </div>
+        <button onclick="closeBatchUploadModal()" class="text-gray-400 hover:text-gray-600 text-xl font-light">✕</button>
+      </div>
+
+      <div class="space-y-4 overflow-y-auto flex-1 pr-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-gray-700">📅 Початкова дата Дня 1:</label>
+            <input type="datetime-local" id="batch-start-date" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-gray-700">⏰ Інтервал публікацій:</label>
+            <select id="batch-interval-select" class="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+              <option value="1">Щодня (+1 день у той самий час)</option>
+              <option value="2">Кожні 2 дні</option>
+              <option value="0">Всі відразу доступні (без затримки)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-gray-700">Список роликів (по одному на рядок):</label>
+            <span class="text-[11px] text-gray-400">Формат: Назва | Посилання на TikTok | Тривалість</span>
+          </div>
+          <textarea id="batch-lessons-text" rows="8" placeholder="Знайомство зі своїми емоціями | https://www.tiktok.com/@yulia_psychologist_/video/123 | 3 хв
+Техніки при тривозі та стресі | https://www.tiktok.com/@yulia_psychologist_/video/124 | 4 хв
+Як говорити Ні без провини | https://www.tiktok.com/@yulia_psychologist_/video/125 | 3 хв" class="w-full px-4 py-3 rounded-xl border border-gray-300 text-xs font-mono focus:ring-2 focus:ring-brand-500 outline-none leading-relaxed"></textarea>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
+          <div class="font-bold flex items-center gap-1.5">
+            <span>💡</span> Підказка:
+          </div>
+          <p>Можна вставити лише список посилань на TikTok або назви. Дати для кожного уроку розрахуються автоматично послідовно.</p>
+        </div>
+      </div>
+
+      <div class="pt-3 flex items-center justify-end gap-3 border-t border-gray-100">
+        <button onclick="closeBatchUploadModal()" class="px-4 py-2.5 rounded-xl bg-gray-100 text-gray-600 text-xs font-bold hover:bg-gray-200">
+          Скасувати
+        </button>
+        <button onclick="applyBatchUpload()" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 shadow-md">
+          🚀 Згенерувати розклад уроків
         </button>
       </div>
     </div>
@@ -1135,6 +1279,7 @@
 
       populateForm();
       renderAdminCertificates();
+      populateMarathonForm();
 
       // Audio Preview
       const preview = document.getElementById('admin-audio-preview');
@@ -1396,6 +1541,19 @@
         duration: document.getElementById('field-duration').value,
         paymentDetails: document.getElementById('field-payment').value
       };
+
+      // Gather Marathon data
+      if (!appData.marathon) appData.marathon = {};
+      const mEnabledEl = document.getElementById('field-marathon-enabled');
+      if (mEnabledEl) appData.marathon.enabled = mEnabledEl.checked;
+      const mTitleEl = document.getElementById('field-marathon-title');
+      if (mTitleEl) appData.marathon.title = mTitleEl.value;
+      const mSubEl = document.getElementById('field-marathon-subtitle');
+      if (mSubEl) appData.marathon.subtitle = mSubEl.value;
+      const mDescEl = document.getElementById('field-marathon-description');
+      if (mDescEl) appData.marathon.description = mDescEl.value;
+      const mTgEl = document.getElementById('field-marathon-telegram');
+      if (mTgEl) appData.marathon.telegramChannel = mTgEl.value;
 
       // Sync Gemini AI Key & Model (Encoded to pass GitHub Secret Protection)
       const geminiInput = document.getElementById('gemini-token-input');
@@ -1764,6 +1922,320 @@
         checkGeminiToken();
         showToast('AI ключ видалено (активний вбудований режим)');
       }
+    }
+
+    // ==========================================
+    // MARATHON SECTION LOGIC
+    // ==========================================
+
+    function populateMarathonForm() {
+      if (!appData.marathon) {
+        appData.marathon = {
+          enabled: true,
+          title: "Безкоштовний онлайн-марафон: Віднови свій ресурс",
+          subtitle: "7 днів до внутрішньої сили та спокою",
+          description: "Практичний інтенсив від практикуючої психологині Юлії Олефіренко.",
+          telegramChannel: "https://t.me/psy_olefirenkoyuliia",
+          lessons: []
+        };
+      }
+
+      const m = appData.marathon;
+      const enabledEl = document.getElementById('field-marathon-enabled');
+      if (enabledEl) enabledEl.checked = m.enabled !== false;
+
+      const titleEl = document.getElementById('field-marathon-title');
+      if (titleEl) titleEl.value = m.title || '';
+
+      const subEl = document.getElementById('field-marathon-subtitle');
+      if (subEl) subEl.value = m.subtitle || '';
+
+      const descEl = document.getElementById('field-marathon-description');
+      if (descEl) descEl.value = m.description || '';
+
+      const tgEl = document.getElementById('field-marathon-telegram');
+      if (tgEl) tgEl.value = m.telegramChannel || '';
+
+      renderAdminMarathon();
+    }
+
+    function renderAdminMarathon() {
+      const container = document.getElementById('admin-marathon-lessons-list');
+      if (!container) return;
+
+      container.innerHTML = '';
+      if (!appData.marathon) appData.marathon = { lessons: [] };
+      if (!appData.marathon.lessons) appData.marathon.lessons = [];
+
+      const lessons = appData.marathon.lessons;
+      const countBadge = document.getElementById('admin-marathon-count-badge');
+      if (countBadge) countBadge.textContent = `${lessons.length} уроків`;
+
+      if (lessons.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-300 space-y-3">
+            <div class="text-3xl">🌱</div>
+            <div class="font-bold text-sm text-gray-700">Уроки марафону ще не додано</div>
+            <p class="text-xs text-gray-500 max-w-sm mx-auto">Скористайтеся кнопкою швидкого додавання пачкою або додайте перший урок вручну.</p>
+            <div class="pt-2 flex items-center justify-center gap-3">
+              <button onclick="openBatchUploadModal()" class="px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold transition-all shadow-xs">
+                ⚡ Додати ролики пачкою
+              </button>
+              <button onclick="addSingleLesson()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all shadow-xs">
+                + Додати 1 урок
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      lessons.forEach((lesson, idx) => {
+        const isUnlocked = !lesson.publishDate || new Date(lesson.publishDate).getTime() <= Date.now();
+        const dateValue = lesson.publishDate ? lesson.publishDate.substring(0, 16) : '';
+
+        const card = document.createElement('div');
+        card.setAttribute('data-index', String(idx));
+        card.className = 'marathon-drag-card p-4 sm:p-5 rounded-2xl border border-gray-200 bg-white hover:border-brand-300 hover:shadow-md transition-all space-y-4 select-none relative';
+
+        card.innerHTML = `
+          <!-- Header Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="marathon-drag-handle cursor-grab active:cursor-grabbing text-gray-400 hover:text-brand-700 hover:bg-brand-50 p-1 rounded-md text-base leading-none" title="Затисніть і перетягніть">⠿</span>
+              <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold uppercase bg-brand-50 text-brand-800 border border-brand-200">
+                День ${lesson.day || (idx + 1)}
+              </span>
+              <div class="flex items-center gap-1">
+                ${isUnlocked 
+                  ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">🟢 Доступний</span>`
+                  : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">🔒 Заплановано</span>`
+                }
+              </div>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="flex items-center gap-2">
+              <button onclick="publishLessonNow(${idx})" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-bold transition-colors" title="Зробити урок доступним прямо зараз">
+                ⚡ Відкрити зараз
+              </button>
+              <button onclick="shiftLessonDate(${idx}, 1)" class="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-[11px] font-semibold transition-colors" title="Перенести на 1 день вперед">
+                📅 +1 день
+              </button>
+              <button onclick="deleteLesson(${idx})" class="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold transition-colors" title="Видалити урок">
+                🗑️
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Fields Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+            
+            <!-- Title -->
+            <div class="md:col-span-6 space-y-1">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-600">Назва уроку:</label>
+              <input type="text" value="${escapeHtmlAttr(lesson.title || '')}" onchange="updateLessonField(${idx}, 'title', this.value)" placeholder="Наприклад: Знайомство зі своїми емоціями" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+
+            <!-- Video URL -->
+            <div class="md:col-span-6 space-y-1">
+              <div class="flex items-center justify-between">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-gray-600">Посилання на відео (TikTok, YouTube, MP4):</label>
+                ${lesson.videoUrl ? `<a href="${escapeHtmlAttr(lesson.videoUrl)}" target="_blank" class="text-[10px] text-brand-700 hover:underline font-semibold">Перевірити ↗</a>` : ''}
+              </div>
+              <input type="url" value="${escapeHtmlAttr(lesson.videoUrl || '')}" onchange="updateLessonField(${idx}, 'videoUrl', this.value)" placeholder="https://www.tiktok.com/@yulia_psychologist_/video/..." class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-mono focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+
+            <!-- Calendar Publish Date & Time -->
+            <div class="md:col-span-6 space-y-1">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-600">📅 Дата та час виходу уроку:</label>
+              <input type="datetime-local" value="${dateValue}" onchange="updateLessonField(${idx}, 'publishDate', this.value)" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+            </div>
+
+            <!-- Duration -->
+            <div class="md:col-span-6 space-y-1">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-600">⏱️ Тривалість ролика:</label>
+              <input type="text" value="${escapeHtmlAttr(lesson.duration || '3 хв')}" onchange="updateLessonField(${idx}, 'duration', this.value)" placeholder="3 хв" class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs sm:text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+
+            <!-- Description -->
+            <div class="md:col-span-6 space-y-1">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-600">📖 Опис уроку та інсайти:</label>
+              <textarea rows="3" onchange="updateLessonField(${idx}, 'description', this.value)" placeholder="Короткий зміст, головні думки..." class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs leading-relaxed focus:ring-2 focus:ring-brand-500 outline-none">${escapeHtml(lesson.description || '')}</textarea>
+            </div>
+
+            <!-- Homework / Practice -->
+            <div class="md:col-span-6 space-y-1">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-600">📝 Практичне завдання (Домашка):</label>
+              <textarea rows="3" onchange="updateLessonField(${idx}, 'homework', this.value)" placeholder="Вправа на день, техніка заспокоєння..." class="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs leading-relaxed focus:ring-2 focus:ring-brand-500 outline-none">${escapeHtml(lesson.homework || '')}</textarea>
+            </div>
+
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      // Initialize SortableJS for marathon lessons
+      if (typeof Sortable !== 'undefined') {
+        if (window.marathonSortableInstance) {
+          try { window.marathonSortableInstance.destroy(); } catch(e) {}
+        }
+        window.marathonSortableInstance = new Sortable(container, {
+          animation: 200,
+          handle: '.marathon-drag-handle',
+          draggable: '.marathon-drag-card',
+          ghostClass: 'opacity-40',
+          chosenClass: 'scale-102',
+          onEnd: function(evt) {
+            if (evt.oldIndex === evt.newIndex || evt.oldIndex === undefined || evt.newIndex === undefined) return;
+            const moved = appData.marathon.lessons.splice(evt.oldIndex, 1)[0];
+            appData.marathon.lessons.splice(evt.newIndex, 0, moved);
+            appData.marathon.lessons.forEach((l, i) => { l.day = i + 1; });
+            renderAdminMarathon();
+            showToast('Порядок уроків змінено! Натисніть «Зберегти»', '🖐️');
+          }
+        });
+      }
+    }
+
+    function updateLessonField(index, field, value) {
+      if (!appData.marathon || !appData.marathon.lessons || !appData.marathon.lessons[index]) return;
+      appData.marathon.lessons[index][field] = value;
+    }
+
+    function addSingleLesson() {
+      if (!appData.marathon) appData.marathon = { lessons: [] };
+      if (!appData.marathon.lessons) appData.marathon.lessons = [];
+
+      const newDay = appData.marathon.lessons.length + 1;
+      const now = new Date();
+      now.setDate(now.getDate() + newDay - 1);
+      now.setHours(9, 0, 0, 0);
+
+      const pad = (n) => String(n).padStart(2, '0');
+      const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+      appData.marathon.lessons.push({
+        id: 'lesson-' + Date.now(),
+        day: newDay,
+        title: `Урок ${newDay}: Нова тема`,
+        description: "Опис уроку та інсайти від Юлії...",
+        homework: "Практична вправа на сьогодні...",
+        videoUrl: "",
+        publishDate: dateStr,
+        duration: "3 хв"
+      });
+
+      renderAdminMarathon();
+      showToast(`Урок ${newDay} додано! Не забудьте зберегти`, '✨');
+    }
+
+    function deleteLesson(index) {
+      if (!confirm(`Ви дійсно бажаєте видалити Урок ${index + 1}?`)) return;
+      appData.marathon.lessons.splice(index, 1);
+      appData.marathon.lessons.forEach((l, i) => { l.day = i + 1; });
+      renderAdminMarathon();
+      showToast('Урок видалено');
+    }
+
+    function publishLessonNow(index) {
+      if (!appData.marathon.lessons[index]) return;
+      const d = new Date(Date.now() - 60000); // 1 min ago
+      const pad = (n) => String(n).padStart(2, '0');
+      appData.marathon.lessons[index].publishDate = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      renderAdminMarathon();
+      showToast(`Урок ${index + 1} тепер доступний для всіх!`, '🟢');
+    }
+
+    function shiftLessonDate(index, days) {
+      if (!appData.marathon.lessons[index]) return;
+      const current = appData.marathon.lessons[index].publishDate ? new Date(appData.marathon.lessons[index].publishDate) : new Date();
+      current.setDate(current.getDate() + days);
+      const pad = (n) => String(n).padStart(2, '0');
+      appData.marathon.lessons[index].publishDate = `${current.getFullYear()}-${pad(current.getMonth() + 1)}-${pad(current.getDate())}T${pad(current.getHours())}:${pad(current.getMinutes())}`;
+      renderAdminMarathon();
+      showToast(`Дату змінено на +${days} дн.`, '📅');
+    }
+
+    function openBatchUploadModal() {
+      const modal = document.getElementById('batch-upload-modal');
+      const startInput = document.getElementById('batch-start-date');
+
+      const now = new Date();
+      now.setHours(9, 0, 0, 0);
+      const pad = (n) => String(n).padStart(2, '0');
+      if (startInput) {
+        startInput.value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      }
+
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeBatchUploadModal() {
+      const modal = document.getElementById('batch-upload-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function applyBatchUpload() {
+      const text = (document.getElementById('batch-lessons-text').value || '').trim();
+      const startVal = document.getElementById('batch-start-date').value;
+      const intervalDays = parseInt(document.getElementById('batch-interval-select').value || '1', 10);
+
+      if (!text) {
+        alert('Будь ласка, введіть хоча б один ролик у список');
+        return;
+      }
+
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const startDate = startVal ? new Date(startVal) : new Date();
+
+      const newLessons = [];
+      const pad = (n) => String(n).padStart(2, '0');
+
+      lines.forEach((line, idx) => {
+        const parts = line.split('|').map(p => p.trim());
+        let title = parts[0] || `Урок ${idx + 1}`;
+        let videoUrl = parts[1] || '';
+        let duration = parts[2] || '3 хв';
+
+        if (title.startsWith('http://') || title.startsWith('https://')) {
+          videoUrl = title;
+          title = `Урок ${idx + 1}`;
+        }
+
+        const lessonDate = new Date(startDate.getTime() + (idx * intervalDays * 24 * 60 * 60 * 1000));
+        const dateStr = `${lessonDate.getFullYear()}-${pad(lessonDate.getMonth() + 1)}-${pad(lessonDate.getDate())}T${pad(lessonDate.getHours())}:${pad(lessonDate.getMinutes())}`;
+
+        newLessons.push({
+          id: 'lesson-' + (Date.now() + idx),
+          day: idx + 1,
+          title: title,
+          description: `У цьому уроці ми розглядаємо тему: ${title}.\n\nПерегляньте відео та виконайте практичне завдання.`,
+          homework: `Практична вправа до теми «${title}»:\n1. Запишіть свої спостереження.\n2. Зробіть 3 глибокі видихи.`,
+          videoUrl: videoUrl,
+          publishDate: dateStr,
+          duration: duration
+        });
+      });
+
+      if (!appData.marathon) appData.marathon = {};
+      appData.marathon.lessons = newLessons;
+
+      renderAdminMarathon();
+      closeBatchUploadModal();
+      showToast(`🎉 Успішно згенеровано ${newLessons.length} уроків за календарем!`, '🚀', true);
+    }
+
+    function escapeHtmlAttr(str) {
+      if (!str) return '';
+      return String(str).replace(/"/g, '&quot;');
     }
 
     function showToast(msg, icon = '✅', showSiteLink = false) {
