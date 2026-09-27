@@ -781,14 +781,15 @@
 
         // 2. Round Video Messages (Telegram Circle Video)
         if (lesson.roundVideo) {
+          const roundPoster = lesson.roundVideo.replace(/\.mp4$/i, '.jpg');
           mediaHtml += `
             <div class="video-wrapper p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-brand-50 to-emerald-50 border border-brand-200/80 flex flex-col items-center text-center space-y-3 shadow-xs">
               <div class="text-xs font-bold text-brand-900 flex items-center gap-1.5">
                 <span>🎥</span> Кругле відео-повідомлення Юлії
               </div>
               <div class="w-52 h-52 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-brand-500 shadow-xl bg-black relative">
-                <video controls playsinline preload="metadata" class="w-full h-full object-cover" onerror="handleMediaError(this)">
-                  <source src="${escapeHtml(lesson.roundVideo)}" type="video/mp4" onerror="handleMediaError(this)">
+                <video controls playsinline webkit-playsinline="true" preload="metadata" poster="${escapeHtml(roundPoster)}" class="w-full h-full object-cover" onerror="handleMediaError(this)">
+                  <source src="${escapeHtml(lesson.roundVideo)}" type="video/mp4">
                   Ваш браузер не підтримує відтворення відео.
                 </video>
               </div>
@@ -812,7 +813,6 @@
                     <span class="text-xs font-bold text-sky-800 shrink-0">Запис #${vIdx + 1}</span>
                     <audio controls preload="metadata" class="w-full h-9 outline-none">
                       <source src="${escapeHtml(voicePath)}" type="audio/mpeg">
-                      <source src="${escapeHtml(voicePath)}" type="audio/ogg">
                       Ваш браузер не підтримує відтворення аудіо.
                     </audio>
                   </div>
@@ -949,10 +949,11 @@
           if (videoUrl.endsWith('.MOV') || videoUrl.endsWith('.mov')) {
             cleanUrl = videoUrl.replace(/\.(MOV|mov)$/, '.mp4');
           }
+          const mainPoster = lesson.posterUrl || cleanUrl.replace(/\.mp4$/i, '.jpg');
 
           container.innerHTML = `
             <div class="video-wrapper w-full max-w-3xl mx-auto p-2 sm:p-4 flex flex-col items-center justify-center bg-black/95 rounded-2xl relative">
-              <video controls playsinline webkit-playsinline="true" preload="metadata" class="w-full max-h-[560px] rounded-xl shadow-2xl bg-black object-contain" onerror="handleMediaError(this)">
+              <video controls playsinline webkit-playsinline="true" preload="metadata" poster="${escapeHtml(mainPoster)}" class="w-full max-h-[560px] rounded-xl shadow-2xl bg-black object-contain" onerror="handleMediaError(this)">
                 <source src="${escapeHtml(cleanUrl)}" type="video/mp4">
                 Ваш браузер не підтримує пряме відтворення відео.
               </video>
