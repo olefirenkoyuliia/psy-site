@@ -102,27 +102,27 @@
 
   <!-- TOP NOTIFICATION / MARATHON HEADER -->
   <header class="sticky top-0 z-40 glass-nav border-b border-warm-border/70 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-[4rem] py-2 flex items-center justify-between gap-2">
       
       <!-- Brand / Home Link -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
         <!-- Mobile Sidebar Toggle -->
-        <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95" aria-label="Меню уроків">
+        <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 shrink-0" aria-label="Меню уроків">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h7"/>
           </svg>
           <span class="text-xs font-semibold hidden xs:inline">Уроки</span>
         </button>
 
-        <a href="index.html" class="group flex items-center gap-2.5">
-          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-brand-600 text-white flex items-center justify-center font-serif text-lg font-bold shadow-soft group-hover:scale-105 transition-transform">
+        <a href="index.html" class="group flex items-center gap-2">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-2xl bg-brand-600 text-white flex items-center justify-center font-serif text-base sm:text-lg font-bold shadow-soft group-hover:scale-105 transition-transform shrink-0">
             ЮО
           </div>
-          <div>
-            <div class="font-serif font-bold text-base sm:text-lg text-warm-text leading-tight group-hover:text-brand-700 transition-colors">
+          <div class="min-w-0">
+            <div class="font-serif font-bold text-sm sm:text-lg text-warm-text leading-tight group-hover:text-brand-700 transition-colors whitespace-nowrap">
               Юлія Олефіренко
             </div>
-            <div class="text-[10px] sm:text-xs text-brand-700 font-semibold flex items-center gap-1">
+            <div class="text-[10px] sm:text-xs text-brand-700 font-semibold hidden sm:flex items-center gap-1">
               <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
               Онлайн-марафон
             </div>
@@ -178,11 +178,11 @@
       <!-- Quick Stats & Instructions -->
       <div class="flex items-center gap-3 shrink-0">
         <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/15 text-center min-w-[100px]">
-          <div id="stat-unlocked-count" class="text-xl sm:text-2xl font-bold text-white">1 / 7</div>
+          <div id="stat-unlocked-count" class="text-xl sm:text-2xl font-bold text-white">1 / 6</div>
           <div class="text-[10px] sm:text-xs text-brand-200">Доступно уроків</div>
         </div>
         <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 sm:p-4 border border-white/15 text-center min-w-[100px]">
-          <div id="stat-completed-count" class="text-xl sm:text-2xl font-bold text-emerald-300">0 / 7</div>
+          <div id="stat-completed-count" class="text-xl sm:text-2xl font-bold text-emerald-300">0 / 6</div>
           <div class="text-[10px] sm:text-xs text-brand-200">Пройдено вами</div>
         </div>
       </div>
@@ -216,7 +216,7 @@
                 <span>🗓️</span> Дерево уроків
               </h2>
               <span id="sidebar-total-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-50 text-brand-800 border border-brand-200">
-                7 днів
+                6 уроків
               </span>
             </div>
             <p class="text-[11px] text-warm-muted mt-0.5">Нові ролики відкриваються щодня за розкладом</p>
@@ -226,7 +226,7 @@
           <div class="py-3 border-b border-warm-border/60 space-y-1.5">
             <div class="flex items-center justify-between text-xs font-semibold">
               <span class="text-warm-muted">Ваш прогрес</span>
-              <span id="sidebar-progress-label" class="text-brand-700">0 з 7 завершено</span>
+              <span id="sidebar-progress-label" class="text-brand-700">0 з 6 завершено</span>
             </div>
             <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden border border-gray-200">
               <div id="sidebar-progress-bar" class="bg-brand-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -274,11 +274,11 @@
           <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-warm-border/60">
             <div class="flex items-center gap-2 text-xs text-warm-muted font-medium">
               <span class="px-2.5 py-1 rounded-full bg-brand-50 text-brand-800 font-bold" id="current-day-badge">
-                День 1
+                Вступ
               </span>
               <span>•</span>
               <span id="current-duration-badge" class="flex items-center gap-1">
-                ⏱️ 3 хв
+                ⏱️ 4 хв
               </span>
             </div>
 
@@ -293,7 +293,7 @@
           <!-- Lesson Title -->
           <div class="space-y-2">
             <h2 id="current-lesson-title" class="font-serif text-2xl sm:text-3xl font-bold text-warm-text leading-tight">
-              Знайомство зі своїми емоціями: як почути себе
+              Вітання та вступ до тренінгу «Дім всередині тебе» 🌿
             </h2>
             <p class="text-xs text-warm-muted flex items-center gap-1.5">
               <span>📅 Дата публікації:</span>
@@ -303,7 +303,18 @@
 
           <!-- VIDEO PLAYER / LOCKED CONTAINER -->
           <div id="video-workspace-container" class="relative rounded-2xl overflow-hidden bg-stone-900 border border-warm-border shadow-inner min-h-[360px] flex items-center justify-center">
-            <!-- Rendered dynamically (video iframe, direct video, or locked countdown) -->
+            <div class="video-wrapper w-full max-w-3xl mx-auto p-2 sm:p-4 flex flex-col items-center justify-center bg-black/95 rounded-2xl relative">
+              <video controls playsinline webkit-playsinline="true" preload="metadata" poster="marathon_media/video_files/5_IMG_5277.jpg" class="w-full max-h-[560px] rounded-xl shadow-2xl bg-black object-contain" onerror="handleMediaError(this)">
+                <source src="marathon_media/video_files/5_IMG_5277.mp4" type="video/mp4">
+                Ваш браузер не підтримує пряме відтворення відео.
+              </video>
+              <div class="video-error-fallback hidden w-full p-4 mt-3 rounded-xl bg-red-950/90 border border-red-500/50 text-red-200 text-xs text-center space-y-2">
+                <p>⚠️ Ваш браузер не зміг завантажити або відтворити дане відео.</p>
+                <a href="marathon_media/video_files/5_IMG_5277.mp4" target="_blank" download class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-xs">
+                  <span>Завантажити відео напряму ↗</span>
+                </a>
+              </div>
+            </div>
           </div>
 
           <!-- Quick Action Bar under Video -->
@@ -470,6 +481,15 @@
       if (!marathonData) {
         try {
           const cached = localStorage.getItem('psy_site_data');
+          if (cached) {
+            const data = JSON.parse(cached);
+            if (data && data.marathon && data.marathon.lessons && data.marathon.lessons.length >= 5) {
+              marathonData = data.marathon;
+            }
+          }
+        } catch(e) {}
+      }
+
       // Discard any stale/cached marathonData if it has less than 5 lessons
       if (marathonData && (!marathonData.lessons || marathonData.lessons.length < 5)) {
         marathonData = null;
@@ -1213,8 +1233,12 @@
       }
     });
 
-    // Boot App
-    window.addEventListener('DOMContentLoaded', initMarathon);
+    // Boot App safely
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMarathon);
+    } else {
+      initMarathon();
+    }
   </script>
 
 </body>
