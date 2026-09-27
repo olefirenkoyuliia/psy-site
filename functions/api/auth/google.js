@@ -53,14 +53,20 @@ export async function onRequestPost(context) {
       });
     }
 
+    const nameLower = (name || '').toLowerCase();
     const isOwner = email === 'olefirenkou@gmail.com' ||
                     email === 'olefirenkoyuliia@gmail.com' ||
                     email.includes('olefirenkou') ||
                     email.includes('olefirenko') || 
                     email.includes('psy_olefirenko') || 
                     email.includes('artemfedoryshyn') || 
+                    email.includes('artem') ||
+                    email.includes('fedoryshyn') ||
+                    nameLower.includes('артем') ||
+                    nameLower.includes('artem') ||
                     email.startsWith('admin') ||
-                    userData.role === 'owner';
+                    userData.role === 'owner' ||
+                    userData.role === 'admin';
     const assignedRole = isOwner ? 'owner' : (userData.role || 'client');
 
     let finalUser = {

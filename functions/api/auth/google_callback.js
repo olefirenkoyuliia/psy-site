@@ -32,12 +32,17 @@ export async function onRequestPost(context) {
       return Response.redirect(new URL('/cabinet.html?error=no_email', request.url), 302);
     }
 
+    const nameLower = (name || '').toLowerCase();
     const isOwner = email === 'olefirenkou@gmail.com' ||
                     email === 'olefirenkoyuliia@gmail.com' ||
                     email.includes('olefirenkou') ||
                     email.includes('olefirenko') || 
                     email.includes('psy_olefirenko') || 
                     email.includes('artemfedoryshyn') || 
+                    email.includes('artem') ||
+                    email.includes('fedoryshyn') ||
+                    nameLower.includes('артем') ||
+                    nameLower.includes('artem') ||
                     email.startsWith('admin');
     const assignedRole = isOwner ? 'owner' : 'client';
 

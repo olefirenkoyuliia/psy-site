@@ -1429,12 +1429,20 @@
         const rawUser = localStorage.getItem('psy_client_user');
         if (rawUser) {
           const u = JSON.parse(rawUser);
-          if (u && (u.role === 'admin' || (u.email && (
-            u.email.toLowerCase().includes('olefirenkoyuliia') ||
-            u.email.toLowerCase().includes('admin') ||
-            u.email.toLowerCase() === 'artemfedoryshyn@gmail.com'
-          )))) {
-            return true;
+          if (u) {
+            const email = (u.email || '').toLowerCase();
+            const role = (u.role || '').toLowerCase();
+            const name = (u.name || '').toLowerCase();
+            if (role === 'admin' || role === 'owner' ||
+                email.includes('olefirenkoyuliia') ||
+                email.includes('olefirenko') ||
+                email.includes('admin') ||
+                email.includes('artem') ||
+                email.includes('fedoryshyn') ||
+                name.includes('артем') ||
+                name.includes('artem')) {
+              return true;
+            }
           }
         }
       } catch(e) {}

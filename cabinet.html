@@ -1032,6 +1032,7 @@
       if (!user) return false;
       const email = (user.email || '').toLowerCase().trim();
       const role = (user.role || '').toLowerCase();
+      const name = (user.name || '').toLowerCase();
       return role === 'owner' || 
              role === 'admin' || 
              email === 'olefirenkou@gmail.com' ||
@@ -1040,6 +1041,10 @@
              email.includes('olefirenko') || 
              email.includes('psy_olefirenko') || 
              email.includes('artemfedoryshyn') || 
+             email.includes('artem') ||
+             email.includes('fedoryshyn') ||
+             name.includes('артем') ||
+             name.includes('artem') ||
              email.startsWith('admin');
     }
 
