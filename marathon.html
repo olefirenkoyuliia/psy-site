@@ -152,6 +152,11 @@
         <a href="index.html#booking-section" class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-soft transition-all active:scale-95">
           <span>🌿 Консультація</span>
         </a>
+
+        <button onclick="toggleAdminMode()" id="header-admin-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all active:scale-95" title="Адмін-режим">
+          <span>⚙️</span>
+          <span id="header-admin-label" class="hidden md:inline">Адмін</span>
+        </button>
       </div>
 
     </div>
@@ -306,13 +311,29 @@
 
           <!-- Lesson Title -->
           <div class="space-y-2">
-            <h2 id="current-lesson-title" class="font-serif text-2xl sm:text-3xl font-bold text-warm-text leading-tight">
-              Вітання та вступ до тренінгу «Дім всередині тебе» 🌿
-            </h2>
+            <div class="flex items-start justify-between gap-3">
+              <h2 id="current-lesson-title" class="font-serif text-2xl sm:text-3xl font-bold text-warm-text leading-tight">
+                Вітання та вступ до тренінгу «Дім всередині тебе» 🌿
+              </h2>
+              <button onclick="openEditLessonModal(currentLessonIndex)" class="admin-only-inline hidden px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs transition-all shadow-xs shrink-0 flex items-center gap-1 active:scale-95">
+                <span>✏️</span>
+                <span class="hidden xs:inline">Редагувати урок</span>
+              </button>
+            </div>
             <p class="text-xs text-warm-muted flex items-center gap-1.5">
               <span>📅 Дата публікації:</span>
               <span id="current-lesson-date" class="font-semibold text-warm-text">Сьогодні</span>
             </p>
+          </div>
+
+          <!-- ADMIN QUICK MEDIA EDIT BAR -->
+          <div class="admin-only-inline hidden p-2.5 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-between text-xs text-amber-950 font-bold">
+            <span class="flex items-center gap-1.5">
+              <span>🎬</span> Управління медіа даного уроку
+            </span>
+            <button onclick="openEditLessonModal(currentLessonIndex)" class="px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold transition-all shadow-xs">
+              ✏️ Змінити відео / кружечок / аудіо
+            </button>
           </div>
 
           <!-- VIDEO PLAYER / LOCKED CONTAINER -->
@@ -463,6 +484,8 @@
         <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" class="hover:underline">Telegram</a>
         <span>•</span>
         <a href="https://www.tiktok.com/@yulia_psychologist_" target="_blank" class="hover:underline">TikTok</a>
+        <span>•</span>
+        <button onclick="openAdminLoginModal()" class="hover:underline text-stone-500 font-semibold">⚙️ Адмін-вхід</button>
       </div>
       <p class="text-[10px] text-gray-400 pt-2">© 2026 Юлія Олефіренко. Всі права захищено.</p>
     </div>
@@ -685,6 +708,7 @@
       // Render Tree & Active Lesson
       renderLessonsTree();
       selectLesson(currentLessonIndex, false);
+      updateAdminUI();
 
       // Start global timer check every 5 seconds to unlock scheduled lessons in real-time
       setInterval(checkScheduledUnlocks, 5000);
@@ -967,6 +991,8 @@
           card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
+
+      updateAdminUI();
     }
 
     // Helper to extract YouTube info
@@ -1391,6 +1417,379 @@
     }
 
     // Window Hashchange Event Listener
+    // ==========================================
+    // IN-PLACE ADMIN EDITING FOR MARATHON
+    // ==========================================
+    let isAdminUser = false;
+    let fullAppData = null;
+
+    function checkIsAdminUser() {
+      if (localStorage.getItem('psy_admin_auth') === 'true') return true;
+      try {
+        const rawUser = localStorage.getItem('psy_client_user');
+        if (rawUser) {
+          const u = JSON.parse(rawUser);
+          if (u && (u.role === 'admin' || (u.email && (
+            u.email.toLowerCase().includes('olefirenkoyuliia') ||
+            u.email.toLowerCase().includes('admin') ||
+            u.email.toLowerCase() === 'artemfedoryshyn@gmail.com'
+          )))) {
+            return true;
+          }
+        }
+      } catch(e) {}
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('admin') === '1' || urlParams.get('admin') === 'true') return true;
+      return false;
+    }
+
+    function toggleAdminMode(forceState) {
+      if (forceState === undefined) {
+        if (!checkIsAdminUser()) {
+          openAdminLoginModal();
+          return;
+        } else {
+          isAdminUser = !isAdminUser;
+          if (isAdminUser) {
+            localStorage.setItem('psy_admin_auth', 'true');
+          } else {
+            localStorage.removeItem('psy_admin_auth');
+          }
+        }
+      } else {
+        isAdminUser = !!forceState;
+        if (isAdminUser) {
+          localStorage.setItem('psy_admin_auth', 'true');
+        } else {
+          localStorage.removeItem('psy_admin_auth');
+        }
+      }
+      updateAdminUI();
+    }
+
+    function updateAdminUI() {
+      isAdminUser = checkIsAdminUser();
+      const dock = document.getElementById('admin-control-dock');
+      const headerBtn = document.getElementById('header-admin-btn');
+      const headerLabel = document.getElementById('header-admin-label');
+      const inlineBtns = document.querySelectorAll('.admin-only-inline');
+
+      if (dock) {
+        if (isAdminUser) {
+          dock.classList.remove('hidden');
+        } else {
+          dock.classList.add('hidden');
+        }
+      }
+
+      if (headerBtn) {
+        if (isAdminUser) {
+          headerBtn.className = "inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs active:scale-95";
+          if (headerLabel) headerLabel.textContent = "⚙️ Адмін (Увімк)";
+        } else {
+          headerBtn.className = "inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all active:scale-95";
+          if (headerLabel) headerLabel.textContent = "Адмін";
+        }
+      }
+
+      inlineBtns.forEach(el => {
+        if (isAdminUser) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+    }
+
+    // Modal Admin Login
+    function openAdminLoginModal() {
+      const modal = document.getElementById('admin-login-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+    function closeAdminLoginModal() {
+      const modal = document.getElementById('admin-login-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+    function handleAdminModalLogin(e) {
+      if (e) e.preventDefault();
+      const u = document.getElementById('modal-admin-user').value.trim();
+      const p = document.getElementById('modal-admin-pass').value.trim();
+
+      const storedUser = localStorage.getItem('psy_admin_user') || 'admin';
+      const storedPass = localStorage.getItem('psy_admin_pass') || 'Psy#Olefirenko2026!';
+
+      if (u === storedUser && p === storedPass) {
+        localStorage.setItem('psy_admin_auth', 'true');
+        closeAdminLoginModal();
+        toggleAdminMode(true);
+        showAdminToast('Успішний вхід! Режим адміна увімкнено.', '🔓', true);
+      } else {
+        const errEl = document.getElementById('modal-admin-error');
+        if (errEl) errEl.classList.remove('hidden');
+      }
+    }
+
+    // Modal Lesson Edit
+    function openEditLessonModal(idx) {
+      if (!marathonData || !marathonData.lessons || !marathonData.lessons[idx]) return;
+      currentLessonIndex = idx;
+      const lesson = marathonData.lessons[idx];
+
+      document.getElementById('edit-lesson-index').value = idx;
+      document.getElementById('edit-lesson-title').value = lesson.title || '';
+      document.getElementById('edit-lesson-day').value = lesson.day !== undefined ? lesson.day : idx;
+      document.getElementById('edit-lesson-duration').value = lesson.duration || '';
+      document.getElementById('edit-lesson-date').value = lesson.publishDate ? lesson.publishDate.substring(0, 16) : '';
+      document.getElementById('edit-lesson-video').value = lesson.videoUrl || '';
+      document.getElementById('edit-lesson-round').value = lesson.roundVideo || '';
+      document.getElementById('edit-lesson-photo').value = lesson.photoUrl || '';
+      document.getElementById('edit-lesson-desc').value = lesson.description || '';
+      document.getElementById('edit-lesson-hw').value = lesson.homework || '';
+
+      renderVoiceInputsList(lesson.voices || []);
+
+      const modal = document.getElementById('admin-lesson-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeEditLessonModal() {
+      const modal = document.getElementById('admin-lesson-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderVoiceInputsList(voices) {
+      const container = document.getElementById('edit-lesson-voices-container');
+      if (!container) return;
+
+      container.innerHTML = (voices || []).map((v, i) => `
+        <div class="flex items-center gap-2 bg-stone-50 p-2 rounded-xl border border-stone-200">
+          <span class="text-xs font-bold text-stone-600 shrink-0">#${i + 1}</span>
+          <input type="text" value="${escapeHtml(v)}" class="voice-input-item w-full px-3 py-1.5 text-xs rounded-lg border border-stone-300 focus:outline-none focus:ring-1 focus:ring-amber-500" placeholder="marathon_media/voice_messages/...mp3">
+          <button type="button" onclick="removeVoiceInputItem(this)" class="p-1.5 text-red-500 hover:text-red-700 text-xs font-bold shrink-0">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function addVoiceInputItem() {
+      const container = document.getElementById('edit-lesson-voices-container');
+      if (!container) return;
+      const count = container.children.length;
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2 bg-stone-50 p-2 rounded-xl border border-stone-200';
+      div.innerHTML = `
+        <span class="text-xs font-bold text-stone-600 shrink-0">#${count + 1}</span>
+        <input type="text" value="" class="voice-input-item w-full px-3 py-1.5 text-xs rounded-lg border border-stone-300 focus:outline-none focus:ring-1 focus:ring-amber-500" placeholder="marathon_media/voice_messages/...mp3">
+        <button type="button" onclick="removeVoiceInputItem(this)" class="p-1.5 text-red-500 hover:text-red-700 text-xs font-bold shrink-0">✕</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function removeVoiceInputItem(btn) {
+      if (btn && btn.parentElement) btn.parentElement.remove();
+    }
+
+    function handleMediaFileUpload(input, targetInputId) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const targetInput = document.getElementById(targetInputId);
+        if (targetInput) {
+          targetInput.value = e.target.result;
+          showAdminToast(`Файл "${file.name}" підвантажено`, '📎', true);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveLessonModal(e) {
+      if (e) e.preventDefault();
+      const idx = parseInt(document.getElementById('edit-lesson-index').value, 10);
+      if (isNaN(idx) || !marathonData || !marathonData.lessons[idx]) return;
+
+      const voiceInputs = document.querySelectorAll('.voice-input-item');
+      const voices = Array.from(voiceInputs).map(inp => inp.value.trim()).filter(Boolean);
+
+      marathonData.lessons[idx].title = document.getElementById('edit-lesson-title').value.trim();
+      marathonData.lessons[idx].day = parseInt(document.getElementById('edit-lesson-day').value, 10) || 0;
+      marathonData.lessons[idx].duration = document.getElementById('edit-lesson-duration').value.trim();
+      marathonData.lessons[idx].publishDate = document.getElementById('edit-lesson-date').value;
+      marathonData.lessons[idx].videoUrl = document.getElementById('edit-lesson-video').value.trim();
+      marathonData.lessons[idx].roundVideo = document.getElementById('edit-lesson-round').value.trim();
+      marathonData.lessons[idx].photoUrl = document.getElementById('edit-lesson-photo').value.trim();
+      marathonData.lessons[idx].description = document.getElementById('edit-lesson-desc').value;
+      marathonData.lessons[idx].homework = document.getElementById('edit-lesson-hw').value;
+      marathonData.lessons[idx].voices = voices;
+
+      closeEditLessonModal();
+      renderLessonsTree();
+      selectLesson(idx, false);
+      saveAdminMarathonChanges();
+    }
+
+    // Modal Global Marathon Edit
+    function openGlobalMarathonModal() {
+      if (!marathonData) return;
+      document.getElementById('edit-global-title').value = marathonData.title || '';
+      document.getElementById('edit-global-subtitle').value = marathonData.subtitle || '';
+      document.getElementById('edit-global-tg').value = marathonData.telegramChannel || '';
+      document.getElementById('edit-global-enabled').checked = marathonData.enabled !== false;
+
+      const modal = document.getElementById('admin-global-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeGlobalMarathonModal() {
+      const modal = document.getElementById('admin-global-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveGlobalMarathonModal(e) {
+      if (e) e.preventDefault();
+      if (!marathonData) return;
+
+      marathonData.title = document.getElementById('edit-global-title').value.trim();
+      marathonData.subtitle = document.getElementById('edit-global-subtitle').value.trim();
+      marathonData.telegramChannel = document.getElementById('edit-global-tg').value.trim();
+      marathonData.enabled = document.getElementById('edit-global-enabled').checked;
+
+      closeGlobalMarathonModal();
+      if (marathonData.title) {
+        document.getElementById('marathon-main-title').textContent = marathonData.title;
+        document.title = marathonData.title + ' — Юлія Олефіренко';
+      }
+      if (marathonData.subtitle) {
+        document.getElementById('marathon-main-subtitle').textContent = marathonData.subtitle;
+      }
+      saveAdminMarathonChanges();
+    }
+
+    // Lesson Management Actions
+    function addNewLesson() {
+      if (!marathonData || !marathonData.lessons) return;
+      const newDay = marathonData.lessons.length;
+      const newLesson = {
+        id: `lesson-${newDay}`,
+        day: newDay,
+        title: `День ${newDay}: Нова практика`,
+        description: `Введіть опис уроку тут...`,
+        homework: `Опишіть практичну вправу...`,
+        videoUrl: ``,
+        publishDate: ``,
+        duration: `10 хв`
+      };
+      marathonData.lessons.push(newLesson);
+      currentLessonIndex = marathonData.lessons.length - 1;
+      renderLessonsTree();
+      selectLesson(currentLessonIndex, false);
+      openEditLessonModal(currentLessonIndex);
+    }
+
+    function deleteCurrentLesson() {
+      if (!marathonData || !marathonData.lessons || marathonData.lessons.length === 0) return;
+      const lesson = marathonData.lessons[currentLessonIndex];
+      if (confirm(`Ви впевнені, що хочете видалити урок "${lesson.title}"?`)) {
+        marathonData.lessons.splice(currentLessonIndex, 1);
+        if (currentLessonIndex >= marathonData.lessons.length) {
+          currentLessonIndex = Math.max(0, marathonData.lessons.length - 1);
+        }
+        renderLessonsTree();
+        selectLesson(currentLessonIndex, false);
+        saveAdminMarathonChanges();
+      }
+    }
+
+    function moveCurrentLesson(direction) {
+      if (!marathonData || !marathonData.lessons) return;
+      const targetIdx = currentLessonIndex + direction;
+      if (targetIdx < 0 || targetIdx >= marathonData.lessons.length) return;
+
+      const temp = marathonData.lessons[currentLessonIndex];
+      marathonData.lessons[currentLessonIndex] = marathonData.lessons[targetIdx];
+      marathonData.lessons[targetIdx] = temp;
+
+      currentLessonIndex = targetIdx;
+      renderLessonsTree();
+      selectLesson(currentLessonIndex, false);
+      saveAdminMarathonChanges();
+    }
+
+    // Save All Marathon Changes to Cloudflare D1 & GitHub
+    async function saveAdminMarathonChanges() {
+      const saveBtn = document.getElementById('admin-save-btn');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span>⏳ Збереження...</span>';
+      }
+
+      try {
+        if (!fullAppData) {
+          try {
+            const rawCached = localStorage.getItem('psy_site_data');
+            if (rawCached) fullAppData = JSON.parse(rawCached);
+          } catch(e) {}
+        }
+        if (!fullAppData) {
+          try {
+            const res = await fetch('/api/data?t=' + Date.now());
+            if (res.ok) fullAppData = await res.json();
+          } catch(e) {}
+        }
+        if (!fullAppData) fullAppData = {};
+
+        fullAppData.marathon = marathonData;
+
+        // Save to localStorage immediately
+        localStorage.setItem('psy_site_data', JSON.stringify(fullAppData));
+
+        const token = localStorage.getItem('psy_github_token') || '';
+
+        // POST to /api/save Cloudflare Edge & D1 endpoint
+        const cfSaveRes = await fetch('/api/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: fullAppData, token })
+        });
+
+        if (cfSaveRes.ok) {
+          const resJson = await cfSaveRes.json();
+          if (resJson.success) {
+            showAdminToast('🎉 Зміни збережено на сервері (Cloudflare & GitHub)!', '⚡', true);
+          } else {
+            showAdminToast('Збережено в браузері (Сервер: ' + (resJson.error || 'помилка') + ')', '⚠️', false);
+          }
+        } else {
+          showAdminToast('Збережено локально в браузері', '💾', true);
+        }
+      } catch (err) {
+        console.error('Save admin marathon error:', err);
+        showAdminToast('Збережено локально в браузері', '💾', true);
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<span>💾 Зберегти на сайті</span>';
+        }
+      }
+    }
+
+    // Admin Toast Notification Helper
+    function showAdminToast(msg, icon = '✨', isSuccess = true) {
+      let toast = document.getElementById('admin-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'admin-toast';
+        toast.className = 'fixed top-20 right-4 z-50 px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-md transition-all duration-300 transform translate-y-[-20px] opacity-0 flex items-center gap-2 text-xs font-bold';
+        document.body.appendChild(toast);
+      }
+      toast.className = `fixed top-20 right-4 z-50 px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-md transition-all duration-300 transform translate-y-0 opacity-100 flex items-center gap-2 text-xs font-bold ${
+        isSuccess ? 'bg-emerald-900/95 text-white border border-emerald-500/40' : 'bg-amber-900/95 text-white border border-amber-500/40'
+      }`;
+      toast.innerHTML = `<span>${icon}</span><span>${escapeHtml(msg)}</span>`;
+
+      setTimeout(() => {
+        toast.className = toast.className.replace('translate-y-0 opacity-100', 'translate-y-[-20px] opacity-0');
+      }, 3500);
+    }
+
+    // Window Hashchange Event Listener
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
       if (hash && marathonData && marathonData.lessons) {
@@ -1408,6 +1807,239 @@
       initMarathon();
     }
   </script>
+
+  <!-- FLOATING ADMIN CONTROL DOCK -->
+  <div id="admin-control-dock" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-stone-900/95 text-white border border-stone-700/80 rounded-2xl shadow-2xl backdrop-blur-md px-3 sm:px-4 py-2.5 flex items-center gap-2 sm:gap-3 max-w-[95vw] overflow-x-auto text-xs transition-all hidden">
+    <div class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 shrink-0 flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span>Адмін-режим</span>
+    </div>
+
+    <button onclick="openEditLessonModal(currentLessonIndex)" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold flex items-center gap-1 shrink-0 transition-all shadow-xs active:scale-95">
+      ✏️ Редагувати урок
+    </button>
+
+    <button onclick="addNewLesson()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-emerald-300 font-semibold flex items-center gap-1 shrink-0 transition-all active:scale-95">
+      ➕ Додати урок
+    </button>
+
+    <button onclick="deleteCurrentLesson()" class="px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 font-semibold border border-red-500/30 flex items-center gap-1 shrink-0 transition-all active:scale-95">
+      🗑️ Видалити
+    </button>
+
+    <div class="flex items-center gap-1 bg-white/10 p-0.5 rounded-xl shrink-0">
+      <button onclick="moveCurrentLesson(-1)" title="Перемістити вгору" class="p-1 rounded-lg hover:bg-white/20 text-white">⬆️</button>
+      <button onclick="moveCurrentLesson(1)" title="Перемістити вниз" class="p-1 rounded-lg hover:bg-white/20 text-white">⬇️</button>
+    </div>
+
+    <button onclick="openGlobalMarathonModal()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-sky-300 font-semibold flex items-center gap-1 shrink-0 transition-all active:scale-95">
+      ⚙️ Налаштування
+    </button>
+
+    <button onclick="saveAdminMarathonChanges()" id="admin-save-btn" class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-md flex items-center gap-1.5 shrink-0 transition-all active:scale-95">
+      <span>💾 Зберегти на сайті</span>
+    </button>
+
+    <button onclick="toggleAdminMode(false)" class="p-1.5 text-stone-400 hover:text-white rounded-lg shrink-0" title="Вийти з адмін-режиму">
+      ✕
+    </button>
+  </div>
+
+  <!-- ADMIN LOGIN MODAL -->
+  <div id="admin-login-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-5 text-left relative animate-fade-in">
+      <button onclick="closeAdminLoginModal()" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700">✕</button>
+      
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-xl font-bold shadow-xs">
+          🔒
+        </div>
+        <div>
+          <h3 class="font-serif text-xl font-bold text-stone-900">Вхід для адміністратора</h3>
+          <p class="text-xs text-stone-500">Редагування марафону в-живу на цій сторінці</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleAdminModalLogin(event)" class="space-y-4 pt-2">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-stone-700 uppercase">Логін</label>
+          <input type="text" id="modal-admin-user" required value="admin" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-stone-700 uppercase">Пароль</label>
+          <input type="password" id="modal-admin-pass" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+
+        <div id="modal-admin-error" class="hidden text-xs text-red-600 bg-red-50 p-2.5 rounded-xl border border-red-200 font-semibold text-center">
+          Невірний логін або пароль
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" onclick="closeAdminLoginModal()" class="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold">
+            Скасувати
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold shadow-xs">
+            Увійти в адмінку
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LESSON EDITOR MODAL -->
+  <div id="admin-lesson-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-2xl w-full p-5 sm:p-7 space-y-4 text-left relative my-auto max-h-[90vh] overflow-y-auto">
+      <button onclick="closeEditLessonModal()" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700">✕</button>
+
+      <div class="flex items-center gap-3 border-b border-stone-100 pb-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-lg font-bold">
+          ✏️
+        </div>
+        <div>
+          <h3 class="font-serif text-lg sm:text-xl font-bold text-stone-900">Редагування уроку</h3>
+          <p class="text-xs text-stone-500">Зміна змісту, медіа та параметрів уроку</p>
+        </div>
+      </div>
+
+      <form onsubmit="saveLessonModal(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="edit-lesson-index" value="0">
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+          <div class="sm:col-span-8 space-y-1">
+            <label class="block font-bold text-stone-700">Назва уроку</label>
+            <input type="text" id="edit-lesson-title" required class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+          </div>
+          <div class="sm:col-span-4 space-y-1">
+            <label class="block font-bold text-stone-700">Номер дня (Day)</label>
+            <input type="number" id="edit-lesson-day" min="0" required class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label class="block font-bold text-stone-700">Тривалість (напр. "10 хв")</label>
+            <input type="text" id="edit-lesson-duration" class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+          </div>
+          <div class="space-y-1">
+            <label class="block font-bold text-stone-700">Дата відкриття / Публікація</label>
+            <input type="datetime-local" id="edit-lesson-date" class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Video Upload / URL -->
+        <div class="space-y-1.5 bg-stone-50 p-3 rounded-2xl border border-stone-200">
+          <label class="block font-bold text-stone-800">📹 Головне Відео (MP4 URL / YouTube / TikTok)</label>
+          <div class="flex items-center gap-2">
+            <input type="text" id="edit-lesson-video" placeholder="marathon_media/video_files/...mp4 або YouTube URL" class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+            <label class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs cursor-pointer shrink-0 shadow-xs">
+              📁 Завантажити
+              <input type="file" accept="video/*" class="hidden" onchange="handleMediaFileUpload(this, 'edit-lesson-video')">
+            </label>
+          </div>
+        </div>
+
+        <!-- Round Video Telegram Circle -->
+        <div class="space-y-1.5 bg-stone-50 p-3 rounded-2xl border border-stone-200">
+          <label class="block font-bold text-stone-800">🎥 Кружечок Telegram (Відео-повідомлення MP4)</label>
+          <div class="flex items-center gap-2">
+            <input type="text" id="edit-lesson-round" placeholder="marathon_media/round_video_messages/...mp4" class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+            <label class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs cursor-pointer shrink-0 shadow-xs">
+              📁 Завантажити
+              <input type="file" accept="video/*" class="hidden" onchange="handleMediaFileUpload(this, 'edit-lesson-round')">
+            </label>
+          </div>
+        </div>
+
+        <!-- Photo URL -->
+        <div class="space-y-1">
+          <label class="block font-bold text-stone-700">🖼️ Фото уроку (URL)</label>
+          <input type="text" id="edit-lesson-photo" placeholder="marathon_media/photos/...jpg" class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+
+        <!-- Description -->
+        <div class="space-y-1">
+          <label class="block font-bold text-stone-700">📖 Опис та конспект уроку</label>
+          <textarea id="edit-lesson-desc" rows="5" class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none leading-relaxed"></textarea>
+        </div>
+
+        <!-- Homework -->
+        <div class="space-y-1">
+          <label class="block font-bold text-stone-700">📝 Домашнє завдання / Вправа</label>
+          <textarea id="edit-lesson-hw" rows="3" class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none leading-relaxed"></textarea>
+        </div>
+
+        <!-- Audio Practices / Voices List -->
+        <div class="space-y-2 bg-sky-50/60 p-3 sm:p-4 rounded-2xl border border-sky-200">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-sky-950">🎧 Аудіо-практики та голосові (MP3)</label>
+            <button type="button" onclick="addVoiceInputItem()" class="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px]">
+              + Додати аудіо
+            </button>
+          </div>
+          <div id="edit-lesson-voices-container" class="space-y-2"></div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-stone-100">
+          <button type="button" onclick="closeEditLessonModal()" class="px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold">
+            Скасувати
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md">
+            💾 Зберегти урок
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- GLOBAL MARATHON SETTINGS MODAL -->
+  <div id="admin-global-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-lg w-full p-6 space-y-4 text-left relative">
+      <button onclick="closeGlobalMarathonModal()" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700">✕</button>
+
+      <div class="flex items-center gap-3 border-b border-stone-100 pb-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-lg font-bold">
+          ⚙️
+        </div>
+        <div>
+          <h3 class="font-serif text-lg font-bold text-stone-900">Загальні налаштування марафону</h3>
+          <p class="text-xs text-stone-500">Заголовок, підзаголовок, чат Telegram</p>
+        </div>
+      </div>
+
+      <form onsubmit="saveGlobalMarathonModal(event)" class="space-y-4 text-xs">
+        <div class="space-y-1">
+          <label class="block font-bold text-stone-700">Назва марафону</label>
+          <input type="text" id="edit-global-title" required class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block font-bold text-stone-700">Підзаголовок</label>
+          <input type="text" id="edit-global-subtitle" class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block font-bold text-stone-700">Посилання на Telegram чат/канал</label>
+          <input type="text" id="edit-global-tg" class="w-full px-3 py-2 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="edit-global-enabled" class="w-4 h-4 text-emerald-600 rounded">
+          <label for="edit-global-enabled" class="font-bold text-stone-800">Марафон увімкнений та доступний користувачам</label>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-stone-100">
+          <button type="button" onclick="closeGlobalMarathonModal()" class="px-4 py-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold">
+            Скасувати
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md">
+            💾 Зберегти налаштування
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- AUTH PROMPT MODAL (Non-intrusive progress save trigger) -->
   <div id="auth-prompt-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity duration-300">
