@@ -268,7 +268,7 @@
           </div>
 
           <!-- Gamification / Reward Badge in Sidebar -->
-          <div class="my-2.5 p-3 rounded-2xl bg-gradient-to-br from-amber-500/10 via-brand-50 to-emerald-50 border border-amber-300/60 space-y-1.5 shadow-xs">
+          <div onclick="handleClaimRewardClick()" class="my-2.5 p-3 rounded-2xl bg-gradient-to-br from-amber-500/10 via-brand-50 to-emerald-50 border border-amber-300/60 space-y-1.5 shadow-xs cursor-pointer hover:scale-[1.02] transition-transform" title="Отримати Сертифікат + 200 грн бонус">
             <div class="flex items-center gap-2">
               <span class="text-lg">🎓</span>
               <div class="min-w-0 flex-1">
@@ -1496,25 +1496,21 @@
 
     // Certificate & Bonus Reward Click Handler
     function handleClaimRewardClick() {
-      if (!isUserRegistered()) {
-        showAuthModal();
-        return;
-      }
       const total = (marathonData && marathonData.lessons) ? marathonData.lessons.length : 6;
-      let accessibleCompletedCount = 0;
+      let completedCount = 0;
       if (marathonData && marathonData.lessons) {
         marathonData.lessons.forEach((l, idx) => {
           const lId = l.id || ('lesson-' + idx);
-          if (completedLessons.has(lId) && canAccessLesson(l, idx)) {
-            accessibleCompletedCount++;
+          if (completedLessons.has(lId)) {
+            completedCount++;
           }
         });
       }
 
-      if (accessibleCompletedCount >= total) {
+      if (completedCount >= total) {
         openCertificateModal();
       } else {
-        alert(`Щоб отримати Іменний Сертифікат та Бонус 200 грн, необхідно пройти всі ${total} уроків марафону.\n\nВаш поточний прогрес: ${accessibleCompletedCount} з ${total} уроків.`);
+        alert(`Щоб отримати Іменний Сертифікат та Бонус 200 грн, необхідно пройти всі ${total} уроків марафону.\n\nВаш поточний прогрес: ${completedCount} з ${total} уроків.`);
       }
     }
 
@@ -1529,12 +1525,12 @@
         }
       } catch(e) {}
       if (!userName || userName === 'Користувач') {
-        userName = localStorage.getItem('psy_client_name') || 'Учасник Марафону';
+        userName = localStorage.getItem('psy_client_name') || '';
       }
 
       const nameInput = document.getElementById('cert-name-input');
       if (nameInput) nameInput.value = userName;
-      updateCertDisplayName(userName);
+      updateCertDisplayName(userName || 'Учасник Марафону');
 
       // Generate or retrieve Certificate Unique ID
       let certId = localStorage.getItem('psy_cert_id');
@@ -1553,12 +1549,18 @@
       if (dateEl) dateEl.textContent = dateStr;
 
       const modal = document.getElementById('certificate-modal');
-      if (modal) modal.classList.remove('hidden');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
     }
 
     function closeCertificateModal() {
       const modal = document.getElementById('certificate-modal');
-      if (modal) modal.classList.add('hidden');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
     }
 
     function updateCertDisplayName(val) {
