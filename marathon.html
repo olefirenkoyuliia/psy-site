@@ -821,9 +821,10 @@
           : 'bg-warm-bg hover:bg-white border-warm-border';
 
         const dayText = getLessonDayText(lesson, idx);
+        const itemOnClick = accessUnlocked ? `selectLesson(${idx})` : `selectLesson(${idx}); showAuthModal();`;
 
         return `
-          <div onclick="selectLesson(${idx})" class="p-3 sm:p-3.5 rounded-2xl border transition-all cursor-pointer select-none ${activeStyles} group">
+          <div onclick="${itemOnClick}" class="p-3 sm:p-3.5 rounded-2xl border transition-all cursor-pointer select-none ${activeStyles} group">
             <div class="flex items-start gap-2.5">
               <div class="text-base pt-0.5 shrink-0">${statusIcon}</div>
               <div class="flex-1 min-w-0 space-y-1">
@@ -920,8 +921,16 @@
       const currentLessonDate = document.getElementById('current-lesson-date');
       if (currentLessonDate) currentLessonDate.textContent = formatLessonDate(lesson.publishDate);
 
+      const isAccessible = canAccessLesson(lesson, index);
+
       const currentLessonDesc = document.getElementById('current-lesson-description');
-      if (currentLessonDesc) currentLessonDesc.textContent = lesson.description || 'Опис уроку скоро з’явиться.';
+      if (currentLessonDesc) {
+        if (!isAccessible) {
+          currentLessonDesc.innerHTML = '🔒 <span class="font-bold">Матеріали та лекція цього уроку заблоковані.</span> Пройдіть безкоштовну авторизацію в 1 клік (Google SSO або Telegram) вище, щоб розблокувати відео, аудіо-практики та матеріали даного Дня.';
+        } else {
+          currentLessonDesc.textContent = lesson.description || 'Опис уроку скоро з’явиться.';
+        }
+      }
 
       const currentLessonHw = document.getElementById('current-lesson-homework');
       if (currentLessonHw) currentLessonHw.textContent = lesson.homework || 'Сьогодні просто поспостерігайте за своїм станом та емоціями.';
@@ -1488,11 +1497,25 @@
       }
     }
 
+    // Realtime Cross-tab Sync on logout / login
+    window.addEventListener('storage', (e) => {
+      if (!e.key || e.key.startsWith('psy_')) {
+        isAdminUser = checkIsAdminUser();
+        renderLessonsTree();
+        selectLesson(currentLessonIndex, false);
+        updateAdminUI();
+      }
+    });
+
     // Navigate to next or previous lesson
     function navigateLesson(offset) {
       const newIndex = currentLessonIndex + offset;
       if (marathonData && marathonData.lessons && newIndex >= 0 && newIndex < marathonData.lessons.length) {
+        const targetLesson = marathonData.lessons[newIndex];
         selectLesson(newIndex);
+        if (!canAccessLesson(targetLesson, newIndex)) {
+          showAuthModal();
+        }
       }
     }
 
@@ -1564,8 +1587,6 @@
 
     function checkIsAdminUser() {
       if (localStorage.getItem('psy_admin_auth') === 'true') return true;
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('admin') === '1' || urlParams.get('admin') === 'true') return true;
       return false;
     }
 
