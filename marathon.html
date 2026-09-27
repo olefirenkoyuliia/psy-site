@@ -748,6 +748,28 @@
       return `День ${idx + 1}`;
     }
 
+    // Check if user is registered / logged in
+    function isUserRegistered() {
+      if (isAdminUser || checkIsAdminUser()) return true;
+      try {
+        const rawUser = localStorage.getItem('psy_client_user');
+        if (rawUser) {
+          const u = JSON.parse(rawUser);
+          if (u && (u.email || u.telegram || u.id || u.name)) return true;
+        }
+        const token = localStorage.getItem('psy_user_token');
+        if (token) return true;
+      } catch(e) {}
+      return false;
+    }
+
+    // Check if a specific lesson can be accessed
+    function canAccessLesson(lesson, idx) {
+      // Lesson 0 (Day 0: Вступ) is ALWAYS free and open for everyone
+      if (idx === 0 || lesson.day === 0 || lesson.id === 'lesson-0') return true;
+      return isUserRegistered();
+    }
+
     // Render the Left Sidebar Tree List
     function renderLessonsTree() {
       const container = document.getElementById('lessons-tree-list');
@@ -758,17 +780,22 @@
       let completedCount = 0;
 
       container.innerHTML = marathonData.lessons.map((lesson, idx) => {
-        const unlocked = isLessonUnlocked(lesson);
+        const dateUnlocked = isLessonUnlocked(lesson);
+        const accessUnlocked = canAccessLesson(lesson, idx);
+        const unlocked = dateUnlocked && accessUnlocked;
         const isCompleted = completedLessons.has(lesson.id || ('lesson-' + idx));
         const isActive = idx === currentLessonIndex;
 
-        if (unlocked) unlockedCount++;
+        if (dateUnlocked && accessUnlocked) unlockedCount++;
         if (isCompleted) completedCount++;
 
         let statusIcon = '🔒';
         let statusBadge = `<span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 border border-stone-200">${formatLessonDate(lesson.publishDate)}</span>`;
 
-        if (unlocked) {
+        if (!accessUnlocked) {
+          statusIcon = '🔑';
+          statusBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300">Після реєстрації</span>`;
+        } else if (dateUnlocked) {
           if (isCompleted) {
             statusIcon = '✅';
             statusBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300">Пройдено</span>`;
@@ -891,7 +918,16 @@
       // Render Extra Media (Voice Notes, Round Videos, Photos)
       const extraMediaContainer = document.getElementById('current-lesson-extra-media');
       if (extraMediaContainer) {
-        let mediaHtml = '';
+        if (!canAccessLesson(lesson, index)) {
+          extraMediaContainer.innerHTML = `
+            <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs text-center font-medium space-y-1">
+              <span class="text-base">🔒</span>
+              <p class="font-bold">Голосові практики та додаткові медіа-матеріали заблоковано</p>
+              <p class="text-[11px] text-amber-800">Підпишіться на Telegram-нагадування вище, щоб розблокувати всі файли уроку 🌿</p>
+            </div>
+          `;
+        } else {
+          let mediaHtml = '';
 
         // 1. Photos
         if (lesson.photoUrl) {
@@ -946,6 +982,7 @@
         }
 
         extraMediaContainer.innerHTML = mediaHtml;
+        }
       }
 
       // Check Unlocked Status
@@ -1026,6 +1063,57 @@
       if (countdownInterval) {
         clearInterval(countdownInterval);
         countdownInterval = null;
+      }
+
+      if (!canAccessLesson(lesson, currentLessonIndex)) {
+        if (statusBadge) {
+          statusBadge.innerHTML = `
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
+              🔒 Доступ за безкоштовною реєстрацією
+            </span>
+          `;
+        }
+
+        container.innerHTML = `
+          <div class="w-full p-6 sm:p-10 bg-gradient-to-br from-brand-900 via-stone-900 to-brand-950 text-white rounded-2xl border border-brand-700/50 shadow-2xl flex flex-col items-center text-center space-y-5 my-2 relative overflow-hidden">
+            <div class="w-16 h-16 rounded-3xl bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center text-3xl mx-auto shadow-glow">
+              🔑
+            </div>
+            <div class="space-y-2 max-w-md">
+              <span class="inline-block px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30">
+                🌱 Безкоштовна реєстрація
+              </span>
+              <h3 class="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight">
+                Урок ${lesson.day ? lesson.day : ''} доступний після підписки
+              </h3>
+              <p class="text-xs text-brand-100/90 leading-relaxed">
+                Вступний урок знаходиться у вільному доступі. Щоб безкоштовно відкрити дні 1–5, підпишіться на Telegram-нагадування за 5 секунд або увійдіть через акаунт!
+              </p>
+            </div>
+
+            <!-- Inline Telegram Lead Capture Form -->
+            <form onsubmit="submitTelegramLead(event)" class="w-full max-w-md space-y-3 bg-white/10 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/15 text-left shadow-soft">
+              <div class="space-y-1">
+                <label class="block text-[11px] font-bold text-brand-100 uppercase">Ваше Ім'я</label>
+                <input type="text" id="inline-lead-name" required placeholder="Наприклад: Олена" class="w-full px-3.5 py-2.5 rounded-xl bg-white text-stone-900 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 font-medium">
+              </div>
+              <div class="space-y-1">
+                <label class="block text-[11px] font-bold text-brand-100 uppercase">Telegram (@username або Телефон)</label>
+                <input type="text" id="inline-lead-tg" required placeholder="@elena_psy або +380..." class="w-full px-3.5 py-2.5 rounded-xl bg-white text-stone-900 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 font-medium">
+              </div>
+              <button type="submit" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-extrabold text-xs shadow-glow transition-all active:scale-95 flex items-center justify-center gap-2">
+                <span>🔔 Отримувати нагадування та відкрити уроки</span>
+                <span>→</span>
+              </button>
+            </form>
+
+            <div class="flex items-center justify-center gap-2 text-xs text-stone-300">
+              <span>Або:</span>
+              <a href="cabinet.html" class="underline hover:text-white font-bold text-emerald-300">Увійти в 1 клік через Google 🔑</a>
+            </div>
+          </div>
+        `;
+        return;
       }
 
       if (unlocked) {
@@ -1797,6 +1885,67 @@
       }, 3500);
     }
 
+    // Telegram Reminders & Lead Capture
+    function openTelegramReminderModal() {
+      const modal = document.getElementById('tg-reminder-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeTelegramReminderModal() {
+      const modal = document.getElementById('tg-reminder-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function submitTelegramLead(e) {
+      if (e) e.preventDefault();
+
+      const nameInp = document.getElementById('inline-lead-name') || document.getElementById('lead-name');
+      const tgInp = document.getElementById('inline-lead-tg') || document.getElementById('lead-telegram');
+
+      const name = nameInp ? nameInp.value.trim() : '';
+      const telegram = tgInp ? tgInp.value.trim() : '';
+
+      if (!name || !telegram) {
+        alert('Будь ласка, введіть ваше ім\'я та Telegram');
+        return;
+      }
+
+      const userProfile = {
+        id: 'tg_' + Date.now(),
+        name: name,
+        telegram: telegram,
+        role: 'client',
+        created_at: new Date().toISOString()
+      };
+
+      try {
+        localStorage.setItem('psy_client_user', JSON.stringify(userProfile));
+        localStorage.setItem('psy_user_token', userProfile.id);
+      } catch(err) {}
+
+      try {
+        await fetch('/api/lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name,
+            telegram: telegram,
+            source: 'marathon_tg_reminder'
+          })
+        });
+      } catch(err) {}
+
+      closeTelegramReminderModal();
+      showAdminToast('🎉 Вітаємо! Всі уроки марафону відкрито.', '🔓', true);
+
+      renderLessonsTree();
+      selectLesson(currentLessonIndex, false);
+
+      if (marathonData && marathonData.telegramChannel) {
+        window.open(marathonData.telegramChannel, '_blank');
+      }
+    }
+
     // Window Hashchange Event Listener
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
@@ -2071,6 +2220,44 @@
           Продовжити без авторизації
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- TELEGRAM REMINDER & LEAD CAPTURE MODAL -->
+  <div id="tg-reminder-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-5 text-left relative animate-fade-in">
+      <button onclick="closeTelegramReminderModal()" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700">✕</button>
+
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center text-2xl shadow-xs">
+          🔔
+        </div>
+        <div>
+          <h3 class="font-serif text-xl font-bold text-stone-900">Нагадування в Telegram</h3>
+          <p class="text-xs text-stone-500">Безкоштовна підписка + розблокування марафону</p>
+        </div>
+      </div>
+
+      <p class="text-xs text-stone-600 leading-relaxed">
+        Введіть ваше ім'я та Telegram handle (або телефон). Ми підключимо вас до щоденних нагадувань та одразу відкриємо доступ до всіх уроків марафону 🌿
+      </p>
+
+      <form onsubmit="submitTelegramLead(event)" class="space-y-4">
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-stone-700 uppercase">Ваше Ім'я</label>
+          <input type="text" id="lead-name" required placeholder="Марія" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none">
+        </div>
+
+        <div class="space-y-1">
+          <label class="block text-xs font-bold text-stone-700 uppercase">Telegram (@username або Телефон)</label>
+          <input type="text" id="lead-telegram" required placeholder="@mariya_psy або +380..." class="w-full px-4 py-2.5 rounded-xl border border-stone-300 text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none">
+        </div>
+
+        <button type="submit" id="submit-lead-btn" class="w-full py-3.5 px-4 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+          <span>🔔 Отримувати нагадування та відкрити уроки</span>
+          <span>→</span>
+        </button>
+      </form>
     </div>
   </div>
 
