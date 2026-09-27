@@ -1,16 +1,26 @@
 export async function onRequestGet(context) {
   const { request, env } = context;
 
-  // 1. Fetch static data.json from repo
+  // 1. Fetch static data.json from repo/GitHub dev branch
   let localData = null;
   try {
-    const url = new URL(request.url);
-    const localUrl = new URL('/data.json', url.origin);
-    const res = await (env.ASSETS ? env.ASSETS.fetch(localUrl) : fetch(localUrl));
-    if (res.ok) {
-      localData = await res.json();
+    const rawRes = await fetch('https://raw.githubusercontent.com/olefirenkoyuliia/psy-site/dev/data.json?t=' + Date.now(), {
+      headers: { 'User-Agent': 'Cloudflare-Worker' }
+    });
+    if (rawRes.ok) {
+      localData = await rawRes.json();
     }
   } catch (e) {}
+
+  if (!localData) {
+    try {
+      const url = new URL(request.url);
+      const res = await fetch(url.origin + '/data.json?t=' + Date.now());
+      if (res.ok) {
+        localData = await res.json();
+      }
+    } catch(e) {}
+  }
 
   // 2. Query Cloudflare D1 SQL Database (Tier 1: 1-3ms edge response)
   if (env.DB) {
