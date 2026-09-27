@@ -233,6 +233,20 @@
             </div>
           </div>
 
+          <!-- Gamification / Reward Badge in Sidebar -->
+          <div class="my-2.5 p-3 rounded-2xl bg-gradient-to-br from-amber-500/10 via-brand-50 to-emerald-50 border border-amber-300/60 space-y-1.5 shadow-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">🎓</span>
+              <div class="min-w-0 flex-1">
+                <div class="font-bold text-[11px] text-amber-950 truncate">Сертифікат + 200 грн бонус</div>
+                <div class="text-[9px] text-amber-900/80">Пройдіть марафон для активації</div>
+              </div>
+            </div>
+            <div class="w-full bg-white/80 rounded-full h-1.5 overflow-hidden border border-amber-200">
+              <div id="sidebar-reward-bar" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
           <!-- Lessons Tree List (Scrollable) -->
           <div id="lessons-tree-list" class="space-y-2.5 overflow-y-auto flex-1 pr-1 py-3 scrollbar-thin">
             <!-- Lessons rendered dynamically via JS -->
@@ -318,13 +332,17 @@
           </div>
 
           <!-- Quick Action Bar under Video -->
-          <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-warm-bg border border-warm-border">
-            <button onclick="toggleLessonCompleted()" id="complete-lesson-btn" class="px-4 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 border border-warm-border hover:border-emerald-300 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-warm-bg border border-warm-border">
+            <button onclick="toggleLessonCompleted()" id="complete-lesson-btn" class="px-4 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 border border-warm-border hover:border-emerald-300 text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-xs active:scale-95">
               <span id="complete-checkbox" class="text-base">⬜</span>
               <span id="complete-btn-text">Позначити як пройдений</span>
             </button>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center justify-between sm:justify-end gap-2">
+              <a href="https://t.me/psy_olefirenkoyuliia" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs" title="Отримувати нагадування в Telegram">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.34-.69.34l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.197 1.006.128.832.897z"/></svg>
+                <span class="hidden sm:inline">🔔 Нагадування</span>
+              </a>
               <button onclick="navigateLesson(-1)" id="prev-lesson-btn" class="px-3.5 py-2 rounded-xl bg-white hover:bg-gray-100 text-warm-text border border-warm-border text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                 ← Попередній
               </button>
@@ -367,6 +385,49 @@
             <div id="current-lesson-homework" class="text-xs sm:text-sm text-stone-800 bg-white/90 p-4 rounded-xl border border-brand-100 leading-relaxed whitespace-pre-line font-medium shadow-xs">
               Завдання завантажується...
             </div>
+          </div>
+
+          <!-- PERSONAL REFLECTION JOURNAL CARD -->
+          <div id="current-notes-container" class="p-5 sm:p-6 rounded-2xl bg-stone-50 border border-warm-border space-y-3 shadow-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">✍️</span>
+                <div>
+                  <h4 class="font-bold text-sm sm:text-base text-warm-text">Ваш особистий щоденник рефлексії</h4>
+                  <p class="text-[11px] text-warm-muted">Запишіть свої інсайти та відчуття від виконання практики</p>
+                </div>
+              </div>
+              <span id="notes-saved-status" class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 hidden">
+                ✓ Збережено
+              </span>
+            </div>
+            <textarea id="lesson-user-notes" oninput="saveLessonNotesAuto()" rows="3" class="w-full p-3.5 rounded-xl border border-warm-border bg-white text-xs text-warm-text placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 transition-all font-sans" placeholder="Наприклад: Сьогодні я відчула напругу в плечах, але після практики дихання з'явилося відчуття легкості..."></textarea>
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <button onclick="saveLessonNotesExplicit()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 active:scale-95">
+                <span>💾 Зберегти нотатку</span>
+              </button>
+              <span class="text-[11px] text-stone-500">
+                🔒 Нотатки зберігаються у вашому профілі
+              </span>
+            </div>
+          </div>
+
+          <!-- CERTIFICATE & BONUS REWARD BANNER -->
+          <div id="marathon-cert-reward-banner" class="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-brand-900 via-brand-800 to-amber-900 text-white shadow-card flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+            <div class="space-y-1.5 text-center sm:text-left z-10">
+              <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-200 text-[10px] font-bold border border-amber-400/30">
+                <span>🎓 Винагорода за проходження</span>
+              </div>
+              <h4 class="font-serif text-lg sm:text-xl font-bold text-white">
+                Отримайте Іменний Сертифікат + 200 грн Бонус
+              </h4>
+              <p class="text-xs text-brand-100/90 max-w-lg leading-relaxed">
+                Завершіть усі 5 днів марафону, щоб розблокувати персональний електронний сертифікат та бонус 200 грн на сесію з Юлією.
+              </p>
+            </div>
+            <button onclick="handleClaimRewardClick()" id="claim-reward-btn" class="shrink-0 px-5 py-3 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-bold text-xs shadow-glow hover:scale-105 active:scale-95 transition-all text-center z-10">
+              Забрати Сертифікат 🎓
+            </button>
           </div>
 
           <!-- PERSONAL SESSION PROMO CTA -->
@@ -747,6 +808,21 @@
 
       const elSidebarLabel = document.getElementById('sidebar-progress-label');
       if (elSidebarLabel) elSidebarLabel.textContent = `${completedCount} з ${total} (${percent}%)`;
+
+      const elRewardBar = document.getElementById('sidebar-reward-bar');
+      if (elRewardBar) elRewardBar.style.width = percent + '%';
+
+      // Update Reward Banner button text if 100% completed
+      const claimBtn = document.getElementById('claim-reward-btn');
+      if (claimBtn) {
+        if (completedCount === total && total > 0) {
+          claimBtn.className = 'shrink-0 px-6 py-3.5 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-stone-950 font-extrabold text-xs shadow-glow hover:scale-105 active:scale-95 transition-all text-center z-10 animate-bounce';
+          claimBtn.innerHTML = '🎓 Отримати Сертифікат зараз! 🎉';
+        } else {
+          claimBtn.className = 'shrink-0 px-5 py-3 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-bold text-xs shadow-glow hover:scale-105 active:scale-95 transition-all text-center z-10';
+          claimBtn.innerHTML = 'Забрати Сертифікат 🎓';
+        }
+      }
     }
 
     // Select and display a specific lesson
@@ -758,6 +834,9 @@
       currentLessonIndex = index;
       const lesson = marathonData.lessons[index];
       const lessonId = lesson.id || ('lesson-' + index);
+
+      // Load Reflection Notes for this lesson
+      loadLessonNotes(lessonId);
 
       if (updateHash && lesson) {
         const targetHash = '#' + (lesson.id || ('day-' + lesson.day));
@@ -1141,7 +1220,8 @@
       const lesson = marathonData.lessons[currentLessonIndex];
       const lessonId = lesson.id || ('lesson-' + currentLessonIndex);
 
-      if (completedLessons.has(lessonId)) {
+      const wasCompleted = completedLessons.has(lessonId);
+      if (wasCompleted) {
         completedLessons.delete(lessonId);
       } else {
         completedLessons.add(lessonId);
@@ -1153,6 +1233,94 @@
 
       renderLessonsTree();
       selectLesson(currentLessonIndex, false);
+
+      // Prompt non-intrusive auth modal when completing a lesson if not logged in
+      if (!wasCompleted) {
+        const userToken = localStorage.getItem('psy_user_token');
+        if (!userToken) {
+          setTimeout(showAuthModal, 400);
+        }
+      }
+    }
+
+    // Interactive Reflection Notes Management
+    let notesTimeout = null;
+
+    function loadLessonNotes(lessonId) {
+      const textarea = document.getElementById('lesson-user-notes');
+      if (!textarea) return;
+      try {
+        const savedNote = localStorage.getItem('psy_marathon_note_' + lessonId) || '';
+        textarea.value = savedNote;
+      } catch(e) {
+        textarea.value = '';
+      }
+    }
+
+    function saveLessonNotesAuto() {
+      if (!marathonData || !marathonData.lessons) return;
+      const lesson = marathonData.lessons[currentLessonIndex];
+      const lessonId = lesson.id || ('lesson-' + currentLessonIndex);
+      const textarea = document.getElementById('lesson-user-notes');
+      if (!textarea) return;
+
+      if (notesTimeout) clearTimeout(notesTimeout);
+      notesTimeout = setTimeout(() => {
+        try {
+          localStorage.setItem('psy_marathon_note_' + lessonId, textarea.value);
+          showNotesSavedStatus();
+        } catch(e) {}
+      }, 800);
+    }
+
+    function saveLessonNotesExplicit() {
+      if (!marathonData || !marathonData.lessons) return;
+      const lesson = marathonData.lessons[currentLessonIndex];
+      const lessonId = lesson.id || ('lesson-' + currentLessonIndex);
+      const textarea = document.getElementById('lesson-user-notes');
+      if (!textarea) return;
+
+      try {
+        localStorage.setItem('psy_marathon_note_' + lessonId, textarea.value);
+        showNotesSavedStatus();
+
+        // Prompt auth modal if user typed a meaningful note and is not logged in
+        const userToken = localStorage.getItem('psy_user_token');
+        if (!userToken && textarea.value.trim().length > 10) {
+          showAuthModal();
+        }
+      } catch(e) {}
+    }
+
+    function showNotesSavedStatus() {
+      const statusEl = document.getElementById('notes-saved-status');
+      if (statusEl) {
+        statusEl.classList.remove('hidden');
+        setTimeout(() => { statusEl.classList.add('hidden'); }, 2500);
+      }
+    }
+
+    // Non-intrusive Auth Modal
+    function showAuthModal() {
+      const modal = document.getElementById('auth-prompt-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      const modal = document.getElementById('auth-prompt-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // Certificate & Bonus Reward Click Handler
+    function handleClaimRewardClick() {
+      const completedCount = completedLessons.size;
+      const total = (marathonData && marathonData.lessons) ? marathonData.lessons.length : 6;
+
+      if (completedCount >= total) {
+        window.location.href = 'cabinet.html#certificates';
+      } else {
+        alert(`Пройдіть усі уроки марафону, щоб розблокувати Іменний Сертифікат та Бонус! (Пройдено: ${completedCount}/${total})`);
+      }
     }
 
     // Navigate to next or previous lesson
@@ -1240,6 +1408,31 @@
       initMarathon();
     }
   </script>
+
+  <!-- AUTH PROMPT MODAL (Non-intrusive progress save trigger) -->
+  <div id="auth-prompt-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl border border-warm-border shadow-2xl max-w-md w-full p-6 space-y-5 text-center relative animate-fade-in">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors">✕</button>
+      <div class="w-14 h-14 rounded-2xl bg-brand-50 border border-brand-200 text-brand-700 flex items-center justify-center text-2xl mx-auto shadow-xs">
+        🌿
+      </div>
+      <div class="space-y-1.5">
+        <h3 class="font-serif text-xl sm:text-2xl font-bold text-warm-text">Збережіть свій прогрес!</h3>
+        <p class="text-xs text-warm-muted leading-relaxed">
+          Чудово, день пройдено! Увійдіть через Google в 1 клік або створіть акаунт, щоб не втратити досягнення та проходити марафон з будь-якого пристрою.
+        </p>
+      </div>
+      <div class="space-y-2.5 pt-2">
+        <a href="cabinet.html" class="w-full py-3.5 px-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-soft flex items-center justify-center gap-2 transition-all active:scale-95">
+          <span>🔑 Увійти / Зареєструватися в Кабінеті</span>
+          <span>→</span>
+        </a>
+        <button onclick="closeAuthModal()" class="w-full py-2 text-[11px] text-warm-muted hover:text-warm-text font-semibold">
+          Продовжити без авторизації
+        </button>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
