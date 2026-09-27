@@ -752,14 +752,18 @@
       return `День ${idx + 1}`;
     }
 
+    // Student Preview Toggle State
+    let isStudentPreview = false;
+
     // Check if user is registered / logged in
     function isUserRegistered() {
-      if (isAdminUser || checkIsAdminUser()) return true;
+      if (isStudentPreview) return false;
+      if (isAdminUser) return true;
       try {
         const rawUser = localStorage.getItem('psy_client_user');
         if (rawUser) {
           const u = JSON.parse(rawUser);
-          if (u && (u.email || u.telegram || u.id || u.name)) return true;
+          if (u && (u.email || u.telegram || u.id)) return true;
         }
         const token = localStorage.getItem('psy_user_token');
         if (token) return true;
@@ -1515,28 +1519,6 @@
 
     function checkIsAdminUser() {
       if (localStorage.getItem('psy_admin_auth') === 'true') return true;
-      try {
-        const rawUser = localStorage.getItem('psy_client_user');
-        if (rawUser) {
-          const u = JSON.parse(rawUser);
-          if (u) {
-            const email = (u.email || '').toLowerCase();
-            const role = (u.role || '').toLowerCase();
-            const name = (u.name || '').toLowerCase();
-            if (role === 'admin' || role === 'owner' ||
-                email.includes('olefirenkoyuliia') ||
-                email.includes('olefirenko') ||
-                email.includes('admin') ||
-                email.includes('artem') ||
-                email.includes('fedoryshyn') ||
-                name.includes('артем') ||
-                name.includes('artem')) {
-              return true;
-            }
-          }
-        }
-      } catch(e) {}
-
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('admin') === '1' || urlParams.get('admin') === 'true') return true;
       return false;
@@ -2068,6 +2050,27 @@
       }
     }
 
+    function toggleStudentPreview() {
+      isStudentPreview = !isStudentPreview;
+      const btn = document.getElementById('student-preview-btn');
+      if (isStudentPreview) {
+        if (btn) {
+          btn.className = "px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold flex items-center gap-1 shrink-0 transition-all active:scale-95 ring-2 ring-purple-300 animate-pulse";
+          btn.textContent = "👁️ Режим Студента (Увімк)";
+        }
+        showAdminToast('👁️ Увімкнено перегляд сторінки очима звичайного студента!', '👁️', true);
+      } else {
+        if (btn) {
+          btn.className = "px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 font-semibold flex items-center gap-1 shrink-0 transition-all active:scale-95";
+          btn.textContent = "👁️ Перегляд студента";
+        }
+        showAdminToast('⚙️ Повернулися в режим адміністратора.', '⚙️', true);
+      }
+      updateAdminUI();
+      renderLessonsTree();
+      selectLesson(currentLessonIndex, false);
+    }
+
     // Window Hashchange Event Listener
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
@@ -2093,6 +2096,10 @@
       <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
       <span>Адмін-режим</span>
     </div>
+
+    <button onclick="toggleStudentPreview()" id="student-preview-btn" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-purple-300 font-semibold flex items-center gap-1 shrink-0 transition-all active:scale-95" title="Перевірити як бачить сторінку звичайний відвідувач">
+      👁️ Перегляд студента
+    </button>
 
     <button onclick="openEditLessonModal(currentLessonIndex)" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold flex items-center gap-1 shrink-0 transition-all shadow-xs active:scale-95">
       ✏️ Редагувати урок
