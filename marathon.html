@@ -768,8 +768,6 @@
           const u = JSON.parse(rawUser);
           if (u && (u.email || u.telegram || u.id)) return true;
         }
-        const token = localStorage.getItem('psy_user_token');
-        if (token) return true;
       } catch(e) {}
       return false;
     }
