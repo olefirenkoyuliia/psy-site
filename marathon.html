@@ -332,6 +332,9 @@
             <div id="current-lesson-description" class="text-sm text-stone-700 leading-relaxed space-y-3 whitespace-pre-line font-normal">
               Опис уроку завантажується...
             </div>
+
+            <!-- EXTRA MEDIA: VOICES, PHOTOS, ROUND VIDEOS -->
+            <div id="current-lesson-extra-media" class="space-y-4 pt-2"></div>
           </div>
 
           <!-- PRACTICAL HOMEWORK / EXERCISE CARD -->
@@ -614,6 +617,63 @@
       document.getElementById('current-lesson-description').textContent = lesson.description || 'Опис уроку скоро з’явиться.';
       document.getElementById('current-lesson-homework').textContent = lesson.homework || 'Сьогодні просто поспостерігайте за своїм станом та емоціями.';
 
+      // Render Extra Media (Voice Notes, Round Videos, Photos)
+      const extraMediaContainer = document.getElementById('current-lesson-extra-media');
+      if (extraMediaContainer) {
+        let mediaHtml = '';
+
+        // 1. Photos
+        if (lesson.photoUrl) {
+          mediaHtml += `
+            <div class="rounded-2xl overflow-hidden border border-warm-border shadow-xs bg-stone-50">
+              <img src="${escapeHtml(lesson.photoUrl)}" alt="${escapeHtml(lesson.title)}" class="w-full max-h-[480px] object-contain mx-auto" />
+            </div>
+          `;
+        }
+
+        // 2. Round Video Messages (Telegram Circle Video)
+        if (lesson.roundVideo) {
+          mediaHtml += `
+            <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-brand-50 to-emerald-50 border border-brand-200/80 flex flex-col items-center text-center space-y-3 shadow-xs">
+              <div class="text-xs font-bold text-brand-900 flex items-center gap-1.5">
+                <span>🎥</span> Кругле відео-повідомлення Юлії
+              </div>
+              <div class="w-52 h-52 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-brand-500 shadow-xl bg-black">
+                <video controls playsinline class="w-full h-full object-cover">
+                  <source src="${escapeHtml(lesson.roundVideo)}" type="video/mp4">
+                  Ваш браузер не підтримує відтворення відео.
+                </video>
+              </div>
+            </div>
+          `;
+        }
+
+        // 3. Voice Messages / Audio Practices
+        if (lesson.voices && Array.isArray(lesson.voices) && lesson.voices.length > 0) {
+          mediaHtml += `
+            <div class="p-4 sm:p-5 rounded-2xl bg-sky-50/70 border border-sky-200/80 space-y-3 shadow-xs">
+              <div class="flex items-center gap-2 font-bold text-xs sm:text-sm text-sky-950">
+                <span>🎧</span> Аудіоповідомлення та практики від Юлії (${lesson.voices.length})
+              </div>
+              <div class="space-y-2">
+                ${lesson.voices.map((voicePath, vIdx) => `
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-white rounded-xl border border-sky-100 shadow-xs">
+                    <span class="text-xs font-bold text-sky-800 shrink-0">Запис #${vIdx + 1}</span>
+                    <audio controls class="w-full h-9 outline-none">
+                      <source src="${escapeHtml(voicePath)}" type="audio/ogg">
+                      <source src="${escapeHtml(voicePath)}" type="audio/mpeg">
+                      Ваш браузер не підтримує відтворення аудіо.
+                    </audio>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        extraMediaContainer.innerHTML = mediaHtml;
+      }
+
       // Check Unlocked Status
       const unlocked = isLessonUnlocked(lesson);
       const isCompleted = completedLessons.has(lessonId);
@@ -725,12 +785,13 @@
             `;
           }
 
-        // 2. Direct Video File (Uploaded MP4, WebM, MOV, or base64 Data URL)
-        } else if (videoUrl.startsWith('data:video/') || videoUrl.endsWith('.mp4') || videoUrl.endsWith('.webm') || videoUrl.endsWith('.mov') || videoUrl.includes('/videos/')) {
+        // 2. Direct Video File (Uploaded MP4, WebM, MOV, or marathon_media video)
+        } else if (videoUrl.startsWith('data:video/') || videoUrl.endsWith('.mp4') || videoUrl.endsWith('.webm') || videoUrl.endsWith('.mov') || videoUrl.endsWith('.MOV') || videoUrl.includes('/videos/') || videoUrl.includes('marathon_media/')) {
           container.innerHTML = `
             <div class="w-full max-w-2xl mx-auto p-2 sm:p-4 flex flex-col items-center justify-center bg-black/95 rounded-2xl">
               <video controls playsinline preload="metadata" class="w-full max-h-[560px] rounded-xl shadow-2xl bg-black object-contain">
                 <source src="${escapeHtml(videoUrl)}" type="video/mp4">
+                <source src="${escapeHtml(videoUrl)}" type="video/quicktime">
                 Ваш браузер не підтримує пряме відтворення відео.
               </video>
             </div>
