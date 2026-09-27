@@ -404,6 +404,31 @@
     let completedLessons = new Set();
     let countdownInterval = null;
 
+    // Stop all playing media (audio & video) across the page before re-rendering workspace
+    function stopAllMedia() {
+      try {
+        const allMedia = document.querySelectorAll('audio, video');
+        allMedia.forEach(el => {
+          try {
+            el.pause();
+            el.currentTime = 0;
+            el.removeAttribute('src');
+            el.load();
+          } catch(e) {}
+        });
+      } catch(e) {}
+    }
+
+    // Media load error handler fallback
+    function handleMediaError(el) {
+      if (!el) return;
+      const wrapper = el.closest('.video-wrapper') || el.parentElement;
+      if (wrapper) {
+        const errBox = wrapper.querySelector('.video-error-fallback');
+        if (errBox) errBox.classList.remove('hidden');
+      }
+    }
+
     // Load Completed Lessons from LocalStorage
     try {
       const savedCompleted = localStorage.getItem('psy_marathon_completed');
@@ -528,11 +553,19 @@
       return `${d.getDate()} ${months[d.getMonth()]}, ${timeStr}`;
     }
 
+    // Helper to format lesson day text cleanly
+    function getLessonDayText(lesson, idx) {
+      if (lesson.day === 0) return 'Вступ';
+      if (lesson.day !== undefined && lesson.day !== null) return `День ${lesson.day}`;
+      return `День ${idx + 1}`;
+    }
+
     // Render the Left Sidebar Tree List
     function renderLessonsTree() {
       const container = document.getElementById('lessons-tree-list');
       if (!container || !marathonData || !marathonData.lessons) return;
 
+      const savedScrollTop = container.scrollTop;
       let unlockedCount = 0;
       let completedCount = 0;
 
@@ -561,6 +594,8 @@
           ? 'bg-brand-50 border-brand-500 shadow-xs ring-2 ring-brand-400/20' 
           : 'bg-warm-bg hover:bg-white border-warm-border';
 
+        const dayText = getLessonDayText(lesson, idx);
+
         return `
           <div onclick="selectLesson(${idx})" class="p-3 sm:p-3.5 rounded-2xl border transition-all cursor-pointer select-none ${activeStyles} group">
             <div class="flex items-start gap-2.5">
@@ -568,7 +603,7 @@
               <div class="flex-1 min-w-0 space-y-1">
                 <div class="flex items-center justify-between gap-1">
                   <span class="text-[11px] font-bold uppercase tracking-wider ${isActive ? 'text-brand-800' : 'text-warm-muted'}">
-                    День ${lesson.day || (idx + 1)}
+                    ${dayText}
                   </span>
                   ${statusBadge}
                 </div>
@@ -584,38 +619,68 @@
         `;
       }).join('');
 
+      container.scrollTop = savedScrollTop;
+
       // Update Badges & Counters
       const total = marathonData.lessons.length;
-      document.getElementById('stat-unlocked-count').textContent = `${unlockedCount} / ${total}`;
-      document.getElementById('stat-completed-count').textContent = `${completedCount} / ${total}`;
-      document.getElementById('sidebar-total-badge').textContent = `${total} днів`;
+      const elUnlocked = document.getElementById('stat-unlocked-count');
+      if (elUnlocked) elUnlocked.textContent = `${unlockedCount} / ${total}`;
+
+      const elCompleted = document.getElementById('stat-completed-count');
+      if (elCompleted) elCompleted.textContent = `${completedCount} / ${total}`;
+
+      const elTotalBadge = document.getElementById('sidebar-total-badge');
+      if (elTotalBadge) elTotalBadge.textContent = `${total} уроків`;
 
       const percent = total > 0 ? Math.round((completedCount / total) * 100) : 0;
-      document.getElementById('header-progress-bar').style.width = percent + '%';
-      document.getElementById('header-progress-text').textContent = percent + '%';
-      document.getElementById('sidebar-progress-bar').style.width = percent + '%';
-      document.getElementById('sidebar-progress-label').textContent = `${completedCount} з ${total} (${percent}%)`;
+      const elHeaderBar = document.getElementById('header-progress-bar');
+      if (elHeaderBar) elHeaderBar.style.width = percent + '%';
+
+      const elHeaderText = document.getElementById('header-progress-text');
+      if (elHeaderText) elHeaderText.textContent = percent + '%';
+
+      const elSidebarBar = document.getElementById('sidebar-progress-bar');
+      if (elSidebarBar) elSidebarBar.style.width = percent + '%';
+
+      const elSidebarLabel = document.getElementById('sidebar-progress-label');
+      if (elSidebarLabel) elSidebarLabel.textContent = `${completedCount} з ${total} (${percent}%)`;
     }
 
     // Select and display a specific lesson
     function selectLesson(index, updateHash = true) {
+      stopAllMedia();
+
       if (!marathonData || !marathonData.lessons || !marathonData.lessons[index]) return;
       
       currentLessonIndex = index;
       const lesson = marathonData.lessons[index];
       const lessonId = lesson.id || ('lesson-' + index);
 
-      if (updateHash) {
-        window.history.replaceState(null, null, '#' + (lesson.id || 'day-' + lesson.day));
+      if (updateHash && lesson) {
+        const targetHash = '#' + (lesson.id || ('day-' + lesson.day));
+        if (window.location.hash !== targetHash) {
+          window.history.replaceState(null, null, targetHash);
+        }
       }
 
       // Update Breadcrumbs & Header
-      document.getElementById('current-day-badge').textContent = `День ${lesson.day || (index + 1)}`;
-      document.getElementById('current-duration-badge').textContent = `⏱️ ${lesson.duration || '3 хв'}`;
-      document.getElementById('current-lesson-title').textContent = lesson.title;
-      document.getElementById('current-lesson-date').textContent = formatLessonDate(lesson.publishDate);
-      document.getElementById('current-lesson-description').textContent = lesson.description || 'Опис уроку скоро з’явиться.';
-      document.getElementById('current-lesson-homework').textContent = lesson.homework || 'Сьогодні просто поспостерігайте за своїм станом та емоціями.';
+      const currentDayBadge = document.getElementById('current-day-badge');
+      if (currentDayBadge) currentDayBadge.textContent = getLessonDayText(lesson, index);
+
+      const currentDurationBadge = document.getElementById('current-duration-badge');
+      if (currentDurationBadge) currentDurationBadge.textContent = `⏱️ ${lesson.duration || '3 хв'}`;
+
+      const currentLessonTitle = document.getElementById('current-lesson-title');
+      if (currentLessonTitle) currentLessonTitle.textContent = lesson.title;
+
+      const currentLessonDate = document.getElementById('current-lesson-date');
+      if (currentLessonDate) currentLessonDate.textContent = formatLessonDate(lesson.publishDate);
+
+      const currentLessonDesc = document.getElementById('current-lesson-description');
+      if (currentLessonDesc) currentLessonDesc.textContent = lesson.description || 'Опис уроку скоро з’явиться.';
+
+      const currentLessonHw = document.getElementById('current-lesson-homework');
+      if (currentLessonHw) currentLessonHw.textContent = lesson.homework || 'Сьогодні просто поспостерігайте за своїм станом та емоціями.';
 
       // Render Extra Media (Voice Notes, Round Videos, Photos)
       const extraMediaContainer = document.getElementById('current-lesson-extra-media');
@@ -634,15 +699,18 @@
         // 2. Round Video Messages (Telegram Circle Video)
         if (lesson.roundVideo) {
           mediaHtml += `
-            <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-brand-50 to-emerald-50 border border-brand-200/80 flex flex-col items-center text-center space-y-3 shadow-xs">
+            <div class="video-wrapper p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-brand-50 to-emerald-50 border border-brand-200/80 flex flex-col items-center text-center space-y-3 shadow-xs">
               <div class="text-xs font-bold text-brand-900 flex items-center gap-1.5">
                 <span>🎥</span> Кругле відео-повідомлення Юлії
               </div>
-              <div class="w-52 h-52 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-brand-500 shadow-xl bg-black">
-                <video controls playsinline class="w-full h-full object-cover">
-                  <source src="${escapeHtml(lesson.roundVideo)}" type="video/mp4">
+              <div class="w-52 h-52 sm:w-60 sm:h-60 rounded-full overflow-hidden border-4 border-brand-500 shadow-xl bg-black relative">
+                <video controls playsinline preload="metadata" class="w-full h-full object-cover" onerror="handleMediaError(this)">
+                  <source src="${escapeHtml(lesson.roundVideo)}" type="video/mp4" onerror="handleMediaError(this)">
                   Ваш браузер не підтримує відтворення відео.
                 </video>
+              </div>
+              <div class="video-error-fallback hidden w-full text-xs text-red-600 bg-red-50 p-2 rounded-lg border border-red-200">
+                ⚠️ Не вдалося відтворити кругле відео. <a href="${escapeHtml(lesson.roundVideo)}" target="_blank" download class="underline font-bold">Завантажити ↗</a>
               </div>
             </div>
           `;
@@ -659,9 +727,9 @@
                 ${lesson.voices.map((voicePath, vIdx) => `
                   <div class="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-white rounded-xl border border-sky-100 shadow-xs">
                     <span class="text-xs font-bold text-sky-800 shrink-0">Запис #${vIdx + 1}</span>
-                    <audio controls class="w-full h-9 outline-none">
-                      <source src="${escapeHtml(voicePath)}" type="audio/ogg">
+                    <audio controls preload="metadata" class="w-full h-9 outline-none">
                       <source src="${escapeHtml(voicePath)}" type="audio/mpeg">
+                      <source src="${escapeHtml(voicePath)}" type="audio/ogg">
                       Ваш браузер не підтримує відтворення аудіо.
                     </audio>
                   </div>
@@ -686,21 +754,23 @@
       const compCheckbox = document.getElementById('complete-checkbox');
       const compText = document.getElementById('complete-btn-text');
 
-      if (isCompleted) {
-        compBtn.className = 'px-4 py-2.5 rounded-xl bg-emerald-600 text-white border border-emerald-700 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95';
-        compCheckbox.textContent = '✅';
-        compText.textContent = 'Урок пройдено (Натисніть щоб скасувати)';
-      } else {
-        compBtn.className = 'px-4 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 border border-warm-border hover:border-emerald-300 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95';
-        compCheckbox.textContent = '⬜';
-        compText.textContent = 'Позначити як пройдений';
+      if (compBtn && compCheckbox && compText) {
+        if (isCompleted) {
+          compBtn.className = 'px-4 py-2.5 rounded-xl bg-emerald-600 text-white border border-emerald-700 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95';
+          compCheckbox.textContent = '✅';
+          compText.textContent = 'Урок пройдено (Натисніть щоб скасувати)';
+        } else {
+          compBtn.className = 'px-4 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 border border-warm-border hover:border-emerald-300 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95';
+          compCheckbox.textContent = '⬜';
+          compText.textContent = 'Позначити як пройдений';
+        }
       }
 
       // Update Navigation Buttons (Prev / Next)
       const prevBtn = document.getElementById('prev-lesson-btn');
       const nextBtn = document.getElementById('next-lesson-btn');
-      prevBtn.disabled = (index === 0);
-      nextBtn.disabled = (index === marathonData.lessons.length - 1);
+      if (prevBtn) prevBtn.disabled = (index === 0);
+      if (nextBtn) nextBtn.disabled = (index === marathonData.lessons.length - 1);
 
       // Re-render sidebar to highlight active item
       renderLessonsTree();
@@ -710,8 +780,34 @@
 
       // Smooth scroll to top of lesson content on mobile
       if (window.innerWidth < 1024) {
-        document.getElementById('lesson-content-card').scrollIntoView({ behavior: 'smooth' });
+        const card = document.getElementById('lesson-content-card');
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
+    }
+
+    // Helper to extract YouTube info
+    function parseYouTube(url) {
+      if (!url) return null;
+      let videoId = '';
+      let isShort = false;
+
+      if (url.includes('/shorts/')) {
+        isShort = true;
+        const m = url.match(/shorts\/([a-zA-Z0-9_-]{11})/);
+        if (m) videoId = m[1];
+      } else if (url.includes('youtu.be/')) {
+        const m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+        if (m) videoId = m[1];
+      } else if (url.includes('v=')) {
+        const m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+        if (m) videoId = m[1];
+      } else if (url.includes('/embed/')) {
+        const m = url.match(/embed\/([a-zA-Z0-9_-]{11})/);
+        if (m) videoId = m[1];
+      }
+      return videoId ? { videoId, isShort } : null;
     }
 
     // Render Video Player or Countdown Timer
@@ -725,37 +821,16 @@
       }
 
       if (unlocked) {
-        statusBadge.innerHTML = `
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            🟢 Доступний для перегляду
-          </span>
-        `;
-
-        const videoUrl = (lesson.videoUrl || '').trim();
-
-        // Helper to extract YouTube info
-        function parseYouTube(url) {
-          if (!url) return null;
-          let videoId = '';
-          let isShort = false;
-          if (url.includes('/shorts/')) {
-            isShort = true;
-            const m = url.match(/shorts\/([a-zA-Z0-9_-]{11})/);
-            if (m) videoId = m[1];
-          } else if (url.includes('youtu.be/')) {
-            const m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
-            if (m) videoId = m[1];
-          } else if (url.includes('watch?v=')) {
-            const m = url.match(/v=([a-zA-Z0-9_-]{11})/);
-            if (m) videoId = m[1];
-          } else if (url.includes('/embed/')) {
-            const m = url.match(/embed\/([a-zA-Z0-9_-]{11})/);
-            if (m) videoId = m[1];
-          }
-          return videoId ? { videoId, isShort } : null;
+        if (statusBadge) {
+          statusBadge.innerHTML = `
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              🟢 Доступний для перегляду
+            </span>
+          `;
         }
 
+        const videoUrl = (lesson.videoUrl || '').trim();
         const ytInfo = parseYouTube(videoUrl);
 
         // 1. YouTube / YouTube Shorts
@@ -787,13 +862,38 @@
 
         // 2. Direct Video File (Uploaded MP4, WebM, MOV, or marathon_media video)
         } else if (videoUrl.startsWith('data:video/') || videoUrl.endsWith('.mp4') || videoUrl.endsWith('.webm') || videoUrl.endsWith('.mov') || videoUrl.endsWith('.MOV') || videoUrl.includes('/videos/') || videoUrl.includes('marathon_media/')) {
+          let sourcesHtml = '';
+          if (videoUrl.endsWith('.MOV') || videoUrl.endsWith('.mov')) {
+            const mp4Alt = videoUrl.replace(/\.(MOV|mov)$/, '.mp4');
+            sourcesHtml = `
+              <source src="${escapeHtml(mp4Alt)}" type="video/mp4" onerror="handleMediaError(this)">
+              <source src="${escapeHtml(videoUrl)}" type="video/quicktime" onerror="handleMediaError(this)">
+            `;
+          } else if (videoUrl.endsWith('.mp4')) {
+            const movAlt = videoUrl.replace(/\.mp4$/, '.MOV');
+            sourcesHtml = `
+              <source src="${escapeHtml(videoUrl)}" type="video/mp4" onerror="handleMediaError(this)">
+              <source src="${escapeHtml(movAlt)}" type="video/quicktime" onerror="handleMediaError(this)">
+            `;
+          } else {
+            sourcesHtml = `
+              <source src="${escapeHtml(videoUrl)}" type="video/mp4" onerror="handleMediaError(this)">
+              <source src="${escapeHtml(videoUrl)}" type="video/quicktime" onerror="handleMediaError(this)">
+            `;
+          }
+
           container.innerHTML = `
-            <div class="w-full max-w-2xl mx-auto p-2 sm:p-4 flex flex-col items-center justify-center bg-black/95 rounded-2xl">
-              <video controls playsinline preload="metadata" class="w-full max-h-[560px] rounded-xl shadow-2xl bg-black object-contain">
-                <source src="${escapeHtml(videoUrl)}" type="video/mp4">
-                <source src="${escapeHtml(videoUrl)}" type="video/quicktime">
+            <div class="video-wrapper w-full max-w-3xl mx-auto p-2 sm:p-4 flex flex-col items-center justify-center bg-black/95 rounded-2xl relative">
+              <video controls playsinline preload="metadata" class="w-full max-h-[560px] rounded-xl shadow-2xl bg-black object-contain" onerror="handleMediaError(this)">
+                ${sourcesHtml}
                 Ваш браузер не підтримує пряме відтворення відео.
               </video>
+              <div class="video-error-fallback hidden w-full p-4 mt-3 rounded-xl bg-red-950/90 border border-red-500/50 text-red-200 text-xs text-center space-y-2">
+                <p>⚠️ Ваш браузер не зміг завантажити або відтворити дане відео.</p>
+                <a href="${escapeHtml(videoUrl)}" target="_blank" download class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-xs">
+                  <span>Завантажити відео напряму ↗</span>
+                </a>
+              </div>
             </div>
           `;
 
@@ -837,7 +937,7 @@
               </div>
               <div class="space-y-1 max-w-md">
                 <h4 class="font-bold text-lg text-white">${escapeHtml(lesson.title)}</h4>
-                <p class="text-xs text-stone-400">Перегляньте відео-урок та виконайте практичну вправу нижче</p>
+                <p class="text-xs text-stone-400">Ознайомтеся з матеріалами та виконайте практичні вправи нижче</p>
               </div>
               ${videoUrl ? `
                 <a href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-all shadow-glow flex items-center gap-1.5">
@@ -851,11 +951,13 @@
 
       } else {
         // LOCKED STATE: Real-time Countdown Timer
-        statusBadge.innerHTML = `
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
-            <span>🔒</span> Відкриється незабаром
-          </span>
-        `;
+        if (statusBadge) {
+          statusBadge.innerHTML = `
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
+              <span>🔒</span> Відкриється незабаром
+            </span>
+          `;
+        }
 
         const pubDate = new Date(lesson.publishDate);
         const targetTime = pubDate.getTime();
@@ -906,7 +1008,7 @@
                 <span>💬 Отримати нагадування в Telegram</span>
               </a>
               <button onclick="selectLesson(0)" class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all">
-                Повернутися до Дня 1
+                Повернутися до Вступу
               </button>
             </div>
 
@@ -1002,9 +1104,11 @@
     function toggleMobileSidebar() {
       const sidebar = document.getElementById('marathon-sidebar');
       const backdrop = document.getElementById('sidebar-backdrop');
+      if (!sidebar) return;
       if (sidebar.classList.contains('-translate-x-full')) {
         sidebar.classList.remove('-translate-x-full');
-        backdrop.classList.remove('hidden');
+        if (backdrop) backdrop.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
       } else {
         closeMobileSidebar();
       }
@@ -1015,6 +1119,7 @@
       const backdrop = document.getElementById('sidebar-backdrop');
       if (sidebar) sidebar.classList.add('-translate-x-full');
       if (backdrop) backdrop.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
     }
 
     // Utility escape HTML
@@ -1027,6 +1132,17 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     }
+
+    // Window Hashchange Event Listener
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && marathonData && marathonData.lessons) {
+        const foundIndex = marathonData.lessons.findIndex(l => l.id === hash || ('day-' + l.day) === hash);
+        if (foundIndex !== -1 && foundIndex !== currentLessonIndex) {
+          selectLesson(foundIndex, false);
+        }
+      }
+    });
 
     // Boot App
     window.addEventListener('DOMContentLoaded', initMarathon);
