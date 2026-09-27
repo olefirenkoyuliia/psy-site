@@ -1,12 +1,28 @@
 export async function onRequestGet(context) {
   const { request, env } = context;
 
-  // 1. Query Cloudflare D1 SQL Database (Tier 1: 1-3ms edge response)
+  // 1. Fetch static data.json from repo
+  let localData = null;
+  try {
+    const url = new URL(request.url);
+    const localUrl = new URL('/data.json', url.origin);
+    const res = await (env.ASSETS ? env.ASSETS.fetch(localUrl) : fetch(localUrl));
+    if (res.ok) {
+      localData = await res.json();
+    }
+  } catch (e) {}
+
+  // 2. Query Cloudflare D1 SQL Database (Tier 1: 1-3ms edge response)
   if (env.DB) {
     try {
       const row = await env.DB.prepare("SELECT data FROM site_data WHERE key = 'main'").first();
       if (row && row.data) {
-        return new Response(row.data, {
+        let d1Data = JSON.parse(row.data);
+        // Merge latest marathon from repo data.json if available
+        if (localData && localData.marathon) {
+          d1Data.marathon = localData.marathon;
+        }
+        return new Response(JSON.stringify(d1Data), {
           headers: {
             'Content-Type': 'application/json; charset=utf-8',
             'Cache-Control': 'no-cache, no-store, must-revalidate',
