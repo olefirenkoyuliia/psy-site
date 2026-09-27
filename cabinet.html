@@ -76,6 +76,30 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #printable-certificate-card, #printable-certificate-card * {
+        visibility: visible !important;
+      }
+      #printable-certificate-card {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        padding: 40px !important;
+        box-shadow: none !important;
+        border: 4px double #557C56 !important;
+        background: #FAF8F5 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        page-break-inside: avoid !important;
+      }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-brand-100 selection:text-brand-900">
@@ -233,6 +257,18 @@
 
         <div id="client-sessions-cards-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Populated dynamically with each scheduled session -->
+        </div>
+      </div>
+
+      <!-- CLIENT TABS SWITCHER -->
+      <div id="client-tabs-nav" class="flex">
+        <div class="inline-flex p-1.5 bg-white rounded-2xl border border-warm-border shadow-soft text-xs font-bold text-warm-muted flex-wrap gap-1">
+          <button type="button" id="client-tab-btn-profile" onclick="switchClientTab('profile')" class="px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2">
+            <span>👤 Мій профіль & Консультації</span>
+          </button>
+          <button type="button" id="client-tab-btn-certificates" onclick="switchClientTab('certificates')" class="px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2">
+            <span>🎓 Сертифікати та Бонуси</span>
+          </button>
         </div>
       </div>
 
@@ -612,6 +648,33 @@
 
         </div>
 
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 4: MARATHON CERTIFICATES & BONUSES VIEW             -->
+      <!-- ======================================================== -->
+      <div id="certificates-view" class="hidden space-y-6">
+        <div class="p-6 sm:p-8 rounded-3xl glass-card border border-warm-border shadow-soft space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-warm-border/60 pb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center text-2xl shadow-xs shrink-0">
+                🎓
+              </div>
+              <div>
+                <h2 class="font-bold text-warm-text text-base sm:text-lg">Сертифікати та Бонуси марафону</h2>
+                <p class="text-xs text-warm-muted">Ваші нагороди за проходження 7-денного інтенсиву «Дім всередині тебе 🌿»</p>
+              </div>
+            </div>
+            <a href="marathon.html" class="px-4 py-2 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all shadow-xs">
+              🌱 Перейти до марафону
+            </a>
+          </div>
+
+          <!-- Dynamic Certificate Content Container -->
+          <div id="cabinet-cert-content-container" class="space-y-6">
+            <!-- Populated via JS function renderCabinetCertificatesView() -->
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1544,9 +1607,15 @@
           </a>
         `;
         ownerTabsNav.classList.add('hidden');
+        const clientTabsNav = document.getElementById('client-tabs-nav');
+        if (clientTabsNav) clientTabsNav.classList.remove('hidden');
         document.getElementById('owner-schedule-view')?.classList.add('hidden');
         document.getElementById('owner-clients-view')?.classList.add('hidden');
-        document.getElementById('personal-profile-view')?.classList.remove('hidden');
+        if (window.location.hash === '#certificates') {
+          switchClientTab('certificates');
+        } else {
+          switchClientTab('profile');
+        }
         loadClientUpcomingSession(user.email);
       }
 
@@ -1558,6 +1627,216 @@
 
       populateForm(user);
     }
+
+    function switchClientTab(tab) {
+      const btnProfile = document.getElementById('client-tab-btn-profile');
+      const btnCertificates = document.getElementById('client-tab-btn-certificates');
+      const viewProfile = document.getElementById('personal-profile-view');
+      const viewCertificates = document.getElementById('certificates-view');
+
+      const activeCls = 'px-5 py-2.5 rounded-xl bg-brand-700 text-white shadow-sm transition-all flex items-center gap-2';
+      const inactiveCls = 'px-5 py-2.5 rounded-xl text-warm-muted hover:text-warm-text transition-all flex items-center gap-2';
+
+      if (btnProfile) btnProfile.className = tab === 'profile' ? activeCls : inactiveCls;
+      if (btnCertificates) btnCertificates.className = tab === 'certificates' ? activeCls : inactiveCls;
+
+      if (viewProfile) viewProfile.classList.toggle('hidden', tab !== 'profile');
+      if (viewCertificates) viewCertificates.classList.toggle('hidden', tab !== 'certificates');
+
+      if (tab === 'certificates') {
+        renderCabinetCertificatesView();
+      }
+    }
+
+    function renderCabinetCertificatesView() {
+      const container = document.getElementById('cabinet-cert-content-container');
+      if (!container) return;
+
+      let completedCount = 0;
+      try {
+        const saved = localStorage.getItem('psy_marathon_completed');
+        if (saved) {
+          const list = JSON.parse(saved);
+          completedCount = Array.isArray(list) ? list.length : 0;
+        }
+      } catch(e) {}
+
+      const totalLessons = 6;
+      const isCompletedAll = completedCount >= totalLessons;
+
+      let userName = '';
+      if (currentUser) userName = currentUser.name || currentUser.first_name || '';
+      if (!userName || userName === 'Користувач') {
+        userName = localStorage.getItem('psy_client_name') || 'Учасник Марафону';
+      }
+
+      let certId = localStorage.getItem('psy_cert_id');
+      if (!certId) {
+        const randomNum = Math.floor(10000 + Math.random() * 90000);
+        certId = `№ PSY-2026-${randomNum}`;
+        try { localStorage.setItem('psy_cert_id', certId); } catch(e) {}
+      }
+
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      if (isCompletedAll) {
+        container.innerHTML = `
+          <!-- UNLOCKED CERTIFICATE STATE -->
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 flex items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2 text-emerald-950 font-bold">
+              <span>🎉</span>
+              <span>Вітаємо! Ви пройшли всі ${totalLessons} уроків марафону. Ваш Іменний Сертифікат та Бонус 200 грн розблоковано!</span>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-emerald-600 text-white font-black text-[10px] shrink-0">
+              ✓ Виконано
+            </span>
+          </div>
+
+          <!-- Editable Name Input -->
+          <div class="p-4 rounded-2xl bg-stone-50 border border-warm-border space-y-1.5">
+            <label class="block text-xs font-bold text-stone-700">Перевірте ваше ім'я для Сертифікату:</label>
+            <div class="flex gap-2">
+              <input type="text" id="cab-cert-name-input" value="${escapeHtml(userName)}" oninput="updateCabinetCertDisplayName(this.value)" class="flex-grow px-3.5 py-2 rounded-xl border border-stone-300 text-xs font-semibold focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="Введіть ваше ім'я">
+            </div>
+          </div>
+
+          <!-- PRINTABLE CERTIFICATE CARD -->
+          <div id="printable-certificate-card" class="p-6 sm:p-10 rounded-3xl bg-gradient-to-br from-amber-50/70 via-stone-50 to-brand-50/60 border-4 double border-brand-600 shadow-card text-center space-y-6 relative overflow-hidden">
+            <div class="space-y-1 relative z-10">
+              <div class="text-[11px] font-bold tracking-widest text-brand-700 uppercase">Юлія Олефіренко • Практикуюча Психологиня</div>
+              <div class="text-2xl">🌱</div>
+            </div>
+
+            <div class="space-y-1 relative z-10">
+              <h2 class="font-serif text-3xl sm:text-4xl font-extrabold text-brand-900 tracking-tight uppercase">СЕРТИФІКАТ</h2>
+              <p class="text-xs font-semibold text-amber-800 uppercase tracking-wider">ПРОХОДЖЕННЯ ОНЛАЙН-ТРЕНІНГУ</p>
+            </div>
+
+            <div class="py-2 space-y-1.5 relative z-10">
+              <div class="text-xs text-stone-500 italic">Засвідчує, що</div>
+              <div id="cab-cert-display-name" class="font-serif text-2xl sm:text-3xl font-bold text-brand-900 border-b-2 border-amber-400/80 px-6 pb-1 inline-block min-w-[200px]">
+                ${escapeHtml(userName)}
+              </div>
+            </div>
+
+            <p class="text-xs sm:text-sm text-stone-700 max-w-lg mx-auto leading-relaxed relative z-10">
+              успішно завершив(ла) 7-денний авторський тренінг <strong>«Дім всередині тебе 🌿»</strong> з відновлення контакту з тілом, зняття напруги, регуляції нервової системи та повернення внутрішньої опори.
+            </p>
+
+            <div class="pt-4 border-t border-brand-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-left relative z-10">
+              <div class="text-[11px] text-stone-600 space-y-0.5">
+                <div>Дата видачі: <strong class="text-stone-900">${dateStr}</strong></div>
+                <div>Сертифікат: <strong class="text-brand-800 font-mono">${certId}</strong></div>
+              </div>
+
+              <div class="text-center sm:text-right space-y-0.5">
+                <div class="font-serif font-bold text-sm text-brand-900">Юлія Олефіренко</div>
+                <div class="text-[10px] text-stone-500">Авторка марафону & Психологиня</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 200 UAH BONUS PROMO CODE VOUCHER -->
+          <div class="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-brand-900 to-amber-950 text-white shadow-soft space-y-3 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">🎁</span>
+                <div>
+                  <h4 class="font-bold text-sm sm:text-base text-white">Ваш Бонус 200 грн на сесію!</h4>
+                  <p class="text-[11px] text-amber-200/90">Подарунок за старанність та проходження марафону</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-amber-400 text-stone-950 font-black text-xs shadow-xs">
+                -200 грн
+              </span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/10 p-3 rounded-xl border border-white/20">
+              <div class="space-y-0.5">
+                <div class="text-[10px] text-amber-200 uppercase font-bold">Промокод на знижку:</div>
+                <div class="font-mono text-lg font-black text-white tracking-wider">MARATHON200</div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="copyCabinetPromoCode()" id="cab-copy-promo-btn" class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs transition-all shadow-xs flex items-center gap-1 active:scale-95">
+                  <span>📋</span>
+                  <span id="cab-copy-promo-btn-text">Скопіювати</span>
+                </button>
+                <a href="index.html#booking-section" target="_blank" class="px-3.5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs transition-all shadow-xs flex items-center gap-1">
+                  <span>Забронювати →</span>
+                </a>
+              </div>
+            </div>
+            <p class="text-[10px] text-stone-300">Вкажіть промокод <strong>MARATHON200</strong> під час бронювання онлайн-сесії з Юлією Олефіренко.</p>
+          </div>
+
+          <div class="flex justify-start">
+            <button onclick="window.print()" class="px-6 py-3 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-soft transition-all flex items-center gap-2 active:scale-95">
+              <span>🖨️ Друк / Завантажити PDF</span>
+            </button>
+          </div>
+        `;
+      } else {
+        const percent = Math.round((completedCount / totalLessons) * 100);
+        container.innerHTML = `
+          <!-- LOCKED PROGRESS STATE -->
+          <div class="p-6 rounded-3xl bg-gradient-to-br from-brand-900 via-stone-900 to-brand-950 text-white shadow-card space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30">
+                🔒 Винагорода очікує завершення
+              </span>
+              <span class="text-xs font-bold text-emerald-300">${completedCount} з ${totalLessons} уроків (${percent}%)</span>
+            </div>
+
+            <div class="space-y-2">
+              <h3 class="font-serif text-2xl font-bold text-white">
+                Завершіть марафон для отримання Сертифікату та 200 грн Бонусу!
+              </h3>
+              <p class="text-xs text-brand-100/90 leading-relaxed">
+                Щоб розблокувати персональний диплом про проходження тренінгу та отримати промокод на знижку 200 грн, позначте всі уроки марафону як виконані.
+              </p>
+            </div>
+
+            <div class="w-full bg-white/10 rounded-full h-3 overflow-hidden border border-white/20">
+              <div class="bg-gradient-to-r from-amber-400 to-emerald-400 h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+            </div>
+
+            <div class="pt-2">
+              <a href="marathon.html" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-glow transition-all active:scale-95">
+                <span>🌱 Продовжити марафон</span>
+                <span>→</span>
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function updateCabinetCertDisplayName(val) {
+      const displayEl = document.getElementById('cab-cert-display-name');
+      if (displayEl) {
+        displayEl.textContent = (val && val.trim()) ? val.trim() : 'Учасник Марафону';
+      }
+    }
+
+    function copyCabinetPromoCode() {
+      navigator.clipboard.writeText('MARATHON200').then(() => {
+        const btnText = document.getElementById('cab-copy-promo-btn-text');
+        if (btnText) {
+          btnText.textContent = 'Скопійовано! ✓';
+          setTimeout(() => { btnText.textContent = 'Скопіювати'; }, 2500);
+        }
+      });
+    }
+
+    window.addEventListener('hashchange', () => {
+      if (window.location.hash === '#certificates') {
+        switchClientTab('certificates');
+      } else if (window.location.hash === '#profile') {
+        switchClientTab('profile');
+      }
+    });
 
     function switchOwnerView(view) {
       const btnSchedule = document.getElementById('tab-btn-schedule');
