@@ -1504,6 +1504,7 @@
         renderLessonsTree();
         selectLesson(currentLessonIndex, false);
         updateAdminUI();
+        renderUserHeaderStatus();
       }
     });
 
@@ -1653,30 +1654,33 @@
 
       const registered = isUserRegistered();
       if (registered) {
-        let name = 'Акаунт';
+        let name = 'Користувач';
         try {
           const rawUser = localStorage.getItem('psy_client_user');
           if (rawUser) {
             const u = JSON.parse(rawUser);
-            name = u.name || u.email || u.telegram || 'Акаунт';
+            name = u.name || u.email || u.telegram || 'Користувач';
           }
         } catch(e) {}
-        if (isAdminUser && name === 'Акаунт') name = 'Адміністратор';
+        if (isAdminUser && name === 'Користувач') name = 'Адміністратор';
 
         widget.innerHTML = `
-          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold shadow-xs">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span class="max-w-[90px] sm:max-w-[130px] truncate font-bold">${escapeHtml(name)}</span>
-            <button onclick="logoutFromMarathon()" class="ml-1 text-emerald-700 hover:text-rose-600 transition-colors font-bold text-xs" title="Вийти з акаунту">
-              ✕
+          <div class="flex items-center gap-1.5">
+            <a href="cabinet.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-950 text-xs font-bold transition-all shadow-xs" title="Перейти до Кабінету">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="max-w-[100px] sm:max-w-[130px] truncate font-extrabold">${escapeHtml(name)}</span>
+            </a>
+            <button onclick="logoutFromMarathon()" class="px-2.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-all shrink-0 active:scale-95" title="Вийти з акаунту">
+              Вийти
             </button>
           </div>
         `;
       } else {
         widget.innerHTML = `
-          <button onclick="showAuthModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all active:scale-95" title="Авторизація / Вхід">
+          <button onclick="showAuthModal()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-stone-950 font-extrabold text-xs shadow-soft transition-all active:scale-95 border border-amber-300" title="Увійти для доступу до всіх уроків">
             <span>👤</span>
-            <span class="hidden sm:inline">Увійти</span>
+            <span class="hidden sm:inline">Увійти в акаунт</span>
+            <span class="sm:hidden">Увійти</span>
           </button>
         `;
       }
@@ -1694,6 +1698,7 @@
         renderLessonsTree();
         selectLesson(0, false);
         updateAdminUI();
+        renderUserHeaderStatus();
       }
     }
 
@@ -2199,6 +2204,9 @@
         }
       }
     });
+
+    // Immediate header status render
+    try { renderUserHeaderStatus(); } catch(e) {}
 
     // Boot App safely
     if (document.readyState === 'loading') {
