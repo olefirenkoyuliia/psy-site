@@ -795,7 +795,7 @@
         const isActive = idx === currentLessonIndex;
 
         if (dateUnlocked && accessUnlocked) unlockedCount++;
-        if (isCompleted) completedCount++;
+        if (isCompleted && accessUnlocked) completedCount++;
 
         let statusIcon = '🔒';
         let statusBadge = `<span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-stone-100 text-stone-600 border border-stone-200">${formatLessonDate(lesson.publishDate)}</span>`;
@@ -1004,9 +1004,14 @@
       const compBtn = document.getElementById('complete-lesson-btn');
       const compCheckbox = document.getElementById('complete-checkbox');
       const compText = document.getElementById('complete-btn-text');
+      const isAccessible = canAccessLesson(lesson, index);
 
       if (compBtn && compCheckbox && compText) {
-        if (isCompleted) {
+        if (!isAccessible) {
+          compBtn.className = 'px-4 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-950 border border-amber-300 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95';
+          compCheckbox.textContent = '🔒';
+          compText.textContent = 'Увійти, щоб позначити пройденим';
+        } else if (isCompleted) {
           compBtn.className = 'px-4 py-2.5 rounded-xl bg-emerald-600 text-white border border-emerald-700 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95';
           compCheckbox.textContent = '✅';
           compText.textContent = 'Урок пройдено (Натисніть щоб скасувати)';
@@ -1014,6 +1019,28 @@
           compBtn.className = 'px-4 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 border border-warm-border hover:border-emerald-300 text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95';
           compCheckbox.textContent = '⬜';
           compText.textContent = 'Позначити як пройдений';
+        }
+      }
+
+      // Update Homework Container
+      const hwContainer = document.getElementById('current-lesson-homework');
+      if (hwContainer) {
+        if (!isAccessible) {
+          hwContainer.innerHTML = '🔒 <span class="font-bold">Практична вправа цього уроку заблокована.</span> Авторизуйтесь вище через Google або Telegram, щоб розблокувати повне завдання.';
+        } else {
+          hwContainer.textContent = lesson.homework || 'Сьогодні просто поспостерігайте за своїм станом та емоціями.';
+        }
+      }
+
+      // Update Reflection Journal Textarea
+      const notesInput = document.getElementById('lesson-user-notes');
+      if (notesInput) {
+        if (!isAccessible) {
+          notesInput.value = '';
+          notesInput.disabled = true;
+          notesInput.placeholder = '🔒 Особистий щоденник рефлексій буде доступним одразу після безкоштовної реєстрації...';
+        } else {
+          notesInput.disabled = false;
         }
       }
 
@@ -1340,6 +1367,11 @@
       const lesson = marathonData.lessons[currentLessonIndex];
       const lessonId = lesson.id || ('lesson-' + currentLessonIndex);
 
+      if (!canAccessLesson(lesson, currentLessonIndex)) {
+        showAuthModal();
+        return;
+      }
+
       const wasCompleted = completedLessons.has(lessonId);
       if (wasCompleted) {
         completedLessons.delete(lessonId);
@@ -1356,8 +1388,7 @@
 
       // Prompt non-intrusive auth modal when completing a lesson if not logged in
       if (!wasCompleted) {
-        const userToken = localStorage.getItem('psy_user_token');
-        if (!userToken) {
+        if (!isUserRegistered()) {
           setTimeout(showAuthModal, 400);
         }
       }
@@ -1405,8 +1436,7 @@
         showNotesSavedStatus();
 
         // Prompt auth modal if user typed a meaningful note and is not logged in
-        const userToken = localStorage.getItem('psy_user_token');
-        if (!userToken && textarea.value.trim().length > 10) {
+        if (!isUserRegistered() && textarea.value.trim().length > 10) {
           showAuthModal();
         }
       } catch(e) {}
@@ -1433,13 +1463,25 @@
 
     // Certificate & Bonus Reward Click Handler
     function handleClaimRewardClick() {
-      const completedCount = completedLessons.size;
+      if (!isUserRegistered()) {
+        showAuthModal();
+        return;
+      }
       const total = (marathonData && marathonData.lessons) ? marathonData.lessons.length : 6;
+      let accessibleCompletedCount = 0;
+      if (marathonData && marathonData.lessons) {
+        marathonData.lessons.forEach((l, idx) => {
+          const lId = l.id || ('lesson-' + idx);
+          if (completedLessons.has(lId) && canAccessLesson(l, idx)) {
+            accessibleCompletedCount++;
+          }
+        });
+      }
 
-      if (completedCount >= total) {
+      if (accessibleCompletedCount >= total) {
         window.location.href = 'cabinet.html#certificates';
       } else {
-        alert(`Пройдіть усі уроки марафону, щоб розблокувати Іменний Сертифікат та Бонус! (Пройдено: ${completedCount}/${total})`);
+        alert(`Пройдіть усі уроки марафону, щоб розблокувати Іменний Сертифікат та Бонус! (Пройдено: ${accessibleCompletedCount}/${total})`);
       }
     }
 
