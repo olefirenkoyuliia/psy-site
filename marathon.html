@@ -422,10 +422,13 @@
     // Media load error handler fallback
     function handleMediaError(el) {
       if (!el) return;
-      const wrapper = el.closest('.video-wrapper') || el.parentElement;
-      if (wrapper) {
-        const errBox = wrapper.querySelector('.video-error-fallback');
-        if (errBox) errBox.classList.remove('hidden');
+      const media = (el.tagName === 'VIDEO' || el.tagName === 'AUDIO') ? el : el.closest('video, audio');
+      if (media && media.error) {
+        const wrapper = media.closest('.video-wrapper') || media.parentElement;
+        if (wrapper) {
+          const errBox = wrapper.querySelector('.video-error-fallback');
+          if (errBox) errBox.classList.remove('hidden');
+        }
       }
     }
 
@@ -467,11 +470,10 @@
       if (!marathonData) {
         try {
           const cached = localStorage.getItem('psy_site_data');
-          if (cached) {
-            const data = JSON.parse(cached);
-            if (data && data.marathon) marathonData = data.marathon;
-          }
-        } catch(e) {}
+      // Discard any stale/cached marathonData if it has less than 5 lessons
+      if (marathonData && (!marathonData.lessons || marathonData.lessons.length < 5)) {
+        marathonData = null;
+        try { localStorage.removeItem('psy_site_data'); } catch(e) {}
       }
 
       // Default Fallback structure if empty or outdated
@@ -943,35 +945,20 @@
 
         // 2. Direct Video File (Uploaded MP4, WebM, MOV, or marathon_media video)
         } else if (videoUrl.startsWith('data:video/') || videoUrl.endsWith('.mp4') || videoUrl.endsWith('.webm') || videoUrl.endsWith('.mov') || videoUrl.endsWith('.MOV') || videoUrl.includes('/videos/') || videoUrl.includes('marathon_media/')) {
-          let sourcesHtml = '';
+          let cleanUrl = videoUrl;
           if (videoUrl.endsWith('.MOV') || videoUrl.endsWith('.mov')) {
-            const mp4Alt = videoUrl.replace(/\.(MOV|mov)$/, '.mp4');
-            sourcesHtml = `
-              <source src="${escapeHtml(mp4Alt)}" type="video/mp4" onerror="handleMediaError(this)">
-              <source src="${escapeHtml(videoUrl)}" type="video/quicktime" onerror="handleMediaError(this)">
-            `;
-          } else if (videoUrl.endsWith('.mp4')) {
-            const movAlt = videoUrl.replace(/\.mp4$/, '.MOV');
-            sourcesHtml = `
-              <source src="${escapeHtml(videoUrl)}" type="video/mp4" onerror="handleMediaError(this)">
-              <source src="${escapeHtml(movAlt)}" type="video/quicktime" onerror="handleMediaError(this)">
-            `;
-          } else {
-            sourcesHtml = `
-              <source src="${escapeHtml(videoUrl)}" type="video/mp4" onerror="handleMediaError(this)">
-              <source src="${escapeHtml(videoUrl)}" type="video/quicktime" onerror="handleMediaError(this)">
-            `;
+            cleanUrl = videoUrl.replace(/\.(MOV|mov)$/, '.mp4');
           }
 
           container.innerHTML = `
             <div class="video-wrapper w-full max-w-3xl mx-auto p-2 sm:p-4 flex flex-col items-center justify-center bg-black/95 rounded-2xl relative">
-              <video controls playsinline preload="metadata" class="w-full max-h-[560px] rounded-xl shadow-2xl bg-black object-contain" onerror="handleMediaError(this)">
-                ${sourcesHtml}
+              <video controls playsinline webkit-playsinline="true" preload="metadata" class="w-full max-h-[560px] rounded-xl shadow-2xl bg-black object-contain" onerror="handleMediaError(this)">
+                <source src="${escapeHtml(cleanUrl)}" type="video/mp4">
                 Ваш браузер не підтримує пряме відтворення відео.
               </video>
               <div class="video-error-fallback hidden w-full p-4 mt-3 rounded-xl bg-red-950/90 border border-red-500/50 text-red-200 text-xs text-center space-y-2">
                 <p>⚠️ Ваш браузер не зміг завантажити або відтворити дане відео.</p>
-                <a href="${escapeHtml(videoUrl)}" target="_blank" download class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-xs">
+                <a href="${escapeHtml(cleanUrl)}" target="_blank" download class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition-all shadow-xs">
                   <span>Завантажити відео напряму ↗</span>
                 </a>
               </div>
