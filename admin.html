@@ -92,7 +92,7 @@
           </span>
           <div>
             <h1 class="font-bold text-gray-900 text-sm sm:text-base">Панель керування сайтом</h1>
-            <p class="text-[11px] text-gray-500">Юлія Олефіренко • Статистика & Редагування</p>
+            <p class="text-[11px] text-gray-500">Юлія Олефіренко • Редагування курсів & Статистика</p>
           </div>
         </div>
 
@@ -111,11 +111,35 @@
       </div>
     </header>
 
+    <!-- Quick Navigation Sub-Bar -->
+    <div class="bg-gray-100/90 border-b border-gray-200 py-2.5 px-4 sticky top-16 z-20 overflow-x-auto backdrop-blur-md">
+      <div class="max-w-6xl mx-auto flex items-center gap-2 text-xs font-semibold whitespace-nowrap">
+        <a href="#section-course-editor" class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-xs flex items-center gap-1.5">
+          <span>🎓 Редактор Курсу / Марафону</span>
+        </a>
+        <a href="#section-analytics" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-brand-50 text-gray-700 hover:text-brand-800 border border-gray-200 transition-all shadow-xs">
+          📊 Статистика
+        </a>
+        <a href="#section-clients-crm" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-brand-50 text-gray-700 hover:text-brand-800 border border-gray-200 transition-all shadow-xs">
+          👥 Клієнти (CRM)
+        </a>
+        <a href="#section-google-sso" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-brand-50 text-gray-700 hover:text-brand-800 border border-gray-200 transition-all shadow-xs">
+          🔐 Google SSO
+        </a>
+        <a href="#section-chat-feed" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-brand-50 text-gray-700 hover:text-brand-800 border border-gray-200 transition-all shadow-xs">
+          💬 Запитання в чаті
+        </a>
+        <a href="#section-gemini-ai" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-brand-50 text-gray-700 hover:text-brand-800 border border-gray-200 transition-all shadow-xs">
+          🤖 AI-Асистент
+        </a>
+      </div>
+    </div>
+
     <!-- Main Container -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
 
       <!-- SECTION: Live Analytics & Visitors Statistics -->
-      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
+      <div id="section-analytics" class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
         <div class="border-b border-gray-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
             <span class="text-2xl">📊</span>
@@ -571,26 +595,26 @@
         </div>
       </div>
 
-      <!-- Section 5: TikTok Online Marathon Manager -->
-      <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
+      <!-- Section 5: Course & Marathon Manager (Редактор курсів та марафону) -->
+      <div id="section-course-editor" class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
         <div class="border-b border-gray-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <span class="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-xl shadow-xs">
-              🎯
+              🎓
             </span>
             <div>
               <div class="flex items-center gap-2">
-                <h2 class="font-bold text-gray-900 text-base sm:text-lg">Безкоштовний онлайн-марафон</h2>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
-                  TikTok реклама
+                <h2 class="font-bold text-gray-900 text-base sm:text-lg">Редагування Курсу / Марафону «Дім всередині тебе»</h2>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  Активний курс
                 </span>
               </div>
-              <p class="text-xs text-gray-500">Автоматичний розклад публікації нових роликів за календарем, дерево уроків та масове додавання</p>
+              <p class="text-xs text-gray-500">Повне керування уроками, відео, кругленькими роликами, аудіо-практиками та завданнями</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <a href="marathon.html" target="_blank" class="px-3.5 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
-              <span>Переглянути марафон</span>
+              <span>Переглянути курс</span>
               <span>↗</span>
             </a>
             <button onclick="openBatchUploadModal()" class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs">
@@ -2069,6 +2093,30 @@
               ` : ''}
             </div>
 
+            <!-- Telegram Round Video (Telegram Circle Video) -->
+            <div class="md:col-span-6 space-y-1">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-600">🎥 Кругле відео-повідомлення (Telegram Circle Video):</label>
+              <div class="flex gap-2">
+                <input type="text" value="${escapeHtmlAttr(lesson.roundVideo || '')}" onchange="updateLessonField(${idx}, 'roundVideo', this.value)" placeholder="marathon_media/round_video_messages/13_video.mp4" class="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-mono focus:ring-2 focus:ring-brand-500 outline-none">
+                <label class="px-3 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shrink-0 shadow-xs" title="Завантажити кругле відео">
+                  <span>🎥 Файл</span>
+                  <input type="file" accept="video/mp4,video/*" class="hidden" onchange="handleLessonRoundVideoUpload(${idx}, this.files)">
+                </label>
+              </div>
+            </div>
+
+            <!-- Voice Messages Audio Files (.mp3) -->
+            <div class="md:col-span-6 space-y-1">
+              <label class="text-[11px] font-bold uppercase tracking-wider text-gray-600">🎧 Аудіозаписи та практики (.mp3, розділені комою):</label>
+              <div class="flex gap-2">
+                <input type="text" value="${escapeHtmlAttr(Array.isArray(lesson.voices) ? lesson.voices.join(', ') : (lesson.voices || ''))}" onchange="updateLessonVoices(${idx}, this.value)" placeholder="marathon_media/voice_messages/8_file_8_0.mp3, marathon_media/voice_messages/10_file_10_0.mp3" class="flex-1 px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-mono focus:ring-2 focus:ring-brand-500 outline-none">
+                <label class="px-3 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shrink-0 shadow-xs" title="Додати MP3 аудіофайл">
+                  <span>🎙️ MP3</span>
+                  <input type="file" accept="audio/mp3,audio/mpeg,audio/*" class="hidden" onchange="handleLessonVoiceUpload(${idx}, this.files)">
+                </label>
+              </div>
+            </div>
+
             <!-- Calendar Publish Date & Time -->
             <div class="md:col-span-6 space-y-1">
               <label class="text-[11px] font-bold uppercase tracking-wider text-gray-600">📅 Дата та час виходу уроку:</label>
@@ -2125,6 +2173,45 @@
     function updateLessonField(index, field, value) {
       if (!appData.marathon || !appData.marathon.lessons || !appData.marathon.lessons[index]) return;
       appData.marathon.lessons[index][field] = value;
+    }
+
+    function updateLessonVoices(index, value) {
+      if (!appData.marathon || !appData.marathon.lessons || !appData.marathon.lessons[index]) return;
+      const parts = value.split(',').map(s => s.trim()).filter(Boolean);
+      appData.marathon.lessons[index].voices = parts;
+    }
+
+    function handleLessonRoundVideoUpload(index, files) {
+      if (!files || !files[0]) return;
+      const file = files[0];
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      showToast(`⏳ Завантаження круглого відео (${sizeMb} MB)...`, '🎥');
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (!appData.marathon.lessons[index]) return;
+        appData.marathon.lessons[index].roundVideo = e.target.result;
+        renderAdminMarathon();
+        showToast(`✅ Кругле відео (${sizeMb} MB) завантажено! Натисніть «Зберегти»`, '🎉', true);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleLessonVoiceUpload(index, files) {
+      if (!files || !files[0]) return;
+      const file = files[0];
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      showToast(`⏳ Завантаження аудіофайлу (${sizeMb} MB)...`, '🎙️');
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        if (!appData.marathon.lessons[index]) return;
+        if (!Array.isArray(appData.marathon.lessons[index].voices)) {
+          appData.marathon.lessons[index].voices = [];
+        }
+        appData.marathon.lessons[index].voices.push(e.target.result);
+        renderAdminMarathon();
+        showToast(`✅ Аудіозапис (${sizeMb} MB) додано! Натисніть «Зберегти»`, '🎉', true);
+      };
+      reader.readAsDataURL(file);
     }
 
     function handleLessonVideoUpload(index, files) {
