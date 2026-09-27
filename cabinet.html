@@ -3692,6 +3692,11 @@
     function logoutUser() {
       if (confirm('Ви дійсно бажаєте вийти з кабінету?')) {
         localStorage.removeItem('psy_client_user');
+        localStorage.removeItem('psy_user_token');
+        localStorage.removeItem('psy_admin_auth');
+        localStorage.removeItem('psy_client_email');
+        localStorage.removeItem('psy_client_name');
+        localStorage.removeItem('psy_google_cal_token');
         currentUser = null;
         renderAuthScreen();
         showToast('Ви вийшли з особистого кабінету');
@@ -3721,8 +3726,11 @@
         if (res.ok && data.success) {
           alert('🌿 ' + (data.message || 'Усі ваші дані успішно видалено.'));
           localStorage.removeItem('psy_client_user');
+          localStorage.removeItem('psy_user_token');
+          localStorage.removeItem('psy_admin_auth');
           localStorage.removeItem('psy_client_email');
           localStorage.removeItem('psy_client_name');
+          localStorage.removeItem('psy_google_cal_token');
           currentUser = null;
           renderAuthScreen();
         } else {

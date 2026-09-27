@@ -152,6 +152,8 @@
           <span class="sm:hidden">Чат</span>
         </a>
 
+        <div id="marathon-user-widget" class="inline-flex items-center gap-1.5"></div>
+
         <a href="index.html#booking-section" class="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-soft transition-all active:scale-95">
           <span>🌿 Консультація</span>
         </a>
@@ -712,6 +714,7 @@
       renderLessonsTree();
       selectLesson(currentLessonIndex, false);
       updateAdminUI();
+      renderUserHeaderStatus();
       initGoogleSso();
 
       // Start global timer check every 5 seconds to unlock scheduled lessons in real-time
@@ -1619,6 +1622,58 @@
         if (isAdminUser) el.classList.remove('hidden');
         else el.classList.add('hidden');
       });
+
+      renderUserHeaderStatus();
+    }
+
+    function renderUserHeaderStatus() {
+      const widget = document.getElementById('marathon-user-widget');
+      if (!widget) return;
+
+      const registered = isUserRegistered();
+      if (registered) {
+        let name = 'Акаунт';
+        try {
+          const rawUser = localStorage.getItem('psy_client_user');
+          if (rawUser) {
+            const u = JSON.parse(rawUser);
+            name = u.name || u.email || u.telegram || 'Акаунт';
+          }
+        } catch(e) {}
+        if (isAdminUser && name === 'Акаунт') name = 'Адміністратор';
+
+        widget.innerHTML = `
+          <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span class="max-w-[90px] sm:max-w-[130px] truncate font-bold">${escapeHtml(name)}</span>
+            <button onclick="logoutFromMarathon()" class="ml-1 text-emerald-700 hover:text-rose-600 transition-colors font-bold text-xs" title="Вийти з акаунту">
+              ✕
+            </button>
+          </div>
+        `;
+      } else {
+        widget.innerHTML = `
+          <button onclick="showAuthModal()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all active:scale-95" title="Авторизація / Вхід">
+            <span>👤</span>
+            <span class="hidden sm:inline">Увійти</span>
+          </button>
+        `;
+      }
+    }
+
+    function logoutFromMarathon() {
+      if (confirm('Ви дійсно бажаєте вийти з акаунту?')) {
+        localStorage.removeItem('psy_client_user');
+        localStorage.removeItem('psy_user_token');
+        localStorage.removeItem('psy_admin_auth');
+        localStorage.removeItem('psy_client_email');
+        localStorage.removeItem('psy_client_name');
+        localStorage.removeItem('psy_google_cal_token');
+        isAdminUser = false;
+        renderLessonsTree();
+        selectLesson(0, false);
+        updateAdminUI();
+      }
     }
 
     // Modal Admin Login
